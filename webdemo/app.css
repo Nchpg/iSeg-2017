@@ -132,8 +132,14 @@ body {
   .shell, .shell.charge {
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-areas: "viewer files" "viewer side";
+    /* La visualisation s'etend sur les deux lignes et les rend plus
+       hautes que la colonne de droite. Sans ces hauteurs explicites, la
+       premiere ligne s'etirerait et laisserait un vide sous le panneau
+       des volumes : « auto » la cale sur son contenu, « 1fr » donne le
+       reste a la seconde. */
+    grid-template-rows: auto 1fr;
   }
-  .side { position: sticky; top: 62px; }
+  .side { position: sticky; top: 62px; align-self: start; }
 }
 
 .panel {

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>iSeg Viewer</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0d12">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -369,6 +372,41 @@ canvas { image-rendering: pixelated; width: 100%; height: 100%; display: block; 
 }
 .readout-tile .v small { font-size: 11px; color: var(--text-dim); font-weight: 400; }
 
+.deploybar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 11px 13px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.deploybar .etat {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  flex: 1;
+  min-width: 150px;
+}
+.deploybar button {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+.deploybar button:hover { border-color: var(--accent-dim); }
+.deploybar button.primaire {
+  color: var(--void);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ---- pied ---- */
 footer {
   text-align: center;
@@ -509,6 +547,12 @@ button.primary:disabled { background: var(--border-2); color: var(--text-faint);
         <div class="v" style="font-size:13px">separable <small>int8, 0.43&nbsp;Mo</small></div>
       </div>
     </div>
+  </section>
+
+  <section class="deploybar">
+    <span class="etat" id="etatHorsLigne"><span id="etatPoint">&#9679;</span> verification&hellip;</span>
+    <button id="btnInstaller" hidden>Installer l'application</button>
+    <button id="btnTelecharger">Telecharger la page</button>
   </section>
 
   <footer>
@@ -872,6 +916,73 @@ $("opacitySlider").addEventListener("input", (e) => {
 });
 
 loadModel();
+
+/* ------------------------------------------------- mode hors ligne
+   Deux facons d'utiliser la page :
+     - en ligne, depuis une URL : le service worker met tout en cache
+       des la premiere visite, l'application devient installable et
+       fonctionne ensuite sans reseau ;
+     - hors ligne, en ouvrant le fichier .html directement : le modele
+       etant embarque, tout marche deja, mais un service worker ne peut
+       pas s'enregistrer sur file://.
+   Dans les deux cas l'inference se fait sur l'appareil. */
+const etat = $("etatHorsLigne"), point = $("etatPoint");
+
+function annonce(couleur, texte) {
+  point.style.color = couleur;
+  etat.lastChild.textContent = " " + texte;
+}
+
+if (location.protocol === "file:") {
+  annonce("var(--wm)", "fichier local : deja autonome, aucun reseau requis apres le premier chargement");
+} else if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then((reg) => {
+      const pret = reg.active && navigator.serviceWorker.controller;
+      annonce(pret ? "var(--wm)" : "var(--accent)",
+              pret ? "hors ligne : pret, la page fonctionne sans reseau"
+                   : "hors ligne : mise en cache en cours, lance une segmentation pour finir");
+    })
+    .catch(() => annonce("var(--danger)", "hors ligne indisponible (service worker refuse)"));
+} else {
+  annonce("var(--text-faint)", "hors ligne indisponible sur ce navigateur");
+}
+
+// Installation en application (Chrome, Edge, Android)
+let invite = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  invite = e;
+  $("btnInstaller").hidden = false;
+});
+$("btnInstaller").addEventListener("click", async () => {
+  if (!invite) return;
+  invite.prompt();
+  await invite.userChoice;
+  invite = null;
+  $("btnInstaller").hidden = true;
+});
+
+// Telechargement de la page complete : le modele etant embarque, le
+// fichier obtenu est autonome et s'ouvre sans serveur.
+$("btnTelecharger").addEventListener("click", async () => {
+  const btn = $("btnTelecharger");
+  btn.textContent = "preparation...";
+  try {
+    const source = location.protocol === "file:"
+      ? document.documentElement.outerHTML
+      : await (await fetch(location.href, { cache: "force-cache" })).text();
+    const url = URL.createObjectURL(new Blob([source], { type: "text/html" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "iseg-viewer.html";
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.textContent = "Telecharger la page";
+  } catch (e) {
+    btn.textContent = "echec du telechargement";
+  }
+});
 </script>
 </body>
 </html>

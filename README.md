@@ -123,21 +123,39 @@ pas les convolutions et n'apporte presque rien.
 
 ### Démonstration mobile
 
-`webdemo/index.html` est une page autonome : elle lit les fichiers `.hdr/.img`,
-laisse choisir une coupe et segmente sur l'appareil, en WebAssembly. Le modèle y est
-embarqué en base64, ce qui évite le `fetch()` d'un fichier local que les navigateurs
-bloquent en `file://`.
+`webdemo/` contient une page qui lit les fichiers `.hdr/.img`, laisse choisir une
+coupe et segmente **sur l'appareil**, en WebAssembly. Le modèle est embarqué en
+base64 dans le HTML : aucun poids à télécharger séparément, et pas de `fetch()` vers
+un fichier local, que les navigateurs bloquent en `file://`.
+
+Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume complet.
+
+**Deux façons de s'en servir**, avec la même base de code et sans aucun serveur
+d'inférence — le calcul se fait toujours dans le navigateur.
+
+*Déployée.* Le dossier `webdemo/` est un site statique : il se publie tel quel sur
+GitHub Pages, Vercel ou Netlify. En HTTPS, le service worker met tout en cache dès la
+première visite et l'application devient installable sur l'écran d'accueil (PWA) ;
+elle fonctionne ensuite sans réseau.
+
+*Fichier unique.* Le bouton « Télécharger la page » produit un `.html` autonome, à
+ouvrir directement — par câble, mail ou cloud, sans hébergement. Une connexion reste
+requise au tout premier chargement pour récupérer le moteur ONNX Runtime depuis son
+CDN ; ensuite le navigateur le garde en cache.
+
+```
+webdemo/
+  index.html      la page, modèle inclus (0,6 Mo)
+  manifest.json   déclaration PWA
+  sw.js           mise en cache pour le hors ligne
+  icon-*.png      icônes d'application
+```
 
 Pour y placer un autre modèle :
 
 ```bash
 python -m iseg.export --checkpoint runs/separable.pt --embed webdemo/index.html
 ```
-
-Il suffit ensuite d'ouvrir le `.html` — aucun serveur nécessaire. Une connexion reste
-requise au premier chargement pour récupérer le moteur ONNX Runtime depuis son CDN.
-
-Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume complet.
 
 ## Structure
 
@@ -149,5 +167,5 @@ iseg/losses.py          Dice + entropie croisée, Dice volumique
 iseg/train.py           entraînement, 8 sujets / 2 en validation
 iseg/export.py          ONNX, quantification int8, injection dans la page web
 colab_iseg.ipynb        orchestration Colab
-webdemo/index.html      démonstration mobile autonome
+webdemo/                démonstration mobile (site statique + PWA)
 ```

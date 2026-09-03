@@ -1,0 +1,15 @@
+{
+  "name": "iSeg Viewer — segmentation cerebrale du nourrisson",
+  "short_name": "iSeg Viewer",
+  "description": "Segmentation LCR / substance grise / substance blanche sur IRM T1-T2, calculee sur l'appareil.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0d12",
+  "theme_color": "#0a0d12",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

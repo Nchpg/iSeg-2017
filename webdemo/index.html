@@ -18,25 +18,55 @@
 <header class="topbar">
   <div class="brand">
     <span class="mark" aria-hidden="true"></span>
-    <h1>iSeg Viewer</h1>
-    <span class="sub">nourrisson 6 mois &middot; T1/T2 &middot; U-Net 2.5D</span>
+    <h1>iSeg&nbsp;Viewer</h1>
+    <span class="sub">nourrisson 6 mois &middot; T1/T2</span>
   </div>
-  <span class="chip busy" id="modelChip"><span class="dot"></span><span id="modelChipText">chargement du modele&hellip;</span></span>
+  <span class="chip busy" id="modelChip"><span class="dot"></span><span id="modelChipText">chargement&hellip;</span></span>
 </header>
 
 <div class="err-banner" id="errBanner" role="alert"></div>
 
 <main class="shell">
 
-  <!-- ===================== panneau de gauche ===================== -->
+  <!-- ===================== visualisation ===================== -->
+  <section class="viewer">
+    <div class="views">
+
+      <figure class="view view-entree">
+        <figcaption><span>Entree <b id="modLabel">T1</b></span><span class="meta" id="dimsLabel"></span></figcaption>
+        <div class="canvaswrap">
+          <canvas id="canvasT1" width="144" height="144"></canvas>
+          <div class="empty" id="emptyT1">
+            <span class="big" aria-hidden="true">&#9633;</span>
+            <span>en attente de volumes</span>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="view">
+        <figcaption><span>Segmentation</span><span class="meta" id="segStateLabel">&mdash;</span></figcaption>
+        <div class="canvaswrap" id="wrapSeg">
+          <canvas id="canvasSeg" width="144" height="144"></canvas>
+          <div class="empty" id="emptySeg">
+            <span class="big" aria-hidden="true">&#9673;</span>
+            <span id="emptySegTxt">Depose une IRM pour commencer</span>
+          </div>
+          <div class="swipehint" id="swipeHint">glisse pour changer de coupe</div>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- ===================== panneau de controle ===================== -->
   <aside class="side">
 
-    <section class="panel">
+    <section class="panel" id="panelFichiers">
       <h2>Volumes</h2>
       <div class="drop" id="dropZone">
         <input type="file" id="fileInput" accept=".hdr,.img" multiple hidden>
-        <p class="drop-title">Depose les 4 fichiers ici</p>
-        <p class="drop-hint">T1 et T2, <code>.hdr</code> + <code>.img</code><br>reconnus par leur nom</p>
+        <p class="drop-title">Depose les 4 fichiers</p>
+        <p class="drop-hint">T1 et T2, <code>.hdr</code> + <code>.img</code>, reconnus par leur nom</p>
         <button type="button" class="ghost" id="btnParcourir">Parcourir&hellip;</button>
       </div>
       <ul class="filelist">
@@ -45,15 +75,33 @@
       </ul>
     </section>
 
-    <section class="panel off" id="panelCoupe">
+    <section class="panel off sticky" id="panelCoupe">
       <h2>Coupe coronale</h2>
       <div class="sliceval"><span id="sliceNum">&mdash;</span><small id="sliceMax"></small></div>
-      <input type="range" id="sliceSlider" min="0" max="191" value="96" disabled
-             aria-label="indice de coupe coronale">
+      <div class="scrub">
+        <canvas id="profil" width="300" height="26" aria-hidden="true"></canvas>
+        <input type="range" id="sliceSlider" min="0" max="191" value="96" disabled
+               aria-label="indice de coupe coronale">
+      </div>
       <div class="btnrow">
         <button id="btnPrev" disabled aria-label="coupe precedente">&larr;</button>
         <button id="btnNext" disabled aria-label="coupe suivante">&rarr;</button>
-        <span class="kbdhint">ou les fleches du clavier</span>
+        <span class="kbdhint">fleches du clavier</span>
+      </div>
+    </section>
+
+    <section class="panel off" id="panelAffichage">
+      <h2>Affichage</h2>
+      <div class="ctrlrow">
+        <span class="ctrllabel">modalite de fond</span>
+        <span class="modswitch">
+          <button id="btnT1" class="on" type="button">T1</button><button id="btnT2" type="button">T2</button>
+        </span>
+      </div>
+      <div class="ctrlrow">
+        <label class="ctrllabel" for="opacitySlider">opacite</label>
+        <input type="range" id="opacitySlider" min="0" max="100" value="65">
+        <output id="opacityVal">65&nbsp;%</output>
       </div>
     </section>
 
@@ -74,49 +122,6 @@
     </section>
 
   </aside>
-
-  <!-- ===================== zone de visualisation ===================== -->
-  <section class="viewer">
-    <div class="views">
-
-      <figure class="view">
-        <figcaption>
-          <span class="modswitch">
-            <button id="btnT1" class="on" type="button">T1</button><button id="btnT2" type="button">T2</button>
-          </span>
-          <span class="meta" id="dimsLabel"></span>
-        </figcaption>
-        <div class="canvaswrap">
-          <canvas id="canvasT1" width="144" height="144"></canvas>
-          <div class="empty" id="emptyT1">
-            <span class="big" aria-hidden="true">&#9633;</span>
-            Charge un volume T1 et un volume T2
-          </div>
-        </div>
-      </figure>
-
-      <figure class="view">
-        <figcaption>
-          <span>Segmentation</span>
-          <span class="meta" id="segStateLabel">&mdash;</span>
-        </figcaption>
-        <div class="canvaswrap">
-          <canvas id="canvasSeg" width="144" height="144"></canvas>
-          <div class="empty" id="emptySeg">
-            <span class="big" aria-hidden="true">&#9673;</span>
-            En attente d'inference
-          </div>
-        </div>
-      </figure>
-
-    </div>
-
-    <div class="opacityrow">
-      <label for="opacitySlider">opacite de la surimpression</label>
-      <input type="range" id="opacitySlider" min="0" max="100" value="65">
-      <output id="opacityVal">65&nbsp;%</output>
-    </div>
-  </section>
 
 </main>
 

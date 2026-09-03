@@ -35,6 +35,7 @@ let volT2 = null;
 let vueModalite = "t1";    // modalite AFFICHEE (le reseau utilise toujours les deux)
 let dernieresClasses = null;
 let derniereEntree = null;
+let profil = null;         // fraction de voxels cerebraux par coupe
 
 /* ============================== erreurs ============================== */
 
@@ -175,6 +176,47 @@ function dessinerSegmentation(base, classes, opacite) {
   $("emptySeg").style.display = "none";
 }
 
+/* Profil de remplissage : proportion de cerveau par coupe. Le volume
+   fait 192 coupes mais le cerveau n'en occupe qu'environ 130 ; dessiner
+   ce profil sous le curseur evite de chercher a l'aveugle dans le vide. */
+function calculerProfil(vol) {
+  const p = new Float32Array(vol.Y);
+  const [x0, x1] = CROP_X, [z0, z1] = CROP_Z;
+  const surface = (x1 - x0) * (z1 - z0);
+  for (let y = 0; y < vol.Y; y++) {
+    let n = 0;
+    for (let z = z0; z < z1; z++) {
+      const base = y * vol.X + z * vol.X * vol.Y;
+      for (let x = x0; x < x1; x++) if (vol.raw[base + x] > 0) n++;
+    }
+    p[y] = n / surface;
+  }
+  return p;
+}
+
+function dessinerProfil() {
+  const c = $("profil"), ctx = c.getContext("2d");
+  const w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+  if (!profil) return;
+
+  const max = Math.max(...profil) || 1;
+  const cour = +$("sliceSlider").value;
+
+  ctx.fillStyle = "#1a2029";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#313c4b";
+  for (let i = 0; i < w; i++) {
+    const v = profil[Math.floor((i / w) * profil.length)] / max;
+    const hb = Math.max(1, v * (h - 4));
+    ctx.fillRect(i, h - hb - 2, 1, hb);
+  }
+  // position courante
+  const x = (cour / (profil.length - 1)) * w;
+  ctx.fillStyle = "#38c6b0";
+  ctx.fillRect(Math.min(w - 2, Math.max(0, x - 1)), 0, 2, h);
+}
+
 function majStatistiques(classes) {
   const n = [0, 0, 0, 0];
   for (let i = 0; i < classes.length; i++) n[classes[i]]++;
@@ -269,6 +311,7 @@ async function accepterFichiers(liste) {
       for (let i = 0; i < masque.length; i++) masque[i] = volT1.raw[i] > 0 ? 1 : 0;
       volT1.norm = zscoreDansMasque(volT1.raw, masque);
       if (volT2) volT2.norm = zscoreDansMasque(volT2.raw, masque);
+      profil = calculerProfil(volT1);
     }
 
     $("dropZone").classList.toggle("rempli", !!(volT1 && volT2));
@@ -287,8 +330,10 @@ function activerSiPret() {
   s.disabled = false;
   $("btnPrev").disabled = $("btnNext").disabled = false;
   $("panelCoupe").classList.remove("off");
+  $("panelAffichage").classList.remove("off");
   $("dimsLabel").textContent = `${volT1.X}×${volT1.Y}×${volT1.Z}`;
   majAffichageCoupe();
+  montrerIndiceTactile();
   segmenter();
 }
 
@@ -296,6 +341,15 @@ function majAffichageCoupe() {
   const s = $("sliceSlider");
   $("sliceNum").textContent = s.value;
   $("sliceMax").textContent = "/ " + s.max;
+  dessinerProfil();
+}
+
+/* Indice « glisse pour changer de coupe », montre une fois sur tactile. */
+function montrerIndiceTactile() {
+  if (!window.matchMedia("(pointer: coarse)").matches) return;
+  const h = $("swipeHint");
+  h.classList.add("on");
+  setTimeout(() => h.classList.remove("on"), 2600);
 }
 
 function allerA(delta) {
@@ -333,6 +387,29 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); allerA(+1); }
 });
 
+/* Sur tactile, glisser horizontalement sur l'image fait defiler les
+   coupes — plus direct que de viser le curseur du panneau. */
+let departX = null, departCoupe = 0;
+const zoneSeg = $("wrapSeg");
+zoneSeg.addEventListener("touchstart", (e) => {
+  if ($("sliceSlider").disabled || e.touches.length !== 1) return;
+  departX = e.touches[0].clientX;
+  departCoupe = +$("sliceSlider").value;
+}, { passive: true });
+zoneSeg.addEventListener("touchmove", (e) => {
+  if (departX === null) return;
+  const delta = Math.round((e.touches[0].clientX - departX) / 14);
+  const s = $("sliceSlider");
+  const cible = Math.min(+s.max, Math.max(0, departCoupe + delta));
+  if (cible !== +s.value) {
+    s.value = cible;
+    majAffichageCoupe();
+    clearTimeout(minuteur);
+    minuteur = setTimeout(segmenter, 110);
+  }
+}, { passive: true });
+zoneSeg.addEventListener("touchend", () => { departX = null; }, { passive: true });
+
 $("opacitySlider").addEventListener("input", (e) => {
   $("opacityVal").textContent = e.target.value + " %";
   if (dernieresClasses && derniereEntree) {
@@ -345,6 +422,7 @@ for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
     vueModalite = mod;
     $("btnT1").classList.toggle("on", mod === "t1");
     $("btnT2").classList.toggle("on", mod === "t2");
+    $("modLabel").textContent = mod.toUpperCase();
     if (volT1 && volT2) {
       derniereEntree = dessinerEntree(+$("sliceSlider").value);
       if (dernieresClasses) {

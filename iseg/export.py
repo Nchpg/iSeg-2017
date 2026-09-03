@@ -70,6 +70,17 @@ def to_onnx(checkpoint, out_path, size=144, opset=17):
         dynamic_axes={"input": {0: "batch"}, "logits": {0: "batch"}},
         opset_version=opset,
     )
+
+    # Le nouvel exportateur dynamo de torch >= 2.5 peut ecrire les poids
+    # dans un fichier ".onnx.data" separe. On les reintegre dans un seul
+    # fichier, sinon la taille mesuree ne compte que le graphe (quelques
+    # Ko) et ignore les poids reels.
+    import onnx
+    m = onnx.load(str(out_path), load_external_data=True)
+    onnx.save(m, str(out_path), save_as_external_data=False)
+    for extra in Path(out_path).parent.glob(f"{Path(out_path).name}.data*"):
+        extra.unlink(missing_ok=True)
+
     return ckpt
 
 

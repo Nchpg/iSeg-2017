@@ -150,16 +150,6 @@ body {
 }
 .panel.off { opacity: .4; pointer-events: none; }
 
-/* le controle de coupe reste accessible pendant qu'on regarde l'image */
-@media (max-width: 1080px) {
-  .panel.sticky {
-    position: sticky;
-    top: 58px;
-    z-index: 20;
-    box-shadow: 0 6px 18px -8px #000;
-  }
-}
-
 /* ========================= depot de fichiers ========================= */
 
 .drop {

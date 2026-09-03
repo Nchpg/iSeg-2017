@@ -8,7 +8,11 @@ runs/
 export/
 figures/
 
+# archive de transfert vers Colab
+iseg-colab.zip
+
 # environnement
 .venv/
 __pycache__/
 *.pyc
+iseg-resultats.zip

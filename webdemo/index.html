@@ -127,33 +127,22 @@
 </main>
 
 <footer>
-  <div class="specs">
-    <article>
-      <h3>Model</h3>
-      <p class="lead">2.5D separable U-Net</p>
-      <dl>
-        <div><dt>parameters</dt><dd>386,782</dd></div>
-        <div><dt>size, int8</dt><dd>0.43 MB</dd></div>
-      </dl>
-    </article>
-
-    <article>
-      <h3>Training</h3>
-      <p class="lead">iSeg-2017 &middot; 6-month-old infants</p>
-      <dl>
-        <div><dt>modalities</dt><dd>T1 + T2</dd></div>
-        <div><dt>Dice, held out</dt><dd>0.86</dd></div>
-      </dl>
-    </article>
-
-    <article>
-      <h3>Runtime</h3>
-      <p class="lead">ONNX Runtime &middot; WebAssembly</p>
-      <dl>
-        <div><dt>per slice</dt><dd>~100 ms</dd></div>
-        <div><dt>computed</dt><dd>on-device</dd></div>
-      </dl>
-    </article>
+  <div class="plate">
+    <div class="row">
+      <span class="key">model</span>
+      <span class="what">2.5D separable U-Net</span>
+      <span class="figs">386,782 params &middot; 0.43 MB int8</span>
+    </div>
+    <div class="row">
+      <span class="key">training</span>
+      <span class="what">iSeg-2017, 6-month-old infants</span>
+      <span class="figs">T1 + T2 &middot; Dice 0.86 held out</span>
+    </div>
+    <div class="row">
+      <span class="key">runtime</span>
+      <span class="what">ONNX Runtime on WebAssembly</span>
+      <span class="figs">~100 ms per slice &middot; on-device</span>
+    </div>
   </div>
 
   <div class="installbar" id="installBar" hidden>

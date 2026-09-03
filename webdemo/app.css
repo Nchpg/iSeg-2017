@@ -389,49 +389,47 @@ footer {
   display: flex; flex-direction: column; gap: 12px;
 }
 
-/* Spec sheet: three cards, each with a headline description and the
-   figures that matter underneath. Values are set in mono with tabular
-   figures so the two columns line up across cards. */
-.specs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 11px;
-}
-@media (max-width: 780px) { .specs { grid-template-columns: 1fr; } }
-
-.specs article {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 13px 15px 12px;
-}
-
-.specs h3 {
-  margin: 0 0 7px;
-  font-size: 9.5px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .11em;
-  color: var(--accent);
-}
-
-.specs .lead {
-  margin: 0 0 11px;
-  font-size: 13px; font-weight: 500; color: var(--text);
-  line-height: 1.35;
-}
-
-.specs dl { margin: 0; display: flex; flex-direction: column; gap: 5px; }
-.specs dl > div {
-  display: flex; align-items: baseline; gap: 10px;
-  padding-top: 5px;
+/* Spec plate, in the spirit of the engraved panel on the back of an
+   instrument: no card chrome, just three aligned rows separated by
+   hairlines. Deliberately quieter than the app panels above — this is
+   reference information, not something to act on. */
+.plate {
   border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
-.specs dt { flex: 1; font-size: 11.5px; color: var(--text-faint); }
-.specs dd {
-  margin: 0;
-  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+
+.plate .row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 18px;
+  padding: 9px 2px;
+}
+.plate .row + .row { border-top: 1px solid var(--border); }
+
+.plate .key {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.plate .what {
+  font-size: 12.5px;
   color: var(--text-dim);
+}
+.plate .figs {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .plate .row {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 4px 14px;
+  }
+  .plate .figs { grid-column: 2; white-space: normal; }
 }
 
 /* only shown when the browser actually offers installation */

@@ -258,10 +258,44 @@ function majStatistiques(classes) {
 
 /* ============================== inference ============================ */
 
-async function segmenter() {
+/* File d'attente « la derniere demande gagne ».
+
+   Une temporisation classique attendrait l'arret du geste avant de
+   lancer quoi que ce soit : pendant tout le glissement, rien ne bouge.
+   Ici on lance une inference des que la precedente est finie, sur la
+   derniere coupe demandee — les positions intermediaires sont sautees
+   plutot que mises en file. Le rythme s'adapte donc a l'appareil. */
+let inferenceEnCours = false;
+let coupeDemandee = null;
+
+function demanderSegmentation(y) {
+  coupeDemandee = y !== undefined ? y : +$("sliceSlider").value;
+  if (!inferenceEnCours) boucleSegmentation();
+}
+
+async function boucleSegmentation() {
+  inferenceEnCours = true;
+  while (coupeDemandee !== null) {
+    const y = coupeDemandee;
+    coupeDemandee = null;
+    await segmenterCoupe(y);
+  }
+  inferenceEnCours = false;
+}
+
+/* Rafraichit l'image de fond seule : quelques millisecondes, donc le
+   niveau de gris suit le doigt sans attendre l'inference. */
+function rafraichirFond(y) {
+  if (!volT1 || !volT2) return;
+  derniereEntree = dessinerEntree(y);
+  if (dernieresClasses) {
+    dessinerSegmentation(derniereEntree, dernieresClasses, +$("opacitySlider").value / 100);
+  }
+}
+
+async function segmenterCoupe(y) {
   if (!session || !volT1 || !volT2) return;
   effacerErreur();
-  const y = +$("sliceSlider").value;
   $("segStateLabel").textContent = "calcul...";
 
   const t0 = performance.now();
@@ -288,6 +322,9 @@ async function segmenter() {
     }
 
     dernieresClasses = classes;
+    // La coupe affichee a pu changer pendant le calcul : on redessine le
+    // fond correspondant pour ne pas superposer deux coupes differentes.
+    derniereEntree = dessinerEntree(y);
     dessinerSegmentation(derniereEntree, classes, +$("opacitySlider").value / 100);
     majStatistiques(classes);
 
@@ -365,7 +402,7 @@ function activerSiPret() {
   $("dimsLabel").textContent = `${volT1.X}×${volT1.Y}×${volT1.Z}`;
   majAffichageCoupe();
   montrerIndiceTactile();
-  segmenter();
+  demanderSegmentation();
 }
 
 function majAffichageCoupe() {
@@ -388,7 +425,8 @@ function allerA(delta) {
   if (s.disabled) return;
   s.value = Math.min(+s.max, Math.max(0, +s.value + delta));
   majAffichageCoupe();
-  segmenter();
+  rafraichirFond(+s.value);
+  demanderSegmentation();
 }
 
 /* ============================== interface ============================ */
@@ -403,11 +441,10 @@ const zone = $("dropZone");
   zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("survol"); }));
 zone.addEventListener("drop", (e) => accepterFichiers(e.dataTransfer.files));
 
-let minuteur = null;
 $("sliceSlider").addEventListener("input", () => {
   majAffichageCoupe();
-  clearTimeout(minuteur);
-  minuteur = setTimeout(segmenter, 110);
+  rafraichirFond(+$("sliceSlider").value);
+  demanderSegmentation();
 });
 $("btnPrev").addEventListener("click", () => allerA(-1));
 $("btnNext").addEventListener("click", () => allerA(+1));
@@ -433,8 +470,8 @@ function viserCoupe(clientX) {
   if (cible === +s.value) return;
   s.value = cible;
   majAffichageCoupe();
-  clearTimeout(minuteur);
-  minuteur = setTimeout(segmenter, 110);
+  rafraichirFond(+$("sliceSlider").value);
+  demanderSegmentation();
 }
 
 const profilCanvas = $("profil");
@@ -467,8 +504,8 @@ zoneSeg.addEventListener("touchmove", (e) => {
   if (cible !== +s.value) {
     s.value = cible;
     majAffichageCoupe();
-    clearTimeout(minuteur);
-    minuteur = setTimeout(segmenter, 110);
+    rafraichirFond(cible);
+    demanderSegmentation();
   }
 }, { passive: true });
 zoneSeg.addEventListener("touchend", () => { departX = null; }, { passive: true });

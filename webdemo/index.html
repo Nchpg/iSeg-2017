@@ -278,6 +278,23 @@ canvas { image-rendering: pixelated; width: 100%; height: 100%; display: block; 
   pointer-events: none;
 }
 
+.modswitch { display: inline-flex; align-items: center; gap: 6px; }
+.modswitch button {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  background: transparent;
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  padding: 2px 7px;
+  cursor: pointer;
+}
+.modswitch button.on {
+  color: var(--void);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ---- opacite overlay ---- */
 .opacityrow {
   display: flex;
@@ -435,7 +452,13 @@ button.primary:disabled { background: var(--border-2); color: var(--text-faint);
     <h2>Visualisation</h2>
     <div class="views">
       <div class="view">
-        <div class="label"><span>T1 &mdash; entree</span><span id="dimsLabel"></span></div>
+        <div class="label">
+          <span class="modswitch">
+            entree
+            <button id="btnT1" class="on">T1</button><button id="btnT2">T2</button>
+          </span>
+          <span id="dimsLabel"></span>
+        </div>
         <div class="canvaswrap">
           <canvas id="canvasT1" width="144" height="144"></canvas>
           <div class="empty-msg" id="emptyT1">Charge un volume T1 et T2 pour commencer</div>
@@ -518,6 +541,7 @@ const TISSUE_COLORS = {
 let session = null;
 let volT1 = null; // {X,Y,Z, raw:Int16Array, norm:Float32Array}
 let volT2 = null;
+let vueModalite = "t1";   // modalite AFFICHEE (le reseau utilise toujours les deux)
 let lastClasses = null; // Uint8Array(144*144), pour redessiner au changement d'opacite
 
 const $ = (id) => document.getElementById(id);
@@ -674,7 +698,11 @@ function rawSliceForDisplay(vol, y) {
   return { img, gray: out, mn, range };
 }
 
-function drawT1(vol, y) {
+/* Le reseau consomme TOUJOURS les deux modalites (10 canaux) ; ce
+   basculement ne change que ce qui est affiche, et sert a verifier d'un
+   coup d'oeil que le T2 s'est bien charge. */
+function drawInput(y) {
+  const vol = vueModalite === "t1" ? volT1 : volT2;
   const { img } = rawSliceForDisplay(vol, y);
   const ctx = $("canvasT1").getContext("2d");
   ctx.putImageData(new ImageData(img, SIZE, SIZE), 0, 0);
@@ -713,7 +741,7 @@ function updateStats(classes) {
 }
 
 /* ---------------------------------------------------------- inference */
-let lastT1Img = null;
+let lastEntreeImg = null;
 
 async function runSegmentation() {
   if (!session || !volT1 || !volT2) return;
@@ -722,7 +750,7 @@ async function runSegmentation() {
   $("segStateLabel").textContent = "calcul...";
 
   const tPrep0 = performance.now();
-  lastT1Img = drawT1(volT1, y);
+  lastEntreeImg = drawInput(y);
   const tensorData = buildTensorData(volT1, volT2, y);
   const tPrep = performance.now() - tPrep0;
 
@@ -744,7 +772,7 @@ async function runSegmentation() {
     }
     lastClasses = classes;
     const opacity = parseInt($("opacitySlider").value, 10) / 100;
-    drawSeg(lastT1Img, classes, opacity);
+    drawSeg(lastEntreeImg, classes, opacity);
     updateStats(classes);
 
     $("tPrep").innerHTML = tPrep.toFixed(1) + " <small>ms</small>";
@@ -826,9 +854,21 @@ $("btnNext").addEventListener("click", () => {
 });
 $("btnRun").addEventListener("click", runSegmentation);
 
+for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
+  $(id).addEventListener("click", () => {
+    vueModalite = mod;
+    $("btnT1").classList.toggle("on", mod === "t1");
+    $("btnT2").classList.toggle("on", mod === "t2");
+    if (volT1 && volT2) {
+      lastEntreeImg = drawInput(parseInt($("sliceSlider").value, 10));
+      if (lastClasses) drawSeg(lastEntreeImg, lastClasses, +$("opacitySlider").value / 100);
+    }
+  });
+}
+
 $("opacitySlider").addEventListener("input", (e) => {
   $("opacityVal").textContent = e.target.value + "%";
-  if (lastClasses && lastT1Img) drawSeg(lastT1Img, lastClasses, +e.target.value / 100);
+  if (lastClasses && lastEntreeImg) drawSeg(lastEntreeImg, lastClasses, +e.target.value / 100);
 });
 
 loadModel();

@@ -194,27 +194,54 @@ function calculerProfil(vol) {
   return p;
 }
 
+/* Largeur du pouce du curseur, en pixels CSS : doit correspondre a la
+   regle input[type=range]::-webkit-slider-thumb de app.css. Le centre du
+   pouce ne parcourt que [POUCE/2, largeur - POUCE/2] ; le profil doit
+   utiliser exactement la meme plage, sinon les deux se desalignent aux
+   extremites. */
+const POUCE = 18;
+
+function geometrieProfil() {
+  const r = $("profil").getBoundingClientRect();
+  return { largeur: r.width, gauche: r.left, utile: Math.max(1, r.width - POUCE) };
+}
+
 function dessinerProfil() {
-  const c = $("profil"), ctx = c.getContext("2d");
-  const w = c.width, h = c.height;
-  ctx.clearRect(0, 0, w, h);
+  const c = $("profil");
+  const { largeur, utile } = geometrieProfil();
+  if (largeur < 2) return;
+
+  // On redimensionne le tampon a la taille reellement affichee, en
+  // tenant compte de la densite d'ecran : sinon le trait est flou et
+  // les coordonnees ne correspondent pas a celles du curseur.
+  const dpr = window.devicePixelRatio || 1;
+  const h = 26;
+  if (c.width !== Math.round(largeur * dpr) || c.height !== Math.round(h * dpr)) {
+    c.width = Math.round(largeur * dpr);
+    c.height = Math.round(h * dpr);
+  }
+  const ctx = c.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, largeur, h);
   if (!profil) return;
 
   const max = Math.max(...profil) || 1;
-  const cour = +$("sliceSlider").value;
+  const x0 = POUCE / 2;
 
   ctx.fillStyle = "#1a2029";
-  ctx.fillRect(0, 0, w, h);
+  ctx.fillRect(0, 0, largeur, h);
+
   ctx.fillStyle = "#313c4b";
-  for (let i = 0; i < w; i++) {
-    const v = profil[Math.floor((i / w) * profil.length)] / max;
+  for (let i = 0; i < utile; i++) {
+    const v = profil[Math.min(profil.length - 1, Math.floor((i / utile) * profil.length))] / max;
     const hb = Math.max(1, v * (h - 4));
-    ctx.fillRect(i, h - hb - 2, 1, hb);
+    ctx.fillRect(x0 + i, h - hb - 2, 1, hb);
   }
-  // position courante
-  const x = (cour / (profil.length - 1)) * w;
+
+  // repere de la coupe courante, sur la meme plage que le pouce
+  const frac = +$("sliceSlider").value / (+$("sliceSlider").max || 1);
   ctx.fillStyle = "#38c6b0";
-  ctx.fillRect(Math.min(w - 2, Math.max(0, x - 1)), 0, 2, h);
+  ctx.fillRect(x0 + frac * utile - 1, 0, 2, h);
 }
 
 function majStatistiques(classes) {
@@ -394,9 +421,8 @@ document.addEventListener("keydown", (e) => {
 /* Le profil de remplissage sert aussi de barre de navigation : cliquer
    ou glisser dessus amene directement a la coupe visee. */
 function coupeDepuisProfil(clientX) {
-  const c = $("profil");
-  const r = c.getBoundingClientRect();
-  const frac = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  const { gauche, utile } = geometrieProfil();
+  const frac = Math.min(1, Math.max(0, (clientX - gauche - POUCE / 2) / utile));
   return Math.round(frac * +$("sliceSlider").max);
 }
 
@@ -505,5 +531,7 @@ $("btnInstaller").addEventListener("click", async () => {
   invite = null;
   $("btnInstaller").hidden = true;
 });
+
+window.addEventListener("resize", () => { if (profil) dessinerProfil(); });
 
 chargerModele();

@@ -314,7 +314,11 @@ async function accepterFichiers(liste) {
       profil = calculerProfil(volT1);
     }
 
-    $("dropZone").classList.toggle("rempli", !!(volT1 && volT2));
+    const complet = !!(volT1 && volT2);
+    $("dropZone").classList.toggle("rempli", complet);
+    // l'image passe en tete, le depot de fichiers redescend
+    $("shell").classList.toggle("charge", complet);
+    if (complet) $("btnParcourir").textContent = "Changer de volumes";
     activerSiPret();
   } catch (e) {
     erreur(e.message);

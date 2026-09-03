@@ -113,17 +113,27 @@ body {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  /* mobile d'abord : une colonne, les vues avant les reglages */
   grid-template-columns: minmax(0, 1fr);
+  /* Mobile, rien de charge : le depot de fichiers vient en premier,
+     c'est la seule action possible. Une fois les volumes lus, la classe
+     .charge le renvoie en bas et remonte l'image. */
+  grid-template-areas: "files" "viewer" "side";
 }
+.shell.charge { grid-template-areas: "viewer" "side" "files"; }
+
+#panelFichiers { grid-area: files; }
+.viewer        { grid-area: viewer; }
+.side          { grid-area: side; }
 
 .side { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
 .viewer { min-width: 0; }
 
 @media (min-width: 1081px) {
-  .shell { grid-template-columns: minmax(0, 1fr) 340px; }
-  .viewer { order: 0; }
-  .side   { order: 1; position: sticky; top: 62px; }
+  .shell, .shell.charge {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-areas: "viewer files" "viewer side";
+  }
+  .side { position: sticky; top: 62px; }
 }
 
 .panel {
@@ -160,7 +170,9 @@ body {
   transition: border-color .15s, background .15s;
 }
 .drop.survol { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
-.drop.rempli { border-style: solid; border-color: var(--accent-dim); padding: 13px; }
+.drop.rempli { border-style: solid; border-color: var(--accent-dim); padding: 11px; }
+.drop.rempli .drop-title,
+.drop.rempli .drop-hint { display: none; }
 
 .drop-title { margin: 0 0 4px; font-size: 13.5px; font-weight: 500; }
 .drop-hint  { margin: 0 0 11px; font-size: 11.5px; color: var(--text-faint); line-height: 1.45; }

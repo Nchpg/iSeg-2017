@@ -1,0 +1,14 @@
+# donnees du challenge (744 Mo, redistribuees sous licence iSeg-2017)
+iSeg-2017-Training/
+iSeg-2017-Testing/
+
+# sorties
+cache/
+runs/
+export/
+figures/
+
+# environnement
+.venv/
+__pycache__/
+*.pyc

@@ -1,7 +1,7 @@
 {
-  "name": "iSeg Viewer — segmentation cerebrale du nourrisson",
+  "name": "iSeg Viewer — infant brain tissue segmentation",
   "short_name": "iSeg Viewer",
-  "description": "Segmentation LCR / substance grise / substance blanche sur IRM T1-T2, calculee sur l'appareil.",
+  "description": "Cerebrospinal fluid, grey matter and white matter segmentation on infant T1/T2 MRI, computed on your device.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

@@ -1,30 +1,30 @@
 "use strict";
 
-/* iSeg Viewer — segmentation 2.5D dans le navigateur.
+/* iSeg Viewer — 2.5D segmentation in the browser.
 
-   Tout le calcul se fait sur l'appareil : le modele ONNX est charge une
-   fois, puis chaque coupe est segmentee en WebAssembly. Aucune image ne
-   quitte la machine.
+   Everything runs on the device: the ONNX model is loaded once, then
+   each slice is segmented through WebAssembly. No image ever leaves the
+   machine.
 
-   Le pretraitement reproduit exactement iseg/data.py cote Python :
-   masque cerebral T1 > 0, z-score dans ce masque applique aux deux
-   modalites, recadrage fixe, empilement de 5 coupes de contexte par
-   modalite. Toute divergence ici ferait chuter le Dice sans prevenir. */
+   Preprocessing mirrors iseg/data.py on the Python side exactly: brain
+   mask from T1 > 0, z-score within that mask applied to both
+   modalities, fixed crop, and a stack of 5 context slices per modality.
+   Any divergence here would silently wreck the Dice score. */
 
-/* ============================ constantes ============================
-   Doivent rester en phase avec iseg/data.py (CROP_X, CROP_Z) et le
-   checkpoint exporte : variante separable, contexte 5, T1+T2 = 10
-   canaux, entree 144x144. */
+/* ============================ constants =============================
+   Must stay in sync with iseg/data.py (CROP_X, CROP_Z) and the exported
+   checkpoint: separable variant, context 5, T1+T2 = 10 channels,
+   144x144 input. */
 const CROP_X = [0, 144];
 const CROP_Z = [72, 216];
 const CONTEXT = 5;
 const SIZE = 144;
-const MODELE = "model.onnx";
+const MODEL_URL = "model.onnx";
 
-const COULEURS = {
-  1: [0x4c, 0x9b, 0xe8],   // LCR
-  2: [0xe8, 0x93, 0x4c],   // substance grise
-  3: [0x5f, 0xbf, 0x77],   // substance blanche
+const COLOURS = {
+  1: [0x4c, 0x9b, 0xe8],   // cerebrospinal fluid
+  2: [0xe8, 0x93, 0x4c],   // grey matter
+  3: [0x5f, 0xbf, 0x77],   // white matter
 };
 
 const $ = (id) => document.getElementById(id);
@@ -32,87 +32,87 @@ const $ = (id) => document.getElementById(id);
 let session = null;
 let volT1 = null;          // {X, Y, Z, raw: Int16Array, norm: Float32Array, name}
 let volT2 = null;
-let vueModalite = "t1";    // modalite AFFICHEE (le reseau utilise toujours les deux)
-let dernieresClasses = null;
-let derniereEntree = null;
-let profil = null;         // fraction de voxels cerebraux par coupe
+let displayedModality = "t1";    // modality DISPLAYED (the network always uses both)
+let lastClasses = null;
+let lastInput = null;
+let occupancy = null;         // fraction of brain voxels per slice
 
-/* ============================== erreurs ============================== */
+/* =============================== errors ============================== */
 
-function erreur(msg) {
+function showError(msg) {
   $("errBanner").textContent = msg;
   $("errBanner").classList.add("on");
 }
-function effacerErreur() { $("errBanner").classList.remove("on"); }
+function clearError() { $("errBanner").classList.remove("on"); }
 
-function etatModele(classe, texte) {
+function setModelStatus(classe, texte) {
   $("modelChip").className = "chip " + classe;
   $("modelChipText").textContent = texte;
 }
 
-/* =========================== chargement modele ======================= */
+/* ============================ model loading ========================== */
 
-async function chargerModele() {
-  ort.env.wasm.numThreads = 1;   // evite l'exigence COOP/COEP d'un hebergement simple
+async function loadModel() {
+  ort.env.wasm.numThreads = 1;   // avoids the COOP/COEP requirement of plain hosting
   try {
     const t0 = performance.now();
-    session = await ort.InferenceSession.create(MODELE, { executionProviders: ["wasm"] });
-    etatModele("ok", `modele pret (${(performance.now() - t0).toFixed(0)} ms)`);
+    session = await ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
+    setModelStatus("ok", `model ready (${(performance.now() - t0).toFixed(0)} ms)`);
   } catch (e) {
-    etatModele("err", "modele indisponible");
-    erreur(
+    setModelStatus("err", "model unavailable");
+    showError(
       location.protocol === "file:"
-        ? "Ouverte en file://, la page ne peut pas charger model.onnx : les navigateurs bloquent " +
-          "l'acces d'un fichier local a un autre. Sers le dossier (python3 -m http.server) ou " +
-          "utilise la version deployee."
-        : "Impossible de charger le modele : " + e.message
+        ? "Opened over file://, this page cannot load model.onnx: browsers forbid a local " +
+          "page from reading another local file. Serve the folder " +
+          "(python3 -m http.server) or use the hosted version."
+        : "Could not load the model: " + e.message
     );
   }
 }
 
-/* ======================== lecture Analyze 7.5 ========================
-   En-tete de 348 octets, little-endian, donnees brutes sans decalage.
-   L'ordre de stockage des voxels est x le plus rapide, puis y, puis z
-   (verifie contre nibabel sur les fichiers du challenge). */
+/* ========================= Analyze 7.5 reader ========================
+   348-byte header, little-endian, raw data with no offset. Voxels are
+   stored with x varying fastest, then y, then z (checked against
+   nibabel on the challenge files). */
 
-function lireEntete(buf) {
+function readHeader(buf) {
   const dv = new DataView(buf);
   const dim = [];
   for (let i = 0; i < 8; i++) dim.push(dv.getInt16(40 + i * 2, true));
   return { X: dim[1], Y: dim[2], Z: dim[3], datatype: dv.getInt16(70, true), bitpix: dv.getInt16(72, true) };
 }
 
-async function lireVolume(fichierHdr, fichierImg) {
-  const { X, Y, Z, datatype, bitpix } = lireEntete(await fichierHdr.arrayBuffer());
+async function readVolume(hdrFile, imgFile) {
+  const { X, Y, Z, datatype, bitpix } = readHeader(await hdrFile.arrayBuffer());
   if (datatype !== 4 || bitpix !== 16) {
-    throw new Error(`type de donnees inattendu (datatype=${datatype}, bitpix=${bitpix}), entier 16 bits attendu`);
+    throw new Error(`unexpected data type (datatype=${datatype}, bitpix=${bitpix}): a 16-bit integer is expected`);
   }
   if (X < CROP_X[1] || Z < CROP_Z[1]) {
-    throw new Error(`dimensions inattendues (${X}x${Y}x${Z}), geometrie iSeg-2017 (144x192x256) attendue`);
+    throw new Error(`unexpected dimensions (${X}×${Y}×${Z}): the iSeg-2017 geometry (144×192×256) is expected`);
   }
-  const buf = await fichierImg.arrayBuffer();
-  // Ordre d'octets little-endian : vrai sur tous les navigateurs deployes.
+  const buf = await imgFile.arrayBuffer();
+  // Little-endian byte order: true on every browser in the wild.
   return { X, Y, Z, raw: new Int16Array(buf, 0, X * Y * Z),
-           name: fichierHdr.name.replace(/\.hdr$/i, "") };
+           name: hdrFile.name.replace(/\.hdr$/i, "") };
 }
 
-/* ============================ pretraitement ========================== */
+/* ============================ preprocessing ========================== */
 
-function zscoreDansMasque(raw, masque) {
-  let somme = 0, n = 0;
-  for (let i = 0; i < raw.length; i++) if (masque[i]) { somme += raw[i]; n++; }
-  const moy = somme / n;
-  let carres = 0;
-  for (let i = 0; i < raw.length; i++) if (masque[i]) { const d = raw[i] - moy; carres += d * d; }
-  const ecart = Math.sqrt(carres / n) || 1e-8;
+function zscoreInMask(raw, mask) {
+  let sum = 0, n = 0;
+  for (let i = 0; i < raw.length; i++) if (mask[i]) { sum += raw[i]; n++; }
+  const mean = sum / n;
+  let sqSum = 0;
+  for (let i = 0; i < raw.length; i++) if (mask[i]) { const d = raw[i] - mean; sqSum += d * d; }
+  const sd = Math.sqrt(sqSum / n) || 1e-8;
   const out = new Float32Array(raw.length);
-  for (let i = 0; i < raw.length; i++) out[i] = (raw[i] - moy) / ecart;
+  for (let i = 0; i < raw.length; i++) out[i] = (raw[i] - mean) / sd;
   return out;
 }
 
-/* Extrait la coupe coronale (x, z) a Y fixe, recadree, ordonnee [x][z]
-   pour correspondre au flatten C de stack_context() cote Python. */
-function extraireCoupe(vol, source, y) {
+/* Extracts the coronal slice (x, z) at fixed Y, cropped, laid out as
+   [x][z] to match the C-order flatten of stack_context() in Python. */
+function extractSlice(vol, source, y) {
   const out = new Float32Array(SIZE * SIZE);
   const [x0] = CROP_X, [z0] = CROP_Z;
   for (let xi = 0; xi < SIZE; xi++) {
@@ -122,52 +122,52 @@ function extraireCoupe(vol, source, y) {
   return out;
 }
 
-/* Empile 5 coupes voisines par modalite -> 10 canaux. Aux extremites du
-   volume on replique la coupe de bord : remplir de zeros creerait un
-   bord noir artificiel, information trompeuse pour le reseau. */
-function construireTenseur(y) {
-  const demi = CONTEXT >> 1;
+/* Stacks 5 neighbouring slices per modality -> 10 channels. At the ends
+   of the volume the edge slice is repeated: padding with zeros would
+   create an artificial black border, which misleads the network. */
+function buildTensor(y) {
+  const half = CONTEXT >> 1;
   const out = new Float32Array(2 * CONTEXT * SIZE * SIZE);
   let ptr = 0;
   for (const vol of [volT1, volT2]) {
-    for (let k = -demi; k <= demi; k++) {
+    for (let k = -demi; k <= half; k++) {
       const yy = Math.min(Math.max(y + k, 0), vol.Y - 1);
-      out.set(extraireCoupe(vol, vol.norm, yy), ptr);
+      out.set(extractSlice(vol, vol.norm, yy), ptr);
       ptr += SIZE * SIZE;
     }
   }
   return out;
 }
 
-/* ================================ rendu ============================== */
+/* =============================== drawing ============================= */
 
-function coupeEnImage(vol, y) {
-  const brut = extraireCoupe(vol, vol.raw, y);
+function sliceToImage(vol, y) {
+  const raw = extractSlice(vol, vol.raw, y);
   let mn = Infinity, mx = -Infinity;
-  for (let i = 0; i < brut.length; i++) { if (brut[i] < mn) mn = brut[i]; if (brut[i] > mx) mx = brut[i]; }
-  const etendue = (mx - mn) || 1;
+  for (let i = 0; i < raw.length; i++) { if (raw[i] < mn) mn = raw[i]; if (raw[i] > mx) mx = raw[i]; }
+  const range = (mx - mn) || 1;
   const img = new Uint8ClampedArray(SIZE * SIZE * 4);
   for (let i = 0; i < SIZE * SIZE; i++) {
-    const g = ((brut[i] - mn) / etendue) * 255;
+    const g = ((raw[i] - mn) / range) * 255;
     img[i * 4] = img[i * 4 + 1] = img[i * 4 + 2] = g;
     img[i * 4 + 3] = 255;
   }
   return img;
 }
 
-function dessinerEntree(y) {
-  const img = coupeEnImage(vueModalite === "t1" ? volT1 : volT2, y);
-  $("canvasT1").getContext("2d").putImageData(new ImageData(img, SIZE, SIZE), 0, 0);
-  $("emptyT1").style.display = "none";
+function drawInput(y) {
+  const img = sliceToImage(displayedModality === "t1" ? volT1 : volT2, y);
+  $("canvasInput").getContext("2d").putImageData(new ImageData(img, SIZE, SIZE), 0, 0);
+  $("emptyInput").style.display = "none";
   return img;
 }
 
-function dessinerSegmentation(base, classes, opacite) {
+function drawSegmentation(base, classes, opacite) {
   const out = new Uint8ClampedArray(base);
   for (let i = 0; i < SIZE * SIZE; i++) {
     const c = classes[i];
     if (c === 0) continue;
-    const [r, g, b] = COULEURS[c];
+    const [r, g, b] = COLOURS[c];
     out[i * 4]     = out[i * 4]     * (1 - opacite) + r * opacite;
     out[i * 4 + 1] = out[i * 4 + 1] * (1 - opacite) + g * opacite;
     out[i * 4 + 2] = out[i * 4 + 2] * (1 - opacite) + b * opacite;
@@ -176,81 +176,80 @@ function dessinerSegmentation(base, classes, opacite) {
   $("emptySeg").style.display = "none";
 }
 
-/* Profil de remplissage : proportion de cerveau par coupe. Le volume
-   fait 192 coupes mais le cerveau n'en occupe qu'environ 130 ; dessiner
-   ce profil sous le curseur evite de chercher a l'aveugle dans le vide. */
-function calculerProfil(vol) {
+/* Occupancy profile: share of brain per slice. The volume holds 192
+   slices but the brain only spans about 130 of them; drawing it under
+   the slider saves you from scrubbing blindly through empty space. */
+function computeOccupancy(vol) {
   const p = new Float32Array(vol.Y);
   const [x0, x1] = CROP_X, [z0, z1] = CROP_Z;
-  const surface = (x1 - x0) * (z1 - z0);
+  const area = (x1 - x0) * (z1 - z0);
   for (let y = 0; y < vol.Y; y++) {
     let n = 0;
     for (let z = z0; z < z1; z++) {
       const base = y * vol.X + z * vol.X * vol.Y;
       for (let x = x0; x < x1; x++) if (vol.raw[base + x] > 0) n++;
     }
-    p[y] = n / surface;
+    p[y] = n / area;
   }
   return p;
 }
 
-/* Largeur du pouce du curseur, en pixels CSS : doit correspondre a la
-   regle input[type=range]::-webkit-slider-thumb de app.css. Le centre du
-   pouce ne parcourt que [POUCE/2, largeur - POUCE/2] ; le profil doit
-   utiliser exactement la meme plage, sinon les deux se desalignent aux
-   extremites. */
-const POUCE = 18;
+/* Slider thumb width in CSS pixels: must match the
+   input[type=range]::-webkit-slider-thumb rule in app.css. The thumb
+   centre only travels [THUMB/2, width - THUMB/2], so the profile has to
+   use exactly the same range or the two drift apart at both ends. */
+const THUMB = 18;
 
-function geometrieProfil() {
-  const r = $("profil").getBoundingClientRect();
-  return { largeur: r.width, gauche: r.left, utile: Math.max(1, r.width - POUCE) };
+function profileGeometry() {
+  const r = $("occupancy").getBoundingClientRect();
+  return { width: r.width, left: r.left, usable: Math.max(1, r.width - THUMB) };
 }
 
-function dessinerProfil() {
-  const c = $("profil");
-  const { largeur, utile } = geometrieProfil();
-  if (largeur < 2) return;
+function drawProfile() {
+  const c = $("occupancy");
+  const { width, usable } = profileGeometry();
+  if (width < 2) return;
 
-  // On redimensionne le tampon a la taille reellement affichee, en
-  // tenant compte de la densite d'ecran : sinon le trait est flou et
-  // les coordonnees ne correspondent pas a celles du curseur.
+  // Resize the buffer to the size actually displayed, accounting for
+  // screen density: otherwise the marker is blurry and its coordinates
+  // no longer line up with the slider.
   const dpr = window.devicePixelRatio || 1;
   const h = 26;
-  if (c.width !== Math.round(largeur * dpr) || c.height !== Math.round(h * dpr)) {
-    c.width = Math.round(largeur * dpr);
+  if (c.width !== Math.round(width * dpr) || c.height !== Math.round(h * dpr)) {
+    c.width = Math.round(width * dpr);
     c.height = Math.round(h * dpr);
   }
   const ctx = c.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, largeur, h);
-  if (!profil) return;
+  ctx.clearRect(0, 0, width, h);
+  if (!occupancy) return;
 
-  const max = Math.max(...profil) || 1;
-  const x0 = POUCE / 2;
+  const max = Math.max(...occupancy) || 1;
+  const x0 = THUMB / 2;
 
   ctx.fillStyle = "#1a2029";
-  ctx.fillRect(0, 0, largeur, h);
+  ctx.fillRect(0, 0, width, h);
 
   ctx.fillStyle = "#313c4b";
-  for (let i = 0; i < utile; i++) {
-    const v = profil[Math.min(profil.length - 1, Math.floor((i / utile) * profil.length))] / max;
+  for (let i = 0; i < usable; i++) {
+    const v = occupancy[Math.min(occupancy.length - 1, Math.floor((i / usable) * occupancy.length))] / max;
     const hb = Math.max(1, v * (h - 4));
     ctx.fillRect(x0 + i, h - hb - 2, 1, hb);
   }
 
-  // repere de la coupe courante, sur la meme plage que le pouce
+  // current slice marker, on the same range as the thumb
   const frac = +$("sliceSlider").value / (+$("sliceSlider").max || 1);
   ctx.fillStyle = "#38c6b0";
-  ctx.fillRect(x0 + frac * utile - 1, 0, 2, h);
+  ctx.fillRect(x0 + frac * usable - 1, 0, 2, h);
 }
 
-function majStatistiques(classes) {
+function updateStats(classes) {
   const n = [0, 0, 0, 0];
   for (let i = 0; i < classes.length; i++) n[classes[i]]++;
   const cerveau = n[1] + n[2] + n[3];
   const pct = cerveau ? [n[1], n[2], n[3]].map((c) => (100 * c) / cerveau) : [0, 0, 0];
   const barres = $("statBar").children;
-  ["pctLCR", "pctGM", "pctWM"].forEach((id, i) => {
+  ["pctCSF", "pctGM", "pctWM"].forEach((id, i) => {
     barres[i].style.width = pct[i].toFixed(1) + "%";
     $(id).textContent = pct[i].toFixed(1) + " %";
   });
@@ -258,59 +257,59 @@ function majStatistiques(classes) {
 
 /* ============================== inference ============================ */
 
-/* File d'attente « la derniere demande gagne ».
+/* "Latest request wins" queue.
 
-   Une temporisation classique attendrait l'arret du geste avant de
-   lancer quoi que ce soit : pendant tout le glissement, rien ne bouge.
-   Ici on lance une inference des que la precedente est finie, sur la
-   derniere coupe demandee — les positions intermediaires sont sautees
-   plutot que mises en file. Le rythme s'adapte donc a l'appareil. */
-let inferenceEnCours = false;
-let coupeDemandee = null;
+   A plain debounce would wait for the gesture to stop before running
+   anything, so nothing moves while you drag. Here a new inference
+   starts as soon as the previous one finishes, on the most recent slice
+   requested — intermediate positions are dropped rather than queued, so
+   the pace adapts to whatever the device can sustain. */
+let inferenceRunning = false;
+let requestedSlice = null;
 
-function demanderSegmentation(y) {
-  coupeDemandee = y !== undefined ? y : +$("sliceSlider").value;
-  if (!inferenceEnCours) boucleSegmentation();
+function requestSegmentation(y) {
+  requestedSlice = y !== undefined ? y : +$("sliceSlider").value;
+  if (!inferenceRunning) segmentationLoop();
 }
 
-async function boucleSegmentation() {
-  inferenceEnCours = true;
-  while (coupeDemandee !== null) {
-    const y = coupeDemandee;
-    coupeDemandee = null;
-    await segmenterCoupe(y);
+async function segmentationLoop() {
+  inferenceRunning = true;
+  while (requestedSlice !== null) {
+    const y = requestedSlice;
+    requestedSlice = null;
+    await segmentSlice(y);
   }
-  inferenceEnCours = false;
+  inferenceRunning = false;
 }
 
-/* Rafraichit l'image de fond seule : quelques millisecondes, donc le
-   niveau de gris suit le doigt sans attendre l'inference. */
-function rafraichirFond(y) {
+/* Redraws the background image only: a few milliseconds, so the
+   greyscale tracks your finger without waiting for inference. */
+function refreshBackground(y) {
   if (!volT1 || !volT2) return;
-  derniereEntree = dessinerEntree(y);
-  if (dernieresClasses) {
-    dessinerSegmentation(derniereEntree, dernieresClasses, +$("opacitySlider").value / 100);
+  lastInput = drawInput(y);
+  if (lastClasses) {
+    drawSegmentation(lastInput, lastClasses, +$("opacitySlider").value / 100);
   }
 }
 
-async function segmenterCoupe(y) {
+async function segmentSlice(y) {
   if (!session || !volT1 || !volT2) return;
-  effacerErreur();
-  $("segStateLabel").textContent = "calcul...";
+  clearError();
+  $("segStateLabel").textContent = "computing…";
 
   const t0 = performance.now();
-  derniereEntree = dessinerEntree(y);
-  const donnees = construireTenseur(y);
+  lastInput = drawInput(y);
+  const data = buildTensor(y);
   const msPrep = performance.now() - t0;
 
   try {
     const t1 = performance.now();
-    const sortie = await session.run({
-      input: new ort.Tensor("float32", donnees, [1, 2 * CONTEXT, SIZE, SIZE]),
+    const output = await session.run({
+      input: new ort.Tensor("float32", data, [1, 2 * CONTEXT, SIZE, SIZE]),
     });
     const msInf = performance.now() - t1;
 
-    const logits = sortie.logits.data;   // [1, 4, 144, 144]
+    const logits = output.logits.data;   // [1, 4, 144, 144]
     const classes = new Uint8Array(SIZE * SIZE);
     for (let i = 0; i < SIZE * SIZE; i++) {
       let best = 0, val = -Infinity;
@@ -321,75 +320,75 @@ async function segmenterCoupe(y) {
       classes[i] = best;
     }
 
-    dernieresClasses = classes;
-    // La coupe affichee a pu changer pendant le calcul : on redessine le
-    // fond correspondant pour ne pas superposer deux coupes differentes.
-    derniereEntree = dessinerEntree(y);
-    dessinerSegmentation(derniereEntree, classes, +$("opacitySlider").value / 100);
-    majStatistiques(classes);
+    lastClasses = classes;
+    // The displayed slice may have changed while computing: redraw the
+    // matching background so two different slices never get overlaid.
+    lastInput = drawInput(y);
+    drawSegmentation(lastInput, classes, +$("opacitySlider").value / 100);
+    updateStats(classes);
 
     $("tPrep").innerHTML = msPrep.toFixed(1) + "<small>ms</small>";
     $("tInfer").innerHTML = msInf.toFixed(1) + "<small>ms</small>";
-    $("segStateLabel").textContent = "coupe " + y;
+    $("segStateLabel").textContent = "slice " + y;
     $("panelStats").classList.remove("off");
   } catch (e) {
-    $("segStateLabel").textContent = "erreur";
-    erreur("Echec de l'inference : " + e.message);
+    $("segStateLabel").textContent = "error";
+    showError("Inference failed: " + e.message);
   }
 }
 
-/* =============================== fichiers ============================
-   Les 4 fichiers d'un sujet se deposent d'un coup : T1 et T2 sont
-   reconnus par leur nom, puis apparies .hdr avec .img. */
+/* ================================ files ==============================
+   All 4 files of a subject are dropped at once: T1 and T2 are picked
+   out by filename, then .hdr is paired with .img. */
 
-async function accepterFichiers(liste) {
-  effacerErreur();
-  const fichiers = Array.from(liste);
-  const trouve = (mod, ext) =>
-    fichiers.find((f) => new RegExp(`t${mod}\\b|t${mod}[._-]`, "i").test(f.name) &&
+async function acceptFiles(liste) {
+  clearError();
+  const files = Array.from(liste);
+  const pick = (mod, ext) =>
+    files.find((f) => new RegExp(`t${mod}\\b|t${mod}[._-]`, "i").test(f.name) &&
                          new RegExp(`\\.${ext}$`, "i").test(f.name));
 
   try {
-    for (const [mod, cible] of [["1", "t1"], ["2", "t2"]]) {
-      const hdr = trouve(mod, "hdr"), img = trouve(mod, "img");
+    for (const [mod, target] of [["1", "t1"], ["2", "t2"]]) {
+      const hdr = pick(mod, "hdr"), img = pick(mod, "img");
       if (!hdr || !img) continue;
-      const vol = await lireVolume(hdr, img);
-      if (cible === "t1") volT1 = vol; else volT2 = vol;
-      const ligne = $(cible === "t1" ? "rowT1" : "rowT2");
-      ligne.classList.add("ok");
-      ligne.querySelector(".nom").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
+      const vol = await readVolume(hdr, img);
+      if (target === "t1") volT1 = vol; else volT2 = vol;
+      const row = $(target === "t1" ? "rowT1" : "rowT2");
+      row.classList.add("ok");
+      row.querySelector(".name").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
     }
 
     if (!volT1 && !volT2) {
-      throw new Error("aucun fichier reconnu : les noms doivent contenir T1 ou T2, avec les paires .hdr et .img");
+      throw new Error("no file recognised: names must contain T1 or T2, and each volume needs its .hdr and .img pair");
     }
     if (volT1 && volT2 && volT1.raw.length !== volT2.raw.length) {
-      throw new Error("les volumes T1 et T2 n'ont pas les memes dimensions");
+      throw new Error("the T1 and T2 volumes have different dimensions");
     }
 
-    // Le masque cerebral vient du T1 (data.py : brain = t1 > 0) et sert
-    // aussi a normaliser le T2 : les deux modalites partagent la meme
-    // statistique, comme a l'entrainement.
+    // The brain mask comes from T1 (data.py: brain = t1 > 0) and also
+    // normalises T2: both modalities share the same statistics, exactly
+    // as during training.
     if (volT1) {
-      const masque = new Uint8Array(volT1.raw.length);
-      for (let i = 0; i < masque.length; i++) masque[i] = volT1.raw[i] > 0 ? 1 : 0;
-      volT1.norm = zscoreDansMasque(volT1.raw, masque);
-      if (volT2) volT2.norm = zscoreDansMasque(volT2.raw, masque);
-      profil = calculerProfil(volT1);
+      const mask = new Uint8Array(volT1.raw.length);
+      for (let i = 0; i < mask.length; i++) mask[i] = volT1.raw[i] > 0 ? 1 : 0;
+      volT1.norm = zscoreInMask(volT1.raw, mask);
+      if (volT2) volT2.norm = zscoreInMask(volT2.raw, mask);
+      occupancy = computeOccupancy(volT1);
     }
 
-    const complet = !!(volT1 && volT2);
-    $("dropZone").classList.toggle("rempli", complet);
-    // l'image passe en tete, le depot de fichiers redescend
-    $("shell").classList.toggle("charge", complet);
-    if (complet) $("btnParcourir").textContent = "Changer de volumes";
-    activerSiPret();
+    const complete = !!(volT1 && volT2);
+    $("dropZone").classList.toggle("filled", complete);
+    // the image moves to the top, the drop zone moves down
+    $("shell").classList.toggle("loaded", complete);
+    if (complete) $("btnBrowse").textContent = "Change volumes";
+    enableWhenReady();
   } catch (e) {
-    erreur(e.message);
+    showError(e.message);
   }
 }
 
-function activerSiPret() {
+function enableWhenReady() {
   if (!(volT1 && volT2)) return;
   const maxY = Math.min(volT1.Y, volT2.Y) - 1;
   const s = $("sliceSlider");
@@ -397,178 +396,178 @@ function activerSiPret() {
   s.value = Math.floor(maxY / 2);
   s.disabled = false;
   $("btnPrev").disabled = $("btnNext").disabled = false;
-  $("panelCoupe").classList.remove("off");
-  $("panelAffichage").classList.remove("off");
+  $("panelSlice").classList.remove("off");
+  $("panelDisplay").classList.remove("off");
   $("dimsLabel").textContent = `${volT1.X}×${volT1.Y}×${volT1.Z}`;
-  majAffichageCoupe();
-  montrerIndiceTactile();
-  demanderSegmentation();
+  updateSliceReadout();
+  showTouchHint();
+  requestSegmentation();
 }
 
-function majAffichageCoupe() {
+function updateSliceReadout() {
   const s = $("sliceSlider");
   $("sliceNum").textContent = s.value;
   $("sliceMax").textContent = "/ " + s.max;
-  dessinerProfil();
+  drawProfile();
 }
 
-/* Indice « glisse pour changer de coupe », montre une fois sur tactile. */
-function montrerIndiceTactile() {
+/* "Swipe to change slice" hint, shown once on touch devices. */
+function showTouchHint() {
   if (!window.matchMedia("(pointer: coarse)").matches) return;
   const h = $("swipeHint");
   h.classList.add("on");
   setTimeout(() => h.classList.remove("on"), 2600);
 }
 
-function allerA(delta) {
+function step(delta) {
   const s = $("sliceSlider");
   if (s.disabled) return;
   s.value = Math.min(+s.max, Math.max(0, +s.value + delta));
-  majAffichageCoupe();
-  rafraichirFond(+s.value);
-  demanderSegmentation();
+  updateSliceReadout();
+  refreshBackground(+s.value);
+  requestSegmentation();
 }
 
-/* ============================== interface ============================ */
+/* =============================== interface =========================== */
 
-$("btnParcourir").addEventListener("click", () => $("fileInput").click());
-$("fileInput").addEventListener("change", (e) => accepterFichiers(e.target.files));
+$("btnBrowse").addEventListener("click", () => $("fileInput").click());
+$("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
 
 const zone = $("dropZone");
 ["dragenter", "dragover"].forEach((ev) =>
-  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add("survol"); }));
+  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add("hover"); }));
 ["dragleave", "drop"].forEach((ev) =>
-  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("survol"); }));
-zone.addEventListener("drop", (e) => accepterFichiers(e.dataTransfer.files));
+  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("hover"); }));
+zone.addEventListener("drop", (e) => acceptFiles(e.dataTransfer.files));
 
 $("sliceSlider").addEventListener("input", () => {
-  majAffichageCoupe();
-  rafraichirFond(+$("sliceSlider").value);
-  demanderSegmentation();
+  updateSliceReadout();
+  refreshBackground(+$("sliceSlider").value);
+  requestSegmentation();
 });
-$("btnPrev").addEventListener("click", () => allerA(-1));
-$("btnNext").addEventListener("click", () => allerA(+1));
+$("btnPrev").addEventListener("click", () => step(-1));
+$("btnNext").addEventListener("click", () => step(+1));
 
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, button")) return;
-  if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); allerA(-1); }
-  if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); allerA(+1); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); step(-1); }
+  if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); step(+1); }
 });
 
-/* Le profil de remplissage sert aussi de barre de navigation : cliquer
-   ou glisser dessus amene directement a la coupe visee. */
-function coupeDepuisProfil(clientX) {
-  const { gauche, utile } = geometrieProfil();
-  const frac = Math.min(1, Math.max(0, (clientX - gauche - POUCE / 2) / utile));
+/* The occupancy profile doubles as a scrub bar: clicking or dragging on
+   it jumps straight to the slice under the pointer. */
+function sliceFromProfile(clientX) {
+  const { left, usable } = profileGeometry();
+  const frac = Math.min(1, Math.max(0, (clientX - left - THUMB / 2) / usable));
   return Math.round(frac * +$("sliceSlider").max);
 }
 
-function viserCoupe(clientX) {
+function scrubTo(clientX) {
   const s = $("sliceSlider");
   if (s.disabled) return;
-  const cible = coupeDepuisProfil(clientX);
-  if (cible === +s.value) return;
-  s.value = cible;
-  majAffichageCoupe();
-  rafraichirFond(+$("sliceSlider").value);
-  demanderSegmentation();
+  const target = sliceFromProfile(clientX);
+  if (target === +s.value) return;
+  s.value = target;
+  updateSliceReadout();
+  refreshBackground(+$("sliceSlider").value);
+  requestSegmentation();
 }
 
-const profilCanvas = $("profil");
-profilCanvas.addEventListener("pointerdown", (e) => {
+const profileCanvas = $("occupancy");
+profileCanvas.addEventListener("pointerdown", (e) => {
   if ($("sliceSlider").disabled) return;
-  profilCanvas.setPointerCapture(e.pointerId);
-  viserCoupe(e.clientX);
+  profileCanvas.setPointerCapture(e.pointerId);
+  scrubTo(e.clientX);
 });
-profilCanvas.addEventListener("pointermove", (e) => {
-  if (profilCanvas.hasPointerCapture(e.pointerId)) viserCoupe(e.clientX);
+profileCanvas.addEventListener("pointermove", (e) => {
+  if (profileCanvas.hasPointerCapture(e.pointerId)) scrubTo(e.clientX);
 });
-profilCanvas.addEventListener("pointerup", (e) => {
-  if (profilCanvas.hasPointerCapture(e.pointerId)) profilCanvas.releasePointerCapture(e.pointerId);
+profileCanvas.addEventListener("pointerup", (e) => {
+  if (profileCanvas.hasPointerCapture(e.pointerId)) profileCanvas.releasePointerCapture(e.pointerId);
 });
 
-/* Sur tactile, glisser horizontalement sur l'image fait defiler les
-   coupes — plus direct que de viser le curseur du panneau. */
-let departX = null, departCoupe = 0;
-const zoneSeg = $("wrapSeg");
-zoneSeg.addEventListener("touchstart", (e) => {
+/* On touch devices, dragging horizontally across the image scrolls
+   through slices — more direct than aiming for the slider. */
+let dragStartX = null, dragStartSlice = 0;
+const segWrap = $("wrapSeg");
+segWrap.addEventListener("touchstart", (e) => {
   if ($("sliceSlider").disabled || e.touches.length !== 1) return;
-  departX = e.touches[0].clientX;
-  departCoupe = +$("sliceSlider").value;
+  dragStartX = e.touches[0].clientX;
+  dragStartSlice = +$("sliceSlider").value;
 }, { passive: true });
-zoneSeg.addEventListener("touchmove", (e) => {
-  if (departX === null) return;
-  const delta = Math.round((e.touches[0].clientX - departX) / 14);
+segWrap.addEventListener("touchmove", (e) => {
+  if (dragStartX === null) return;
+  const delta = Math.round((e.touches[0].clientX - dragStartX) / 14);
   const s = $("sliceSlider");
-  const cible = Math.min(+s.max, Math.max(0, departCoupe + delta));
-  if (cible !== +s.value) {
-    s.value = cible;
-    majAffichageCoupe();
-    rafraichirFond(cible);
-    demanderSegmentation();
+  const target = Math.min(+s.max, Math.max(0, dragStartSlice + delta));
+  if (target !== +s.value) {
+    s.value = target;
+    updateSliceReadout();
+    refreshBackground(target);
+    requestSegmentation();
   }
 }, { passive: true });
-zoneSeg.addEventListener("touchend", () => { departX = null; }, { passive: true });
+segWrap.addEventListener("touchend", () => { dragStartX = null; }, { passive: true });
 
 $("opacitySlider").addEventListener("input", (e) => {
   $("opacityVal").textContent = e.target.value + " %";
-  if (dernieresClasses && derniereEntree) {
-    dessinerSegmentation(derniereEntree, dernieresClasses, +e.target.value / 100);
+  if (lastClasses && lastInput) {
+    drawSegmentation(lastInput, lastClasses, +e.target.value / 100);
   }
 });
 
 for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
   $(id).addEventListener("click", () => {
-    vueModalite = mod;
+    displayedModality = mod;
     $("btnT1").classList.toggle("on", mod === "t1");
     $("btnT2").classList.toggle("on", mod === "t2");
     $("modLabel").textContent = mod.toUpperCase();
     if (volT1 && volT2) {
-      derniereEntree = dessinerEntree(+$("sliceSlider").value);
-      if (dernieresClasses) {
-        dessinerSegmentation(derniereEntree, dernieresClasses, +$("opacitySlider").value / 100);
+      lastInput = drawInput(+$("sliceSlider").value);
+      if (lastClasses) {
+        drawSegmentation(lastInput, lastClasses, +$("opacitySlider").value / 100);
       }
     }
   });
 }
 
-/* ============================= hors ligne ============================
-   Deployee en HTTPS, la page s'installe et fonctionne sans reseau une
-   fois le moteur ONNX Runtime mis en cache — ce qui suppose une
-   premiere segmentation en ligne. */
+/* =============================== offline =============================
+   Served over HTTPS, the page installs and runs without a network once
+   the ONNX Runtime engine is cached — which requires running one
+   segmentation while online. */
 
-function annonce(couleur, texte) {
-  $("etatPoint").style.color = couleur;
-  $("etatTexte").textContent = texte;
+function announce(couleur, texte) {
+  $("statusDot").style.color = couleur;
+  $("statusText").textContent = texte;
 }
 
 if (location.protocol === "file:") {
-  annonce("var(--danger)", "ouverte en file:// — sers le dossier ou utilise la version deployee");
+  announce("var(--danger)", "opened over file:// — serve the folder or use the hosted version");
 } else if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").then((reg) => {
     const pret = reg.active && navigator.serviceWorker.controller;
-    annonce(pret ? "var(--wm)" : "var(--accent)",
-            pret ? "hors ligne : pret, la page fonctionne sans reseau"
-                 : "hors ligne : cache en cours, lance une segmentation pour finir");
-  }).catch(() => annonce("var(--danger)", "hors ligne indisponible (service worker refuse)"));
+    announce(pret ? "var(--wm)" : "var(--accent)",
+            pret ? "offline ready — this page works without a network"
+                 : "caching — run one segmentation to finish preparing offline use");
+  }).catch(() => announce("var(--danger)", "offline unavailable (service worker rejected)"));
 } else {
-  annonce("var(--text-faint)", "hors ligne indisponible sur ce navigateur");
+  announce("var(--text-faint)", "offline unavailable in this browser");
 }
 
-let invite = null;
+let installPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
-  invite = e;
-  $("btnInstaller").hidden = false;
+  installPrompt = e;
+  $("btnInstall").hidden = false;
 });
-$("btnInstaller").addEventListener("click", async () => {
-  if (!invite) return;
-  invite.prompt();
-  await invite.userChoice;
-  invite = null;
-  $("btnInstaller").hidden = true;
+$("btnInstall").addEventListener("click", async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt = null;
+  $("btnInstall").hidden = true;
 });
 
-window.addEventListener("resize", () => { if (profil) dessinerProfil(); });
+window.addEventListener("resize", () => { if (occupancy) drawProfile(); });
 
-chargerModele();
+loadModel();

@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>iSeg Viewer</title>
-<meta name="description" content="Segmentation LCR / substance grise / substance blanche sur IRM T1-T2 de nourrissons, calculee sur l'appareil.">
+<meta name="description" content="Cerebrospinal fluid, grey matter and white matter segmentation on infant T1/T2 MRI, computed on your device.">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0d12">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -19,41 +19,41 @@
   <div class="brand">
     <span class="mark" aria-hidden="true"></span>
     <h1>iSeg&nbsp;Viewer</h1>
-    <span class="sub">nourrisson 6 mois &middot; T1/T2</span>
+    <span class="sub">Infant brain tissue segmentation</span>
   </div>
-  <span class="chip busy" id="modelChip"><span class="dot"></span><span id="modelChipText">chargement&hellip;</span></span>
+  <span class="chip busy" id="modelChip"><span class="dot"></span><span id="modelChipText">loading model&hellip;</span></span>
 </header>
 
 <div class="err-banner" id="errBanner" role="alert"></div>
 
 <main class="shell" id="shell">
 
-  <!-- ===================== chargement des volumes ===================== -->
-  <section class="panel" id="panelFichiers">
+  <!-- ===================== volume loading ===================== -->
+  <section class="panel" id="panelFiles">
     <h2>Volumes</h2>
     <div class="drop" id="dropZone">
       <input type="file" id="fileInput" accept=".hdr,.img" multiple hidden>
-      <p class="drop-title">Depose les 4 fichiers</p>
-      <p class="drop-hint">T1 et T2, <code>.hdr</code> + <code>.img</code>, reconnus par leur nom</p>
-      <button type="button" class="ghost" id="btnParcourir">Parcourir&hellip;</button>
+      <p class="drop-title">Drop all 4 files</p>
+      <p class="drop-hint">T1 and T2, <code>.hdr</code> + <code>.img</code>, matched by filename</p>
+      <button type="button" class="ghost" id="btnBrowse">Browse&hellip;</button>
     </div>
     <ul class="filelist">
-      <li id="rowT1"><span class="tag">T1</span><span class="nom">en attente</span></li>
-      <li id="rowT2"><span class="tag">T2</span><span class="nom">en attente</span></li>
+      <li id="rowT1"><span class="tag">T1</span><span class="name">waiting</span></li>
+      <li id="rowT2"><span class="tag">T2</span><span class="name">waiting</span></li>
     </ul>
   </section>
 
-  <!-- ===================== visualisation ===================== -->
+  <!-- ===================== viewer ===================== -->
   <section class="viewer">
     <div class="views">
 
-      <figure class="view view-entree">
-        <figcaption><span>Entree <b id="modLabel">T1</b></span><span class="meta" id="dimsLabel"></span></figcaption>
+      <figure class="view view-input">
+        <figcaption><span>Input <b id="modLabel">T1</b></span><span class="meta" id="dimsLabel"></span></figcaption>
         <div class="canvaswrap">
-          <canvas id="canvasT1" width="144" height="144"></canvas>
-          <div class="empty" id="emptyT1">
+          <canvas id="canvasInput" width="144" height="144"></canvas>
+          <div class="empty" id="emptyInput">
             <span class="big" aria-hidden="true">&#9633;</span>
-            <span>en attente de volumes</span>
+            <span>waiting for volumes</span>
           </div>
         </div>
       </figure>
@@ -64,60 +64,60 @@
           <canvas id="canvasSeg" width="144" height="144"></canvas>
           <div class="empty" id="emptySeg">
             <span class="big" aria-hidden="true">&#9673;</span>
-            <span id="emptySegTxt">Depose une IRM pour commencer</span>
+            <span id="emptySegTxt">Drop an MRI to get started</span>
           </div>
-          <div class="swipehint" id="swipeHint">glisse pour changer de coupe</div>
+          <div class="swipehint" id="swipeHint">Swipe to change slice</div>
         </div>
       </figure>
 
     </div>
   </section>
 
-  <!-- ===================== panneau de controle ===================== -->
+  <!-- ===================== controls ===================== -->
   <aside class="side">
 
-    <section class="panel off" id="panelCoupe">
-      <h2>Coupe coronale</h2>
+    <section class="panel off" id="panelSlice">
+      <h2>Coronal slice</h2>
       <div class="sliceval"><span id="sliceNum">&mdash;</span><small id="sliceMax"></small></div>
       <div class="scrub">
-        <canvas id="profil" width="300" height="26" aria-hidden="true"></canvas>
+        <canvas id="occupancy" width="300" height="26" aria-hidden="true"></canvas>
         <input type="range" id="sliceSlider" min="0" max="191" value="96" disabled
-               aria-label="indice de coupe coronale">
+               aria-label="coronal slice index">
       </div>
       <div class="btnrow">
-        <button id="btnPrev" disabled aria-label="coupe precedente">&larr;</button>
-        <button id="btnNext" disabled aria-label="coupe suivante">&rarr;</button>
-        <span class="kbdhint">fleches du clavier</span>
+        <button id="btnPrev" disabled aria-label="previous slice">&larr;</button>
+        <button id="btnNext" disabled aria-label="next slice">&rarr;</button>
+        <span class="kbdhint">or arrow keys</span>
       </div>
     </section>
 
-    <section class="panel off" id="panelAffichage">
-      <h2>Affichage</h2>
+    <section class="panel off" id="panelDisplay">
+      <h2>Display</h2>
       <div class="ctrlrow">
-        <span class="ctrllabel">modalite de fond</span>
+        <span class="ctrllabel">background modality</span>
         <span class="modswitch">
           <button id="btnT1" class="on" type="button">T1</button><button id="btnT2" type="button">T2</button>
         </span>
       </div>
       <div class="ctrlrow">
-        <label class="ctrllabel" for="opacitySlider">opacite</label>
+        <label class="ctrllabel" for="opacitySlider">overlay opacity</label>
         <input type="range" id="opacitySlider" min="0" max="100" value="65">
         <output id="opacityVal">65&nbsp;%</output>
       </div>
     </section>
 
     <section class="panel off" id="panelStats">
-      <h2>Composition de la coupe</h2>
+      <h2>Slice composition</h2>
       <div class="statbar" id="statBar">
-        <span class="s-lcr"></span><span class="s-gm"></span><span class="s-wm"></span>
+        <span class="s-csf"></span><span class="s-gm"></span><span class="s-wm"></span>
       </div>
       <ul class="legend">
-        <li><i class="s-lcr"></i>LCR<b id="pctLCR">&mdash;</b></li>
-        <li><i class="s-gm"></i>substance grise<b id="pctGM">&mdash;</b></li>
-        <li><i class="s-wm"></i>substance blanche<b id="pctWM">&mdash;</b></li>
+        <li><i class="s-csf"></i>cerebrospinal fluid<b id="pctCSF">&mdash;</b></li>
+        <li><i class="s-gm"></i>grey matter<b id="pctGM">&mdash;</b></li>
+        <li><i class="s-wm"></i>white matter<b id="pctWM">&mdash;</b></li>
       </ul>
       <div class="tiles">
-        <div class="tile"><span class="k">pretraitement</span><span class="v" id="tPrep">&mdash;<small>ms</small></span></div>
+        <div class="tile"><span class="k">preprocessing</span><span class="v" id="tPrep">&mdash;<small>ms</small></span></div>
         <div class="tile"><span class="k">inference</span><span class="v" id="tInfer">&mdash;<small>ms</small></span></div>
       </div>
     </section>
@@ -128,12 +128,32 @@
 
 <footer>
   <div class="deploybar">
-    <span class="etat"><span id="etatPoint">&#9679;</span> <span id="etatTexte">verification&hellip;</span></span>
-    <button id="btnInstaller" hidden>Installer l'application</button>
+    <span class="status"><span id="statusDot">&#9679;</span> <span id="statusText">checking&hellip;</span></span>
+    <button id="btnInstall" hidden>Install app</button>
   </div>
-  <p class="mentions">
-    Calcul entierement <b>local</b> dans le navigateur (WebAssembly) &mdash; aucune image n'est envoyee sur le reseau.<br>
-    U-Net 2.5D separable &middot; contexte 5 coupes &middot; 386&nbsp;782 parametres &middot; entraine sur iSeg-2017
+
+  <dl class="specs">
+    <div>
+      <dt>Model</dt>
+      <dd>2.5D separable U-Net &middot; 386,782 parameters &middot; 0.43&nbsp;MB quantised to int8</dd>
+    </div>
+    <div>
+      <dt>Training</dt>
+      <dd>iSeg-2017, T1 and T2 MRI of 6-month-old infants &middot; Dice&nbsp;0.86 on two held-out subjects</dd>
+    </div>
+    <div>
+      <dt>Runtime</dt>
+      <dd>ONNX&nbsp;Runtime on WebAssembly, on your device &middot; about 100&nbsp;ms per slice</dd>
+    </div>
+  </dl>
+
+  <p class="privacy">
+    Your images never leave your device: everything is computed in the browser,
+    with nothing sent over the network.
+  </p>
+  <p class="disclaimer">
+    Research demonstration of a segmentation method. It has not undergone any clinical
+    validation and must not be used for diagnosis.
   </p>
 </footer>
 

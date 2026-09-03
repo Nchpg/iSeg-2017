@@ -1,16 +1,16 @@
-/* iSeg Viewer — feuille de style.
+/* iSeg Viewer — stylesheet.
 
-   Parti pris : un poste de lecture radiologique. Fond quasi noir a
-   dominante bleu froid (les salles de lecture se tiennent dans le noir,
-   et un fond sombre ne fausse pas la perception des niveaux de gris),
-   IBM Plex Sans/Mono pour l'aspect appareil technique. Theme unique
-   assume, comme les vrais visualiseurs DICOM.
+   The look follows a radiology reading station: near-black ground with
+   a cool blue cast (reading rooms are kept dark, and a dark ground does
+   not skew how greyscale is perceived), IBM Plex Sans/Mono for the
+   instrument-panel feel. Single theme on purpose, like real DICOM
+   viewers.
 
-   Trois paliers de mise en page :
-     > 1080px  panneau lateral + deux vues cote a cote
-     700-1080  panneau sous les vues, deux vues cote a cote
-     < 700px   une seule vue (la segmentation, qui contient deja
-               l'image de fond), reglages colles sous elle */
+   Three layout tiers:
+     > 1080px  side panel plus two views next to each other
+     700-1080  panel below the views, two views next to each other
+     < 700px   one view only (the segmentation already contains the
+               background image), controls right under it */
 
 :root {
   --void:      #0a0d12;
@@ -57,7 +57,7 @@ body {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
-/* ========================= entete ========================= */
+/* ========================== header ========================== */
 
 .topbar {
   position: sticky;
@@ -102,7 +102,7 @@ body {
 .chip.err  .dot { background: var(--danger); }
 @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
 
-/* ========================= ossature ========================= */
+/* ========================= structure ======================== */
 
 .shell {
   flex: 1;
@@ -114,14 +114,14 @@ body {
   max-width: 1440px;
   margin: 0 auto;
   grid-template-columns: minmax(0, 1fr);
-  /* Mobile, rien de charge : le depot de fichiers vient en premier,
-     c'est la seule action possible. Une fois les volumes lus, la classe
-     .charge le renvoie en bas et remonte l'image. */
+  /* Mobile with nothing loaded: the drop zone comes first, since it is
+     the only thing you can act on. Once volumes are read, the .loaded
+     class sends it back down and lifts the image up. */
   grid-template-areas: "files" "viewer" "side";
 }
-.shell.charge { grid-template-areas: "viewer" "side" "files"; }
+.shell.loaded { grid-template-areas: "viewer" "side" "files"; }
 
-#panelFichiers { grid-area: files; }
+#panelFiles { grid-area: files; }
 .viewer        { grid-area: viewer; }
 .side          { grid-area: side; }
 
@@ -129,14 +129,13 @@ body {
 .viewer { min-width: 0; }
 
 @media (min-width: 1081px) {
-  .shell, .shell.charge {
+  .shell, .shell.loaded {
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-areas: "viewer files" "viewer side";
-    /* La visualisation s'etend sur les deux lignes et les rend plus
-       hautes que la colonne de droite. Sans ces hauteurs explicites, la
-       premiere ligne s'etirerait et laisserait un vide sous le panneau
-       des volumes : « auto » la cale sur son contenu, « 1fr » donne le
-       reste a la seconde. */
+    /* The viewer spans both rows and makes them taller than the right
+       column needs. Without explicit row heights the first row would
+       stretch and leave a gap under the volumes panel: "auto" pins it
+       to its content, "1fr" hands the remainder to the second. */
     grid-template-rows: auto 1fr;
   }
   .side { position: sticky; top: 62px; align-self: start; }
@@ -156,7 +155,7 @@ body {
 }
 .panel.off { opacity: .4; pointer-events: none; }
 
-/* ========================= depot de fichiers ========================= */
+/* ========================== file drop ======================= */
 
 .drop {
   border: 1.5px dashed var(--border-2);
@@ -165,10 +164,10 @@ body {
   text-align: center;
   transition: border-color .15s, background .15s;
 }
-.drop.survol { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
-.drop.rempli { border-style: solid; border-color: var(--accent-dim); padding: 11px; }
-.drop.rempli .drop-title,
-.drop.rempli .drop-hint { display: none; }
+.drop.hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.drop.filled { border-style: solid; border-color: var(--accent-dim); padding: 11px; }
+.drop.filled .drop-title,
+.drop.filled .drop-hint { display: none; }
 
 .drop-title { margin: 0 0 4px; font-size: 13.5px; font-weight: 500; }
 .drop-hint  { margin: 0 0 11px; font-size: 11.5px; color: var(--text-faint); line-height: 1.45; }
@@ -198,10 +197,10 @@ button.ghost:hover { border-color: var(--accent-dim); }
   font-weight: 600; font-size: 10px;
 }
 .filelist li.ok .tag { color: var(--void); background: var(--accent); border-color: var(--accent); }
-.filelist li.ok .nom { color: var(--text-dim); }
-.filelist .nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filelist li.ok .name { color: var(--text-dim); }
+.filelist .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ========================= controle de coupe ========================= */
+/* ======================== slice control ===================== */
 
 .sliceval {
   display: flex; align-items: baseline; gap: 5px;
@@ -211,13 +210,13 @@ button.ghost:hover { border-color: var(--accent-dim); }
 .sliceval span { font-size: 25px; font-weight: 500; letter-spacing: -.02em; }
 .sliceval small { font-size: 12px; color: var(--text-faint); }
 
-/* le profil de remplissage montre ou se trouve reellement le cerveau */
+/* the occupancy profile shows where the brain actually sits */
 .scrub { position: relative; }
 .scrub canvas {
   width: 100%; height: 26px; display: block;
   border-radius: 4px;
   cursor: pointer;
-  touch-action: none;   /* on gere nous-memes le glissement */
+  touch-action: none;   /* dragging is handled in app.js */
 }
 .panel.off .scrub canvas { cursor: default; }
 .scrub input[type=range] { position: relative; margin-top: -3px; }
@@ -238,8 +237,8 @@ input[type=range]::-webkit-slider-thumb {
   box-shadow: 0 0 0 1px var(--accent-dim);
   cursor: pointer;
 }
-/* meme largeur que la version webkit : la constante POUCE de app.js
-   s'aligne dessus pour faire coincider le profil et le curseur */
+/* same width as the webkit rule: the THUMB constant in app.js relies
+   on it to keep the occupancy profile aligned with the slider */
 input[type=range]::-moz-range-thumb {
   box-sizing: border-box;
   width: 18px; height: 18px; border-radius: 50%;
@@ -263,7 +262,7 @@ input[type=range]:disabled::-webkit-slider-thumb { background: var(--text-faint)
 .kbdhint { font-size: 11px; color: var(--text-faint); }
 @media (pointer: coarse) { .kbdhint { display: none; } }
 
-/* ========================= reglages d'affichage ========================= */
+/* ======================= display controls =================== */
 
 .ctrlrow { display: flex; align-items: center; gap: 10px; }
 .ctrlrow + .ctrlrow { margin-top: 11px; }
@@ -288,14 +287,14 @@ input[type=range]:disabled::-webkit-slider-thumb { background: var(--text-faint)
 }
 .modswitch button.on { color: var(--void); background: var(--accent); border-color: var(--accent); }
 
-/* ========================= statistiques ========================= */
+/* ========================= statistics ======================= */
 
 .statbar {
   height: 22px; border-radius: 5px; overflow: hidden;
   display: flex; border: 1px solid var(--border); background: var(--panel-2);
 }
 .statbar span { height: 100%; width: 33.33%; transition: width .25s ease; }
-.s-lcr { background: var(--lcr); }
+.s-csf { background: var(--lcr); }
 .s-gm  { background: var(--gm); }
 .s-wm  { background: var(--wm); }
 
@@ -320,7 +319,7 @@ input[type=range]:disabled::-webkit-slider-thumb { background: var(--text-faint)
 .tile .v { font-family: var(--font-mono); font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .tile .v small { font-size: 10.5px; color: var(--text-dim); margin-left: 3px; }
 
-/* ========================= visualisation ========================= */
+/* =========================== viewer ========================= */
 
 .views { display: grid; gap: 11px; grid-template-columns: 1fr 1fr; }
 
@@ -373,16 +372,16 @@ canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; 
   pointer-events: none;
 }
 .swipehint.on { opacity: 1; }
-/* indice reserve au tactile */
+/* touch devices only */
 @media (pointer: fine) { .swipehint { display: none; } }
 
-/* sous 700px : une seule vue, la segmentation contient deja l'image de fond */
+/* under 700px: a single view, since the segmentation already carries the background image */
 @media (max-width: 700px) {
   .views { grid-template-columns: 1fr; }
-  .view-entree { display: none; }
+  .view-input { display: none; }
 }
 
-/* ========================= pied ========================= */
+/* ========================== footer ========================== */
 
 footer {
   width: 100%; max-width: 1440px; margin: 0 auto;
@@ -397,7 +396,7 @@ footer {
   border: 1px solid var(--border);
   border-radius: var(--r);
 }
-.deploybar .etat {
+.deploybar .status {
   flex: 1; min-width: 160px;
   font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
 }
@@ -407,10 +406,50 @@ footer {
   border: none; border-radius: 7px; padding: 8px 15px; cursor: pointer;
 }
 
-.mentions { margin: 0; text-align: center; font-size: 11px; color: var(--text-faint); line-height: 1.6; }
-.mentions b { color: var(--text-dim); font-weight: 500; }
+/* spec sheet: label on the left, value on the right, one row per
+   topic — folds into two levels on narrow screens */
+.specs {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex; flex-direction: column; gap: 9px;
+}
+.specs > div { display: flex; gap: 14px; align-items: baseline; }
+.specs dt {
+  flex: none; width: 96px;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint);
+}
+.specs dd {
+  margin: 0;
+  font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
+}
+@media (max-width: 560px) {
+  .specs > div { flex-direction: column; gap: 2px; }
+  .specs dt { width: auto; }
+}
 
-/* ========================= erreurs ========================= */
+.privacy {
+  margin: 0;
+  text-align: center;
+  font-size: 12px; color: var(--text-dim); line-height: 1.6;
+  max-width: 62ch; margin-inline: auto;
+}
+
+/* disclaimer: stated plainly, without alarm */
+.disclaimer {
+  margin: 0;
+  text-align: center;
+  font-size: 11px; color: var(--text-faint); line-height: 1.55;
+  max-width: 62ch; margin-inline: auto;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+
+/* ========================== errors ========================== */
 
 .err-banner {
   display: none;

@@ -17,7 +17,10 @@ import torch.nn.functional as F
 
 
 def soft_dice(logits, target, n_classes=4, eps=1e-6):
-    """Dice differentiable, moyenne sur les trois tissus.
+    """Dice differentiable, renvoie UNE valeur PAR TISSU : (LCR, GM, WM).
+
+    La moyenne sur les tissus est prise par l'appelant (DiceCELoss), ce
+    qui permet aussi de suivre les trois separement.
 
     Le fond (classe 0) est ecarte : le segmenter est trivial et l'inclure
     gonflerait le score sans rien mesurer d'utile.

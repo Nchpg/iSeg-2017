@@ -127,33 +127,42 @@
 </main>
 
 <footer>
-  <div class="deploybar">
-    <span class="status"><span id="statusDot">&#9679;</span> <span id="statusText">checking&hellip;</span></span>
-    <button id="btnInstall" hidden>Install app</button>
+  <div class="specs">
+    <article>
+      <h3>Model</h3>
+      <p class="lead">2.5D separable U-Net</p>
+      <dl>
+        <div><dt>parameters</dt><dd>386,782</dd></div>
+        <div><dt>size, int8</dt><dd>0.43 MB</dd></div>
+      </dl>
+    </article>
+
+    <article>
+      <h3>Training</h3>
+      <p class="lead">iSeg-2017 &middot; 6-month-old infants</p>
+      <dl>
+        <div><dt>modalities</dt><dd>T1 + T2</dd></div>
+        <div><dt>Dice, held out</dt><dd>0.86</dd></div>
+      </dl>
+    </article>
+
+    <article>
+      <h3>Runtime</h3>
+      <p class="lead">ONNX Runtime &middot; WebAssembly</p>
+      <dl>
+        <div><dt>per slice</dt><dd>~100 ms</dd></div>
+        <div><dt>computed</dt><dd>on-device</dd></div>
+      </dl>
+    </article>
   </div>
 
-  <dl class="specs">
-    <div>
-      <dt>Model</dt>
-      <dd>2.5D separable U-Net &middot; 386,782 parameters &middot; 0.43&nbsp;MB quantised to int8</dd>
-    </div>
-    <div>
-      <dt>Training</dt>
-      <dd>iSeg-2017, T1 and T2 MRI of 6-month-old infants &middot; Dice&nbsp;0.86 on two held-out subjects</dd>
-    </div>
-    <div>
-      <dt>Runtime</dt>
-      <dd>ONNX&nbsp;Runtime on WebAssembly, on your device &middot; about 100&nbsp;ms per slice</dd>
-    </div>
-  </dl>
+  <div class="installbar" id="installBar" hidden>
+    <button id="btnInstall">Install app</button>
+  </div>
 
   <p class="privacy">
     Your images never leave your device: everything is computed in the browser,
     with nothing sent over the network.
-  </p>
-  <p class="disclaimer">
-    Research demonstration of a segmentation method. It has not undergone any clinical
-    validation and must not be used for diagnosis.
   </p>
 </footer>
 

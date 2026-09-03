@@ -532,40 +532,26 @@ for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
 }
 
 /* =============================== offline =============================
-   Served over HTTPS, the page installs and runs without a network once
-   the ONNX Runtime engine is cached — which requires running one
-   segmentation while online. */
+   Served over HTTPS the service worker caches the app, so the page keeps
+   working without a network and can be installed to the home screen. */
 
-function announce(couleur, texte) {
-  $("statusDot").style.color = couleur;
-  $("statusText").textContent = texte;
+if (location.protocol !== "file:" && "serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
-if (location.protocol === "file:") {
-  announce("var(--danger)", "opened over file:// — serve the folder or use the hosted version");
-} else if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js").then((reg) => {
-    const pret = reg.active && navigator.serviceWorker.controller;
-    announce(pret ? "var(--wm)" : "var(--accent)",
-            pret ? "offline ready — this page works without a network"
-                 : "caching — run one segmentation to finish preparing offline use");
-  }).catch(() => announce("var(--danger)", "offline unavailable (service worker rejected)"));
-} else {
-  announce("var(--text-faint)", "offline unavailable in this browser");
-}
-
+// The install button only exists when the browser offers the prompt.
 let installPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   installPrompt = e;
-  $("btnInstall").hidden = false;
+  $("installBar").hidden = false;
 });
 $("btnInstall").addEventListener("click", async () => {
   if (!installPrompt) return;
   installPrompt.prompt();
   await installPrompt.userChoice;
   installPrompt = null;
-  $("btnInstall").hidden = true;
+  $("installBar").hidden = true;
 });
 
 window.addEventListener("resize", () => { if (occupancy) drawProfile(); });

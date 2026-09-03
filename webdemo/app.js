@@ -391,6 +391,39 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); allerA(+1); }
 });
 
+/* Le profil de remplissage sert aussi de barre de navigation : cliquer
+   ou glisser dessus amene directement a la coupe visee. */
+function coupeDepuisProfil(clientX) {
+  const c = $("profil");
+  const r = c.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  return Math.round(frac * +$("sliceSlider").max);
+}
+
+function viserCoupe(clientX) {
+  const s = $("sliceSlider");
+  if (s.disabled) return;
+  const cible = coupeDepuisProfil(clientX);
+  if (cible === +s.value) return;
+  s.value = cible;
+  majAffichageCoupe();
+  clearTimeout(minuteur);
+  minuteur = setTimeout(segmenter, 110);
+}
+
+const profilCanvas = $("profil");
+profilCanvas.addEventListener("pointerdown", (e) => {
+  if ($("sliceSlider").disabled) return;
+  profilCanvas.setPointerCapture(e.pointerId);
+  viserCoupe(e.clientX);
+});
+profilCanvas.addEventListener("pointermove", (e) => {
+  if (profilCanvas.hasPointerCapture(e.pointerId)) viserCoupe(e.clientX);
+});
+profilCanvas.addEventListener("pointerup", (e) => {
+  if (profilCanvas.hasPointerCapture(e.pointerId)) profilCanvas.releasePointerCapture(e.pointerId);
+});
+
 /* Sur tactile, glisser horizontalement sur l'image fait defiler les
    coupes — plus direct que de viser le curseur du panneau. */
 let departX = null, departCoupe = 0;

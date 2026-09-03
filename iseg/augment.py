@@ -105,4 +105,6 @@ class Augment:
         if self.noise_sigma > 0:
             x = x + self.rng.normal(0, self.noise_sigma, size=x.shape).astype(np.float32)
 
-        return x.astype(np.float32), target
+        # Le float32 est garanti tout au long de la chaine ; la conversion
+        # finale est faite une seule fois par ISegSlices.__getitem__.
+        return x, target

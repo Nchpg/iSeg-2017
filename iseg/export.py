@@ -1,16 +1,15 @@
 """Export d'un checkpoint vers un .onnx quantifie, pret a embarquer.
 
-    python -m iseg.export --checkpoint runs/separable_fold0.pt
-    python -m iseg.export --checkpoint runs/separable_fold0.pt --embed webdemo/index.html
+    python -m iseg.export --checkpoint runs/separable.pt
+    python -m iseg.export --checkpoint runs/separable.pt --deploy webdemo
 
 Produit le .onnx float32 et sa version int8 (environ 3,5x plus petite).
-Avec --embed, le modele int8 est injecte en base64 dans la page web, qui
-devient un fichier unique utilisable hors serveur.
+Avec --deploy, le modele int8 est aussi copie sous le nom model.onnx
+dans le dossier du site, ou la page va le chercher.
 """
 
 import argparse
-import base64
-import re
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -80,20 +79,13 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
     prepared.unlink(missing_ok=True)
 
 
-def embed_in_html(onnx_path, html_path):
-    """Injecte le modele en base64 dans la balise #modelData de la page.
-
-    Un fetch() vers un fichier local est bloque quand la page est ouverte
-    en file:// ; embarquer les poids rend le .html autonome.
-    """
-    b64 = base64.b64encode(Path(onnx_path).read_bytes()).decode()
-    html = Path(html_path).read_text(encoding="utf-8")
-    nouveau, n = re.subn(
-        r'(<script type="text/plain" id="modelData">)[^<]*(</script>)',
-        lambda m: m.group(1) + b64 + m.group(2), html, count=1)
-    if n == 0:
-        raise ValueError(f'balise <script id="modelData"> introuvable dans {html_path}')
-    Path(html_path).write_text(nouveau, encoding="utf-8")
+def deploy(onnx_path, site_dir):
+    """Place le modele la ou la page ira le chercher."""
+    cible = Path(site_dir) / "model.onnx"
+    if not cible.parent.is_dir():
+        raise ValueError(f"dossier du site introuvable : {site_dir}")
+    shutil.copyfile(onnx_path, cible)
+    return cible
 
 
 def mo(path):
@@ -106,8 +98,8 @@ def main():
     p.add_argument("--cache", default="cache", help="coupes servant a la calibration")
     p.add_argument("--calib-subjects", type=int, nargs="+", default=[1, 2])
     p.add_argument("--out", default="export")
-    p.add_argument("--embed", metavar="INDEX.HTML",
-                   help="injecter le modele int8 dans cette page web")
+    p.add_argument("--deploy", metavar="DOSSIER",
+                   help="copier le modele int8 en <DOSSIER>/model.onnx")
     p.add_argument("--no-quant", action="store_true", help="float32 seulement")
     args = p.parse_args()
 
@@ -128,9 +120,9 @@ def main():
         print(f"  int8      {final.name:<32} {mo(final):>6.2f} Mo   "
               f"(/{mo(fp32) / mo(final):.1f})")
 
-    if args.embed:
-        embed_in_html(final, args.embed)
-        print(f"  injecte dans {args.embed} -> {mo(args.embed):.2f} Mo (page autonome)")
+    if args.deploy:
+        cible = deploy(final, args.deploy)
+        print(f"  copie     {cible}")
 
 
 if __name__ == "__main__":

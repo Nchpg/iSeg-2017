@@ -123,38 +123,40 @@ pas les convolutions et n'apporte presque rien.
 
 ### Démonstration mobile
 
-`webdemo/` contient une page qui lit les fichiers `.hdr/.img`, laisse choisir une
-coupe et segmente **sur l'appareil**, en WebAssembly. Le modèle est embarqué en
-base64 dans le HTML : aucun poids à télécharger séparément, et pas de `fetch()` vers
-un fichier local, que les navigateurs bloquent en `file://`.
+`webdemo/` est un site statique qui lit les fichiers `.hdr/.img`, laisse choisir une
+coupe et segmente **sur l'appareil**, en WebAssembly. Aucune image ne quitte la
+machine, et il n'y a aucun serveur d'inférence.
 
 Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume complet.
 
-**Deux façons de s'en servir**, avec la même base de code et sans aucun serveur
-d'inférence — le calcul se fait toujours dans le navigateur.
-
-*Déployée.* Le dossier `webdemo/` est un site statique : il se publie tel quel sur
-GitHub Pages, Vercel ou Netlify. En HTTPS, le service worker met tout en cache dès la
-première visite et l'application devient installable sur l'écran d'accueil (PWA) ;
-elle fonctionne ensuite sans réseau.
-
-*Fichier unique.* Le bouton « Télécharger la page » produit un `.html` autonome, à
-ouvrir directement — par câble, mail ou cloud, sans hébergement. Une connexion reste
-requise au tout premier chargement pour récupérer le moteur ONNX Runtime depuis son
-CDN ; ensuite le navigateur le garde en cache.
-
 ```
 webdemo/
-  index.html      la page, modèle inclus (0,6 Mo)
+  index.html      structure
+  app.css         styles
+  app.js          lecture Analyze, prétraitement, inférence, rendu
+  model.onnx      le modèle int8 (0,43 Mo)
+  sw.js           service worker (cache hors ligne)
   manifest.json   déclaration PWA
-  sw.js           mise en cache pour le hors ligne
   icon-*.png      icônes d'application
+```
+
+Le dossier se publie tel quel sur GitHub Pages, Vercel ou Netlify. En HTTPS le
+service worker met tout en cache dès la première visite et l'application devient
+installable sur l'écran d'accueil ; elle fonctionne ensuite sans réseau, à condition
+d'avoir lancé **une segmentation en ligne** au préalable — c'est ce qui déclenche la
+mise en cache du moteur ONNX Runtime, chargé depuis un CDN.
+
+Ouvrir `index.html` en `file://` ne marche pas : les navigateurs interdisent à une
+page locale de charger `model.onnx`. Pour un essai local, servir le dossier :
+
+```bash
+cd webdemo && python3 -m http.server 8000
 ```
 
 Pour y placer un autre modèle :
 
 ```bash
-python -m iseg.export --checkpoint runs/separable.pt --embed webdemo/index.html
+python -m iseg.export --checkpoint runs/separable.pt --deploy webdemo
 ```
 
 ## Structure
@@ -167,5 +169,5 @@ iseg/losses.py          Dice + entropie croisée, Dice volumique
 iseg/train.py           entraînement, 8 sujets / 2 en validation
 iseg/export.py          ONNX, quantification int8, injection dans la page web
 colab_iseg.ipynb        orchestration Colab
-webdemo/                démonstration mobile (site statique + PWA)
+webdemo/                site statique : démonstration mobile (PWA)
 ```

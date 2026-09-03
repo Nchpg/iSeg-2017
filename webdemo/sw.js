@@ -7,14 +7,17 @@
    en cache au premier passage. Apres une inference reussie en ligne,
    plus rien n'est necessaire.
 
-   Le modele lui-meme est embarque en base64 dans index.html, il n'y a
-   donc aucun poids a telecharger separement. */
+   Le modele (model.onnx, 0,43 Mo) fait partie des fichiers pre-caches :
+   apres l'installation il est disponible hors ligne. */
 
-const CACHE = "iseg-viewer-v1";
+const CACHE = "iseg-viewer-v2";
 
 const LOCAL = [
   "./",
   "./index.html",
+  "./app.css",
+  "./app.js",
+  "./model.onnx",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",

@@ -7,10 +7,9 @@ T2 de bébés de 6 mois, avec un objectif de déploiement mobile ou embarqué.
 
 Les 13 sujets du dossier `iSeg-2017-Testing/` **n'ont pas d'étiquettes** : elles n'ont
 jamais été publiées, elles servaient au classement du challenge. Toute évaluation
-chiffrée se fait donc en **validation croisée 5 blocs sur les 10 sujets
-d'entraînement** (8 sujets d'entraînement, 2 de validation par bloc). Le dossier de
-test ne sert qu'à produire des prédictions qualitatives et à mesurer un temps
-d'inférence.
+chiffrée se fait donc sur les 10 sujets d'entraînement : **8 pour apprendre, les
+sujets 1 et 2 mis de côté pour mesurer**. Le dossier de test ne sert qu'à produire
+des prédictions qualitatives et à mesurer un temps d'inférence.
 
 Le découpage est fait **par sujet**, jamais par coupe : deux coupes voisines d'un
 même volume sont quasi identiques, les mélanger entre entraînement et validation
@@ -18,10 +17,10 @@ donnerait un Dice artificiellement élevé.
 
 Le Dice se calcule **par volume**, après réassemblage de toutes les coupes.
 
-## Ce que l'exploration a établi
+## Ce que les données imposent
 
-`python explore.py` produit quatre figures dans `figures/` et le rapport chiffré
-ci-dessous.
+Constats mesurés sur les 10 sujets (le script d'analyse qui les a produits est dans
+l'historique git : `git show HEAD~1:explore.py`, figures dans `figures/`).
 
 **Géométrie.** 10 sujets, 144×192×256, 1 mm isotrope. T1, T2 et label partagent la
 même matrice affine : les modalités sont déjà recalées, aucun réalignement à faire.
@@ -45,9 +44,8 @@ Conséquence structurante : à 6 mois, **aucune combinaison d'intensités ne sé
 WM**. C'est la phase iso-intense, et elle rend le contexte spatial indispensable
 plutôt qu'accessoire. Le T2 est conservé (son coût est dérisoire, et un réseau
 convolutif exploite des relations non linéaires que le critère de Fisher ne capte
-pas), mais son apport réel doit être **mesuré par ablation**, pas supposé.
-
-Attendu : le Dice de la WM sera le plus bas des trois.
+pas). Son apport réel n'a pas été mesuré par ablation — `--modalities t1` permet
+de le faire si la question se pose.
 
 ## Choix de conception
 
@@ -65,7 +63,7 @@ Attendu : le Dice de la WM sera le plus bas des trois.
 Un U-Net 2D dont les canaux d'entrée portent la troisième dimension : `context`
 coupes coronales adjacentes par modalité (5 par défaut, soit 10 canaux avec T1+T2).
 
-| variante | description | paramètres | int8 | Dice (5 blocs) |
+| variante | description | paramètres | int8 | Dice |
 |---|---|---|---|---|
 | `standard` | convolutions 3×3 pleines, base 16, 4 niveaux | 1 943 636 | 1,89 Mo | 0,8927 |
 | **`separable`** | depthwise 3×3 + pointwise 1×1 | 386 782 | **0,43 Mo** | **0,8624** |
@@ -76,22 +74,26 @@ taille**. Descendre plus bas (`tiny`) coûte 3,4 points de Dice supplémentaires
 un gain de taille sans effet pratique — les deux tiennent déjà largement sur un
 téléphone.
 
-Détail par tissu pour `separable` : LCR 0,8969 ± 0,0072, GM 0,8606 ± 0,0033,
-WM 0,8297 ± 0,0083. L'écart entre le meilleur et le pire bloc est de 0,0085, donc
-la performance ne dépend pas du découpage.
+Détail par tissu pour `separable` : LCR 0,8969, GM 0,8606, WM 0,8297 — la substance
+blanche est bien la plus difficile, comme le chevauchement d'histogrammes de 0,702
+le laissait prévoir.
+
+Ces chiffres viennent d'une validation croisée 5 blocs faite une fois (écart entre
+le meilleur et le pire bloc : 0,0085, donc la performance ne dépend pas du
+découpage). Le code actuel se contente d'un découpage unique, suffisant pour
+mesurer un modèle.
 
 ## Utilisation
 
-### Environnement local (exploration seulement)
+### Environnement local
 
 Sous NixOS, les wheels manylinux ont besoin de `libstdc++` et `zlib` dans le chemin
 des bibliothèques ; `env.sh` s'en charge.
 
 ```bash
 uv venv .venv
-uv pip install --python .venv/bin/python numpy nibabel matplotlib
+uv pip install --python .venv/bin/python numpy nibabel torch onnx onnxruntime onnxscript
 source env.sh
-.venv/bin/python explore.py
 ```
 
 ### Entraînement (Colab, GPU T4)
@@ -100,20 +102,18 @@ Ouvrir `colab_iseg.ipynb`. Le notebook n'orchestre que des appels au paquet `ise
 qui reste versionné dans git.
 
 ```bash
-python -m iseg.train --variant standard --modalities t1t2 --context 5 --epochs 60
-python -m iseg.train --variant separable --epochs 60
-python -m iseg.train --variant tiny --epochs 60
-
-# ablations
-python -m iseg.train --variant standard --modalities t1   # le T2 sert-il ?
-python -m iseg.train --variant standard --context 1        # 2D pur
-python -m iseg.train --variant standard --context 7        # contexte élargi
+python -m iseg.train                       # separable, 60 epoques, ~10 min sur T4
+python -m iseg.train --variant standard    # la reference haute
+python -m iseg.train --variant tiny        # la plus petite
 ```
+
+Le Dice sur les deux sujets de validation s'affiche toutes les 5 époques, et les
+poids du meilleur passage sont écrits dans `runs/<variante>.pt`.
 
 ### Export du modèle
 
 ```bash
-python -m iseg.export --checkpoint runs/separable_fold0.pt
+python -m iseg.export --checkpoint runs/separable.pt
 ```
 
 Produit le `.onnx` float32 et sa version quantifiée int8, environ 3,5× plus petite
@@ -131,7 +131,7 @@ bloquent en `file://`.
 Pour y placer un autre modèle :
 
 ```bash
-python -m iseg.export --checkpoint runs/separable_fold0.pt --embed webdemo/index.html
+python -m iseg.export --checkpoint runs/separable.pt --embed webdemo/index.html
 ```
 
 Il suffit ensuite d'ouvrir le `.html` — aucun serveur nécessaire. Une connexion reste
@@ -142,12 +142,11 @@ Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume 
 ## Structure
 
 ```
-explore.py              exploration et figures
 iseg/data.py            prétraitement, cache, dataset 2.5D
 iseg/augment.py         augmentation (géométrie + intensité, dont champ de biais)
 iseg/model.py           U-Net 2.5D et variantes frugales
 iseg/losses.py          Dice + entropie croisée, Dice volumique
-iseg/train.py           validation croisée 5 blocs
+iseg/train.py           entraînement, 8 sujets / 2 en validation
 iseg/export.py          ONNX, quantification int8, injection dans la page web
 colab_iseg.ipynb        orchestration Colab
 webdemo/index.html      démonstration mobile autonome

@@ -108,8 +108,3 @@ def build(variant, in_channels, n_classes=4):
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-def model_size_mb(model):
-    """Taille en float32, 4 octets par parametre."""
-    return count_parameters(model) * 4 / 1024 ** 2

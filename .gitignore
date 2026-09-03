@@ -16,4 +16,3 @@ iseg-colab.zip
 __pycache__/
 *.pyc
 iseg-resultats.zip
-webdemo/model.onnx

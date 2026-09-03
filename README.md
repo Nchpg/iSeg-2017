@@ -65,15 +65,20 @@ Attendu : le Dice de la WM sera le plus bas des trois.
 Un U-Net 2D dont les canaux d'entrée portent la troisième dimension : `context`
 coupes coronales adjacentes par modalité (5 par défaut, soit 10 canaux avec T1+T2).
 
-| variante | description | paramètres | MACs/coupe |
-|---|---|---|---|
-| `standard` | convolutions 3×3 pleines, base 16, 4 niveaux | 1 943 636 | 981 M |
-| `separable` | depthwise 3×3 + pointwise 1×1 | 386 782 | 174 M |
-| `tiny` | separable, base 8, 3 niveaux | 26 974 | 43 M |
+| variante | description | paramètres | int8 | Dice (5 blocs) |
+|---|---|---|---|---|
+| `standard` | convolutions 3×3 pleines, base 16, 4 niveaux | 1 943 636 | 1,89 Mo | 0,8927 |
+| **`separable`** | depthwise 3×3 + pointwise 1×1 | 386 782 | **0,43 Mo** | **0,8624** |
+| `tiny` | separable, base 8, 3 niveaux | 26 974 | 0,07 Mo | 0,8281 |
 
-Mesuré pour 10 canaux d'entrée en 144×144. Le rapport entre les extrêmes est de
-**72× sur les paramètres et 23× sur le calcul** — de quoi tracer une courbe de
-compromis lisible.
+`separable` est le modèle retenu : **97 % du Dice de `standard` pour 20 % de sa
+taille**. Descendre plus bas (`tiny`) coûte 3,4 points de Dice supplémentaires pour
+un gain de taille sans effet pratique — les deux tiennent déjà largement sur un
+téléphone.
+
+Détail par tissu pour `separable` : LCR 0,8969 ± 0,0072, GM 0,8606 ± 0,0033,
+WM 0,8297 ± 0,0083. L'écart entre le meilleur et le pire bloc est de 0,0085, donc
+la performance ne dépend pas du découpage.
 
 ## Utilisation
 
@@ -105,31 +110,34 @@ python -m iseg.train --variant standard --context 1        # 2D pur
 python -m iseg.train --variant standard --context 7        # contexte élargi
 ```
 
-### Export et mesure de frugalité
+### Export du modèle
 
 ```bash
-python -m iseg.export --checkpoint runs/standard_fold0.pt --cache cache \
-    --calib-subjects 1 2 --runs 50 --threads 1
+python -m iseg.export --checkpoint runs/separable_fold0.pt
 ```
 
-Produit le `.onnx` float32, sa version quantifiée int8 (statique, calibrée sur de
-vraies coupes) et un rapport JSON : paramètres, MACs, taille en Mo, latence par coupe
-et extrapolation au volume entier.
+Produit le `.onnx` float32 et sa version quantifiée int8, environ 3,5× plus petite
+(1,49 Mo → 0,43 Mo pour `separable`). La quantification est statique, calibrée sur
+de vraies coupes — sur un réseau convolutif, la quantification dynamique ne touche
+pas les convolutions et n'apporte presque rien.
 
-La latence est mesurée **CPU mono-thread**, proxy honnête pour un cœur ARM. Sur un
-modèle très petit, la quantification int8 peut se révéler *plus lourde et plus lente*
-que le float32 : les nœuds de quantification et déquantification ajoutés dominent
-alors le calcul utile. C'est un résultat à reporter tel quel, pas à masquer.
+### Démonstration mobile
 
-### Mesure sur téléphone réel (optionnel)
+`webdemo/index.html` est une page autonome : elle lit les fichiers `.hdr/.img`,
+laisse choisir une coupe et segmente sur l'appareil, en WebAssembly. Le modèle y est
+embarqué en base64, ce qui évite le `fetch()` d'un fichier local que les navigateurs
+bloquent en `file://`.
 
-Aucune application n'est nécessaire pour obtenir le chiffre qui compte :
+Pour y placer un autre modèle :
 
 ```bash
-adb push onnxruntime_perf_test /data/local/tmp/
-adb push export/standard_fold0.int8.onnx /data/local/tmp/
-adb shell "cd /data/local/tmp && ./onnxruntime_perf_test -e cpu -r 50 standard_fold0.int8.onnx"
+python -m iseg.export --checkpoint runs/separable_fold0.pt --embed webdemo/index.html
 ```
+
+Il suffit ensuite d'ouvrir le `.html` — aucun serveur nécessaire. Une connexion reste
+requise au premier chargement pour récupérer le moteur ONNX Runtime depuis son CDN.
+
+Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume complet.
 
 ## Structure
 
@@ -140,6 +148,7 @@ iseg/augment.py         augmentation (géométrie + intensité, dont champ de bi
 iseg/model.py           U-Net 2.5D et variantes frugales
 iseg/losses.py          Dice + entropie croisée, Dice volumique
 iseg/train.py           validation croisée 5 blocs
-iseg/export.py          ONNX, quantification int8, MACs, latence
+iseg/export.py          ONNX, quantification int8, injection dans la page web
 colab_iseg.ipynb        orchestration Colab
+webdemo/index.html      démonstration mobile autonome
 ```

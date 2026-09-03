@@ -20,8 +20,7 @@ TRAIN = ROOT / "iSeg-2017-Training"
 FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 
-# iSeg encode les tissus avec ces valeurs dans le fichier label
-LABELS = {0: "fond", 10: "LCR", 150: "GM", 250: "WM"}
+# iSeg encode les tissus 10 / 150 / 250 dans le fichier label, le fond a 0
 TISSUES = ["LCR", "GM", "WM"]
 SUBJECTS = list(range(1, 11))
 

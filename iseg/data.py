@@ -34,7 +34,6 @@ CROP_Z = (72, 216)
 
 # Valeurs d'etiquette du challenge -> indices de classe
 LABEL_MAP = {0: 0, 10: 1, 150: 2, 250: 3}
-CLASS_NAMES = ["fond", "LCR", "GM", "WM"]
 TISSUE_NAMES = ["LCR", "GM", "WM"]
 
 # Une coupe entre dans l'entrainement si au moins cette fraction de ses
@@ -61,7 +60,8 @@ def preprocess_subject(root, subject, with_label=True):
     """Charge un sujet, normalise et recadre.
 
     Retourne t1, t2 en float32 et le label en uint8 (0-3), de forme
-    (128, Y, 128). Le label vaut None pour les sujets de test.
+    (144, Y, 144). Le label vaut None pour les sujets de test, qui n'ont
+    pas d'annotation publique.
     """
     root = Path(root)
     t1 = _read(root / f"subject-{subject}-T1.hdr").astype(np.float32)
@@ -99,11 +99,11 @@ def build_cache(raw_dir, cache_dir, subjects, with_label=True):
     """
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
-    written = []
     for s in subjects:
         out = cache_dir / f"subject-{s}.npz"
         if out.exists():
-            written.append(out)
+            # Idempotent : un cache complet dispense d'avoir les .hdr/.img
+            # sous la main, ce qui allege le transfert vers Colab.
             continue
         t1, t2, label = preprocess_subject(raw_dir, s, with_label)
         payload = {"t1": t1.astype(np.float16), "t2": t2.astype(np.float16)}
@@ -114,8 +114,6 @@ def build_cache(raw_dir, cache_dir, subjects, with_label=True):
                 (label > 0).sum(axis=(0, 2)) / (label.shape[0] * label.shape[2])
             ).astype(np.float32)
         np.savez_compressed(out, **payload)
-        written.append(out)
-    return written
 
 
 def load_cached(cache_dir, subject):

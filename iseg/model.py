@@ -8,9 +8,10 @@ Core ML) savent accelerer et quantifier.
 
 Trois variantes, pour tracer la courbe Dice vs frugalite :
 
-  standard   convolutions 3x3 pleines           -> reference haute
-  separable  depthwise 3x3 + pointwise 1x1      -> ~8x moins de calcul
-  tiny       standard mais base=8, depth=3      -> reference basse
+  standard   convolutions 3x3 pleines            1 943 636 params
+  separable  depthwise 3x3 + pointwise 1x1         386 782 params
+  tiny       separable, plus etroit et moins       26 974 params
+             profond (base=8, depth=3)
 """
 
 import torch
@@ -109,5 +110,6 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def model_size_mb(model, bytes_per_param=4):
-    return count_parameters(model) * bytes_per_param / 1024 ** 2
+def model_size_mb(model):
+    """Taille en float32, 4 octets par parametre."""
+    return count_parameters(model) * 4 / 1024 ** 2

@@ -9,9 +9,6 @@ L'exploration a montre un desequilibre modere entre tissus a l'interieur
 du cerveau (LCR 22 %, GM 47 %, WM 31 %, soit un facteur 2,2). Pas besoin
 de ponderation agressive : le terme Dice suffit a mettre les trois tissus
 sur un pied d'egalite.
-
-Le fond est exclu du terme Dice : le segmenter est trivial et l'inclure
-gonflerait artificiellement le score.
 """
 
 import torch
@@ -19,13 +16,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def soft_dice(logits, target, n_classes=4, ignore_background=True, eps=1e-6):
-    """Dice differentiable, moyenne sur les classes retenues."""
-    probs = F.softmax(logits, dim=1)
-    onehot = F.one_hot(target, n_classes).permute(0, 3, 1, 2).float()
+def soft_dice(logits, target, n_classes=4, eps=1e-6):
+    """Dice differentiable, moyenne sur les trois tissus.
 
-    start = 1 if ignore_background else 0
-    probs, onehot = probs[:, start:], onehot[:, start:]
+    Le fond (classe 0) est ecarte : le segmenter est trivial et l'inclure
+    gonflerait le score sans rien mesurer d'utile.
+    """
+    probs = F.softmax(logits, dim=1)[:, 1:]
+    onehot = F.one_hot(target, n_classes).permute(0, 3, 1, 2).float()[:, 1:]
 
     dims = (0, 2, 3)
     inter = (probs * onehot).sum(dims)

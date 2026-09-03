@@ -22,9 +22,12 @@ import torch.nn as nn
 from . import model as models
 from .data import ISegSlices
 
+# Taille des coupes attendue par le reseau, fixee par le recadrage de data.py
+SIZE = 144
+
 
 # --------------------------------------------------------------- MACs
-def count_macs(net, in_channels, size=144):
+def count_macs(net, in_channels):
     """Multiplications-accumulations pour une inference, par couche conv.
 
     Compte a la main plutot que d'ajouter une dependance : seules les
@@ -48,27 +51,27 @@ def count_macs(net, in_channels, size=144):
             hooks.append(m.register_forward_hook(hook))
     net.eval()
     with torch.no_grad():
-        net(torch.zeros(1, in_channels, size, size))
+        net(torch.zeros(1, in_channels, SIZE, SIZE))
     for h in hooks:
         h.remove()
     return total[0]
 
 
 # -------------------------------------------------------------- export
-def to_onnx(checkpoint, out_path, size=144, opset=17):
+def to_onnx(checkpoint, out_path):
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     net = models.build(ckpt["variant"], ckpt["in_channels"])
     net.load_state_dict(ckpt["state_dict"])
     net.eval()
 
-    dummy = torch.randn(1, ckpt["in_channels"], size, size)
+    dummy = torch.randn(1, ckpt["in_channels"], SIZE, SIZE)
     torch.onnx.export(
         net, dummy, str(out_path),
         input_names=["input"], output_names=["logits"],
         # Le lot reste dynamique : l'application segmente une coupe a la
         # fois, mais le banc d'essai peut en grouper plusieurs.
         dynamic_axes={"input": {0: "batch"}, "logits": {0: "batch"}},
-        opset_version=opset,
+        opset_version=17,
     )
 
     # Le nouvel exportateur dynamo de torch >= 2.5 peut ecrire les poids
@@ -117,7 +120,7 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
 
 
 # ------------------------------------------------------------ latence
-def benchmark(onnx_path, in_channels, size=144, runs=50, warmup=5, threads=1):
+def benchmark(onnx_path, in_channels, runs=50, warmup=5, threads=1):
     """Latence par coupe, CPU mono-thread par defaut."""
     import onnxruntime as ort
 
@@ -126,7 +129,7 @@ def benchmark(onnx_path, in_channels, size=144, runs=50, warmup=5, threads=1):
     opts.inter_op_num_threads = threads
     sess = ort.InferenceSession(str(onnx_path), opts, providers=["CPUExecutionProvider"])
 
-    x = np.random.randn(1, in_channels, size, size).astype(np.float32)
+    x = np.random.randn(1, in_channels, SIZE, SIZE).astype(np.float32)
     for _ in range(warmup):
         sess.run(None, {"input": x})
 

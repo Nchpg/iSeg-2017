@@ -130,7 +130,7 @@ function buildTensor(y) {
   const out = new Float32Array(2 * CONTEXT * SIZE * SIZE);
   let ptr = 0;
   for (const vol of [volT1, volT2]) {
-    for (let k = -demi; k <= half; k++) {
+    for (let k = -half; k <= half; k++) {
       const yy = Math.min(Math.max(y + k, 0), vol.Y - 1);
       out.set(extractSlice(vol, vol.norm, yy), ptr);
       ptr += SIZE * SIZE;
@@ -274,12 +274,17 @@ function requestSegmentation(y) {
 
 async function segmentationLoop() {
   inferenceRunning = true;
-  while (requestedSlice !== null) {
-    const y = requestedSlice;
-    requestedSlice = null;
-    await segmentSlice(y);
+  try {
+    while (requestedSlice !== null) {
+      const y = requestedSlice;
+      requestedSlice = null;
+      await segmentSlice(y);
+    }
+  } finally {
+    // Without this, a single thrown error would leave the flag set and
+    // wedge every later request on "computing…" for good.
+    inferenceRunning = false;
   }
-  inferenceRunning = false;
 }
 
 /* Redraws the background image only: a few milliseconds, so the
@@ -297,12 +302,12 @@ async function segmentSlice(y) {
   clearError();
   $("segStateLabel").textContent = "computing…";
 
-  const t0 = performance.now();
-  lastInput = drawInput(y);
-  const data = buildTensor(y);
-  const msPrep = performance.now() - t0;
-
   try {
+    const t0 = performance.now();
+    lastInput = drawInput(y);
+    const data = buildTensor(y);
+    const msPrep = performance.now() - t0;
+
     const t1 = performance.now();
     const output = await session.run({
       input: new ort.Tensor("float32", data, [1, 2 * CONTEXT, SIZE, SIZE]),
@@ -333,7 +338,7 @@ async function segmentSlice(y) {
     $("panelStats").classList.remove("off");
   } catch (e) {
     $("segStateLabel").textContent = "error";
-    showError("Inference failed: " + e.message);
+    showError("Segmentation failed: " + e.message);
   }
 }
 
@@ -341,9 +346,9 @@ async function segmentSlice(y) {
    All 4 files of a subject are dropped at once: T1 and T2 are picked
    out by filename, then .hdr is paired with .img. */
 
-async function acceptFiles(liste) {
+async function acceptFiles(fileList) {
   clearError();
-  const files = Array.from(liste);
+  const files = Array.from(fileList);
   const pick = (mod, ext) =>
     files.find((f) => new RegExp(`t${mod}\\b|t${mod}[._-]`, "i").test(f.name) &&
                          new RegExp(`\\.${ext}$`, "i").test(f.name));
@@ -379,7 +384,7 @@ async function acceptFiles(liste) {
 
     const complete = !!(volT1 && volT2);
     $("dropZone").classList.toggle("filled", complete);
-    // the image moves to the top, the drop zone moves down
+    // the image moves to the top, the drop dropArea moves down
     $("shell").classList.toggle("loaded", complete);
     if (complete) $("btnBrowse").textContent = "Change volumes";
     enableWhenReady();
@@ -433,12 +438,12 @@ function step(delta) {
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
 $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
 
-const zone = $("dropZone");
+const dropArea = $("dropZone");
 ["dragenter", "dragover"].forEach((ev) =>
-  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add("hover"); }));
+  dropArea.addEventListener(ev, (e) => { e.preventDefault(); dropArea.classList.add("hover"); }));
 ["dragleave", "drop"].forEach((ev) =>
-  zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("hover"); }));
-zone.addEventListener("drop", (e) => acceptFiles(e.dataTransfer.files));
+  dropArea.addEventListener(ev, (e) => { e.preventDefault(); dropArea.classList.remove("hover"); }));
+dropArea.addEventListener("drop", (e) => acceptFiles(e.dataTransfer.files));
 
 $("sliceSlider").addEventListener("input", () => {
   updateSliceReadout();

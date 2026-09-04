@@ -21,13 +21,13 @@ const SLICE = Number(process.argv[3] || 96);
 const DATA = path.join(__dirname, "..", "iSeg-2017-Training");
 const SIZE = 144, CONTEXT = 5;
 
-let echecs = 0;
-const check = (nom, ok, detail = "") => {
-  console.log(`  ${ok ? "ok  " : "FAIL"}  ${nom}${detail ? "   " + detail : ""}`);
-  if (!ok) echecs++;
+let failures = 0;
+const check = (name, ok, detail = "") => {
+  console.log(`  ${ok ? "ok  " : "FAIL"}  ${name}${detail ? "   " + detail : ""}`);
+  if (!ok) failures++;
 };
 
-/* --- DOM minimal --- */
+/* --- minimal DOM --- */
 function fakeElement(id) {
   const el = {
     id,
@@ -78,39 +78,32 @@ const doc = {
   documentElement: { outerHTML: "" },
 };
 
-const boutonFactice = (id, cle, valeur) => {
+const fakeButton = (id, key, value) => {
   const b = fakeElement(id);
-  b.dataset = { [cle]: valeur };
+  b.dataset = { [key]: value };
   b._clicks = [];
   b.addEventListener = (ev, fn) => { if (ev === "click") b._clicks.push(fn); };
   b.click = () => b._clicks.forEach((fn) => fn());
   return b;
 };
 
-const modelButtons = ["tiny", "separable", "standard"].map((v) => boutonFactice("mdl-" + v, "variant", v));
+const modelButtons = ["tiny", "separable", "standard"].map((v) => fakeButton("mdl-" + v, "variant", v));
 
-// boutons « try example 1 2 3 », avec leur gestionnaire de clic
-const exampleButtons = [1, 2, 3].map((n) => {
-  const b = fakeElement("ex" + n);
-  b.dataset = { subject: String(n) };
-  b._clicks = [];
-  b.addEventListener = (ev, fn) => { if (ev === "click") b._clicks.push(fn); };
-  b.click = () => b._clicks.forEach((fn) => fn());
-  return b;
-});
+// "try example 1 2 3" buttons, with their click handler
+const exampleButtons = [1, 2, 3].map((n) => fakeButton("ex" + n, "subject", String(n)));
 
-/* --- fausse session ONNX --- */
-let dernierTenseur = null;
+/* --- fake ONNX session --- */
+let lastTensor = null;
 const ortStub = {
   env: { wasm: {} },
   Tensor: class {
-    constructor(type, data, dims) { this.type = type; this.data = data; this.dims = dims; dernierTenseur = data; }
+    constructor(type, data, dims) { this.type = type; this.data = data; this.dims = dims; lastTensor = data; }
   },
   InferenceSession: {
     create: async () => ({
       run: async () => {
-        // logits deterministes dont la classe gagnante varie selon la
-        // position, ce qui exerce l'argmax
+        // deterministic logits whose winning class varies with position,
+        // which exercises the argmax
         const logits = new Float32Array(4 * SIZE * SIZE);
         for (let i = 0; i < SIZE * SIZE; i++) logits[(i % 4) * SIZE * SIZE + i] = 1;
         return { logits: { data: logits } };
@@ -119,27 +112,27 @@ const ortStub = {
   },
 };
 
-/* --- fichiers --- */
-function fakeFile(nom) {
-  const buf = fs.readFileSync(path.join(DATA, nom));
+/* --- files --- */
+function fakeFile(name) {
+  const buf = fs.readFileSync(path.join(DATA, name));
   return {
-    name: nom,
+    name,
     arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
   };
 }
 
-/* --- execution --- */
+/* --- run --- */
 const source = fs.readFileSync(path.join(__dirname, "app.js"), "utf8") + `
 ;globalThis.__t = {
   acceptFiles, requestSegmentation, buildTensor, segmentSlice, unpackSample, loadSample,
-  etat: () => ({ volT1, volT2, lastClasses, inferenceRunning, requestedSlice }),
+  state: () => ({ volT1, volT2, lastClasses, inferenceRunning, requestedSlice }),
 };`;
 
 const fakeFetch = async (url) => {
-  const nom = String(url).split("/").pop();
-  const chemin = path.join(__dirname, nom);
-  if (!fs.existsSync(chemin)) return { ok: false, status: 404 };
-  const buf = fs.readFileSync(chemin);
+  const name = String(url).split("/").pop();
+  const file = path.join(__dirname, name);
+  if (!fs.existsSync(file)) return { ok: false, status: 404 };
+  const buf = fs.readFileSync(file);
   return { ok: true, status: 200, arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) };
 };
 
@@ -162,105 +155,103 @@ ctx.globalThis = ctx;
 vm.runInContext(source, ctx);
 
 (async () => {
-  console.log(`\ntest app.js — sujet ${SUBJECT}, coupe ${SLICE}\n`);
+  console.log(`\ntest app.js — subject ${SUBJECT}, slice ${SLICE}\n`);
 
   const t = ctx.__t;
-  let volsAvant;
   await t.acceptFiles([
     fakeFile(`subject-${SUBJECT}-T1.hdr`), fakeFile(`subject-${SUBJECT}-T1.img`),
     fakeFile(`subject-${SUBJECT}-T2.hdr`), fakeFile(`subject-${SUBJECT}-T2.img`),
   ]);
 
-  const e = t.etat();
-  check("les deux volumes sont lus", !!(e.volT1 && e.volT2),
+  const e = t.state();
+  check("both volumes are read", !!(e.volT1 && e.volT2),
         e.volT1 ? `${e.volT1.X}x${e.volT1.Y}x${e.volT1.Z}` : "");
-  check("la normalisation a produit des valeurs", !!e.volT1?.norm && e.volT1.norm.length > 0);
+  check("normalisation produced values", !!e.volT1?.norm && e.volT1.norm.length > 0);
 
   doc.getElementById("sliceSlider").value = String(SLICE);
   await t.segmentSlice(SLICE);
 
-  const apres = t.etat();
-  check("la segmentation s'est terminee", !!apres.lastClasses);
-  check("la file est relachee", apres.inferenceRunning === false);
-  check("l'etat affiche n'est plus 'computing'",
+  const after = t.state();
+  check("segmentation completed", !!after.lastClasses);
+  check("the queue is released", after.inferenceRunning === false);
+  check("the displayed state is no longer 'computing'",
         doc.getElementById("segStateLabel").textContent !== "computing…",
         `"${doc.getElementById("segStateLabel").textContent}"`);
 
-  const tenseur = t.buildTensor(SLICE);
-  check("le tenseur a la bonne taille", tenseur.length === 2 * CONTEXT * SIZE * SIZE,
-        `${tenseur.length} valeurs`);
-  check("le tenseur ne contient pas de NaN", !tenseur.some(Number.isNaN));
+  const tensor = t.buildTensor(SLICE);
+  check("the tensor has the right size", tensor.length === 2 * CONTEXT * SIZE * SIZE,
+        `${tensor.length} values`);
+  check("the tensor holds no NaN", !tensor.some(Number.isNaN));
 
-  // chaque echantillon doit reconstituer son volume d'origine
+  // every sample must reconstruct its original volume
   for (const f of fs.readdirSync(__dirname).filter((n) => /^sample-\d+\.bin$/.test(n)).sort()) {
     const n = f.match(/\d+/)[0];
     const gz = fs.readFileSync(path.join(__dirname, f));
-    const brut = require("zlib").gunzipSync(gz);
-    const ech = t.unpackSample(brut.buffer.slice(brut.byteOffset, brut.byteOffset + brut.byteLength));
+    const raw = require("zlib").gunzipSync(gz);
+    const sample = t.unpackSample(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength));
 
     let diff = 0;
-    for (const [mod, vol] of [["T1", ech.t1], ["T2", ech.t2]]) {
+    for (const [mod, vol] of [["T1", sample.t1], ["T2", sample.t2]]) {
       const orig = fs.readFileSync(path.join(DATA, `subject-${n}-${mod}.img`));
       const ref = new Int16Array(orig.buffer, orig.byteOffset, orig.byteLength / 2);
       for (let i = 0; i < ref.length; i++) if (vol.raw[i] !== ref[i]) diff++;
     }
-    check(`${f} reproduit le volume d'origine`, diff === 0,
-          diff ? `${diff} voxels differents` : `${(gz.length / 1e6).toFixed(2)} Mo compresse`);
+    check(`${f} reproduces the original volume`, diff === 0,
+          diff ? `${diff} differing voxels` : `${(gz.length / 1e6).toFixed(2)} MB compressed`);
   }
 
-  // les boutons d'exemple doivent etre cables et fonctionnels
-  check("les 3 boutons d'exemple ont un gestionnaire",
+  // the example buttons must be wired and working
+  check("the 3 example buttons have a handler",
         exampleButtons.every((b) => b._clicks.length === 1),
         exampleButtons.map((b) => b._clicks.length).join("/"));
 
-  volsAvant = t.etat().volT1;
   await t.loadSample("2");
-  const apresEx = t.etat();
-  check("le clic sur un exemple charge le volume",
-        apresEx.volT1 && apresEx.volT1.name === "example 2 T1",
-        apresEx.volT1 ? apresEx.volT1.name : "rien charge");
-  check("les boutons sont reactives", exampleButtons.every((b) => b.disabled === false) ||
-        !!apresEx.volT1);
+  const afterExample = t.state();
+  check("clicking an example loads the volume",
+        afterExample.volT1 && afterExample.volT1.name === "example 2 T1",
+        afterExample.volT1 ? afterExample.volT1.name : "nothing loaded");
+  check("the buttons are re-enabled", exampleButtons.every((b) => b.disabled === false) ||
+        !!afterExample.volT1);
 
-  // le clavier ne doit pas dependre du focus
-  const touche = (key, cible) => {
-    let bloque = false;
-    const ev = { key, target: cible, preventDefault: () => { bloque = true; } };
+  // the keyboard must not depend on focus
+  const press = (key, target) => {
+    let blocked = false;
+    const ev = { key, target, preventDefault: () => { blocked = true; } };
     (doc._listeners.keydown || []).forEach((fn) => fn(ev));
-    return bloque;
+    return blocked;
   };
 
-  const bouton = { tagName: "BUTTON" };
-  const curseur = { tagName: "INPUT" };
+  const button = { tagName: "BUTTON" };
+  const slider = { tagName: "INPUT" };
   doc.getElementById("sliceSlider").value = "100";
 
-  check("les fleches agissent quand le focus est sur un bouton",
-        touche("ArrowRight", bouton), "cas qui etait casse");
-  check("les fleches sont laissees au curseur natif",
-        !touche("ArrowRight", curseur));
-  check("les fleches agissent sur le corps de page",
-        touche("ArrowLeft", { tagName: "BODY" }));
+  check("arrows act when a button holds focus",
+        press("ArrowRight", button), "the case that used to be broken");
+  check("arrows are left to the native slider",
+        !press("ArrowRight", slider));
+  check("arrows act on the page body",
+        press("ArrowLeft", { tagName: "BODY" }));
 
-  // selecteur de modele
-  check("les 3 boutons de modele ont un gestionnaire",
+  // model selector
+  check("the 3 model buttons have a handler",
         modelButtons.every((b) => b._clicks.length === 1),
         modelButtons.map((b) => b._clicks.length).join("/"));
 
   for (const v of ["tiny", "separable", "standard"]) {
-    check(`model-${v}.onnx est present`,
+    check(`model-${v}.onnx is present`,
           fs.existsSync(path.join(__dirname, `model-${v}.onnx`)),
           fs.existsSync(path.join(__dirname, `model-${v}.onnx`))
-            ? `${(fs.statSync(path.join(__dirname, `model-${v}.onnx`)).size / 1e6).toFixed(2)} Mo` : "");
+            ? `${(fs.statSync(path.join(__dirname, `model-${v}.onnx`)).size / 1e6).toFixed(2)} MB` : "");
   }
 
   modelButtons.find((b) => b.dataset.variant === "tiny").click();
   await new Promise((r) => setTimeout(r, 30));
-  check("changer de modele met la fiche a jour",
+  check("switching model updates the spec sheet",
         doc.getElementById("mParams").textContent === "26,974",
         `"${doc.getElementById("mParams").textContent}"`);
 
-  fs.writeFileSync("/tmp/tenseur_js.bin", Buffer.from(tenseur.buffer));
-  console.log(`\n  tenseur ecrit dans /tmp/tenseur_js.bin pour comparaison avec Python`);
-  console.log(`\n${echecs === 0 ? "tout est vert" : echecs + " echec(s)"}\n`);
-  process.exit(echecs ? 1 : 0);
+  fs.writeFileSync("/tmp/tensor_js.bin", Buffer.from(tensor.buffer));
+  console.log(`\n  tensor written to /tmp/tensor_js.bin for comparison with Python`);
+  console.log(`\n${failures === 0 ? "all green" : failures + " failure(s)"}\n`);
+  process.exit(failures ? 1 : 0);
 })();

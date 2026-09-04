@@ -1,9 +1,8 @@
-"""U-Net 2.5D et ses variantes frugales.
+"""2.5D U-Net and its frugal variants.
 
-Un U-Net 2D ordinaire : ce sont les canaux d'entree qui portent la
-troisieme dimension (`context` coupes adjacentes par modalite). Aucune
-convolution 3D, donc un modele que les runtimes mobiles savent
-accelerer et quantifier.
+An ordinary 2D U-Net: the input channels carry the third dimension
+(`context` adjacent slices per modality). No 3D convolution, so mobile
+runtimes can accelerate and quantize the model.
 """
 
 import torch
@@ -11,7 +10,7 @@ import torch.nn as nn
 
 
 class ConvBlock(nn.Module):
-    """Deux convolutions 3x3, chacune suivie de BatchNorm et ReLU."""
+    """Two 3x3 convolutions, each followed by BatchNorm and ReLU."""
 
     def __init__(self, in_ch, out_ch, separable=False):
         super().__init__()
@@ -30,8 +29,8 @@ def _standard_conv(in_ch, out_ch):
 
 
 def _separable_conv(in_ch, out_ch):
-    """Une 3x3 par canal d'entree puis une 1x1 qui melange les canaux :
-    9*C + C*C' au lieu de 9*C*C'."""
+    """One 3x3 per input channel, then a 1x1 that mixes the channels:
+    9*C + C*C' instead of 9*C*C'."""
     return [
         nn.Conv2d(in_ch, in_ch, 3, padding=1, groups=in_ch, bias=False),
         nn.Conv2d(in_ch, out_ch, 1, bias=False),
@@ -57,7 +56,7 @@ class UNet25D(nn.Module):
         prev = prev * 2
         for c in reversed(chans):
             self.ups.append(nn.ConvTranspose2d(prev, c, 2, stride=2))
-            # concatenation avec la connexion de saut -> 2 * c canaux
+            # concatenated with the skip connection -> 2 * c channels
             self.decoders.append(ConvBlock(2 * c, c, separable))
             prev = c
 
@@ -74,9 +73,9 @@ class UNet25D(nn.Module):
 
         for up, dec, skip in zip(self.ups, self.decoders, reversed(skips)):
             x = up(x)
-            # La frontiere cortex / substance blanche se joue sur 2-3 mm :
-            # sans connexion de saut, le decodeur ne peut pas retrouver ce
-            # detail perdu au sous-echantillonnage.
+            # The cortex / white matter boundary plays out over 2-3 mm:
+            # without a skip connection the decoder cannot recover that
+            # detail, lost during downsampling.
             x = dec(torch.cat([skip, x], dim=1))
 
         return self.head(x)
@@ -91,7 +90,7 @@ VARIANTS = {
 
 def build(variant, in_channels, n_classes=4):
     if variant not in VARIANTS:
-        raise ValueError(f"variante inconnue : {variant} (choix : {list(VARIANTS)})")
+        raise ValueError(f"unknown variant: {variant} (choices: {list(VARIANTS)})")
     return UNet25D(in_channels, n_classes, **VARIANTS[variant])
 
 

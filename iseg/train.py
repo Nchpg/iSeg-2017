@@ -1,9 +1,10 @@
-"""Entrainement du U-Net 2.5D.
+"""Training of the 2.5D U-Net.
 
-Le decoupage se fait par sujet, jamais par coupe : deux coupes voisines
-d'un meme volume sont quasi identiques, les repartir entre entrainement
-et validation gonflerait le Dice sans rien mesurer. Deux sujets sont mis
-de cote, et le Dice affiche est calcule sur leurs volumes reassembles.
+The split is by subject, never by slice: two neighbouring slices of the
+same volume are nearly identical, and spreading them across train and
+validation would inflate Dice without measuring anything. Two subjects
+are held out, and the reported Dice is computed on their reassembled
+volumes.
 """
 
 import argparse
@@ -26,7 +27,7 @@ TRAIN_SUBJECTS = [s for s in SUBJECTS if s not in VAL_SUBJECTS]
 
 @torch.no_grad()
 def predict_volume(net, vols, context, modalities, device, batch_size=16):
-    """Segmente toutes les coupes coronales et reassemble le volume."""
+    """Segment every coronal slice and reassemble the volume."""
     net.eval()
     n = vols["t1"].shape[1]
     out = np.empty((vols["t1"].shape[0], n, vols["t1"].shape[2]), dtype=np.uint8)
@@ -40,7 +41,7 @@ def predict_volume(net, vols, context, modalities, device, batch_size=16):
 
 
 def evaluate(net, cache_dir, subjects, context, modalities, device):
-    """Dice 3D par tissu, moyenne sur les sujets de validation."""
+    """3D Dice per tissue, averaged over the validation subjects."""
     scores = []
     for s in subjects:
         vols = load_cached(cache_dir, s)
@@ -50,13 +51,13 @@ def evaluate(net, cache_dir, subjects, context, modalities, device):
 
 
 def main():
-    p = argparse.ArgumentParser(description="Entrainement U-Net 2.5D sur iSeg-2017")
-    p.add_argument("--raw", default="iSeg-2017-Training", help="dossier des .hdr/.img")
-    p.add_argument("--cache", default="cache", help="dossier des volumes pretraites")
-    p.add_argument("--out", default="runs", help="dossier des poids")
+    p = argparse.ArgumentParser(description="2.5D U-Net training on iSeg-2017")
+    p.add_argument("--raw", default="iSeg-2017-Training", help="folder holding the .hdr/.img")
+    p.add_argument("--cache", default="cache", help="folder holding the preprocessed volumes")
+    p.add_argument("--out", default="runs", help="folder holding the weights")
     p.add_argument("--variant", default="separable", choices=list(models.VARIANTS))
     p.add_argument("--modalities", default="t1t2", choices=["t1t2", "t1"])
-    p.add_argument("--context", type=int, default=5, help="nombre de coupes 2.5D (impair)")
+    p.add_argument("--context", type=int, default=5, help="number of 2.5D slices (odd)")
     p.add_argument("--epochs", type=int, default=60)
     p.add_argument("--batch-size", type=int, default=16)
     p.add_argument("--lr", type=float, default=3e-4)
@@ -66,7 +67,7 @@ def main():
     args = p.parse_args()
 
     if args.context % 2 == 0:
-        p.error("--context doit etre impair (coupe centrale + voisines symetriques)")
+        p.error("--context must be odd (centre slice + symmetric neighbours)")
 
     torch.manual_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,14 +87,14 @@ def main():
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    poids = out_dir / f"{args.variant}.pt"
+    weights = out_dir / f"{args.variant}.pt"
 
-    print(f"peripherique {device} | {args.variant} : "
-          f"{models.count_parameters(net):,} parametres")
-    print(f"entrainement {TRAIN_SUBJECTS} | validation {VAL_SUBJECTS}")
-    print(f"{len(train_set)} coupes, {args.epochs} epoques\n")
+    print(f"device {device} | {args.variant}: "
+          f"{models.count_parameters(net):,} parameters")
+    print(f"train {TRAIN_SUBJECTS} | validation {VAL_SUBJECTS}")
+    print(f"{len(train_set)} slices, {args.epochs} epochs\n")
 
-    meilleur = -1.0
+    best = -1.0
     for epoch in range(1, args.epochs + 1):
         net.train()
         t0, total = time.time(), 0.0
@@ -110,17 +111,17 @@ def main():
             dice = evaluate(net, args.cache, VAL_SUBJECTS, args.context, modalities, device)
             print(f"  ep {epoch:>3}  loss {total / len(train_set):.4f}  "
                   + "  ".join(f"{n} {d:.4f}" for n, d in zip(TISSUE_NAMES, dice))
-                  + f"  moyenne {dice.mean():.4f}  ({time.time() - t0:.0f}s)")
+                  + f"  mean {dice.mean():.4f}  ({time.time() - t0:.0f}s)")
 
-            # Selection sur le Dice de validation, pas sur la perte.
-            if dice.mean() > meilleur:
-                meilleur = dice.mean()
+            # Selected on validation Dice, not on the loss.
+            if dice.mean() > best:
+                best = dice.mean()
                 torch.save({"state_dict": net.state_dict(), "variant": args.variant,
                             "in_channels": train_set.in_channels, "context": args.context,
                             "modalities": modalities,
-                            "dice": dict(zip(TISSUE_NAMES, dice.tolist()))}, poids)
+                            "dice": dict(zip(TISSUE_NAMES, dice.tolist()))}, weights)
 
-    print(f"\nmeilleur Dice {meilleur:.4f} -> {poids}")
+    print(f"\nbest Dice {best:.4f} -> {weights}")
 
 
 if __name__ == "__main__":

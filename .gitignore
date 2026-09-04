@@ -1,18 +1,18 @@
-# donnees du challenge (744 Mo, redistribuees sous licence iSeg-2017)
+# challenge data (744 MB, redistributed under the iSeg-2017 licence)
 iSeg-2017-Training/
 iSeg-2017-Testing/
 
-# sorties
+# outputs
 cache/
 runs/
 export/
 figures/
 
-# archive de transfert vers Colab
+# transfer archives
 iseg-colab.zip
+iseg-resultats.zip
 
-# environnement
+# environment
 .venv/
 __pycache__/
 *.pyc
-iseg-resultats.zip

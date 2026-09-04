@@ -1,1 +1,1 @@
-"""Segmentation 2.5D frugale des tissus cerebraux du nourrisson (iSeg-2017)."""
+"""Frugal 2.5D segmentation of infant brain tissue (iSeg-2017)."""

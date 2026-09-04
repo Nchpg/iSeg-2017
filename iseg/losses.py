@@ -1,9 +1,8 @@
-"""Fonction de cout et metriques.
+"""Loss function and metrics.
 
-Dice + entropie croisee a parts egales : l'entropie croisee donne des
-gradients stables au demarrage, quand le Dice est encore proche de zero
-et ne signale pas grand-chose ; le Dice optimise directement la metrique
-d'evaluation et ignore la taille des classes.
+Dice + cross-entropy in equal parts: cross-entropy gives stable
+gradients at the start, when Dice is still near zero and signals little;
+Dice optimises the evaluation metric directly and ignores class size.
 """
 
 import torch
@@ -12,10 +11,10 @@ import torch.nn.functional as F
 
 
 def soft_dice(logits, target, n_classes=4, eps=1e-6):
-    """Dice differentiable, une valeur par tissu : (LCR, GM, WM).
+    """Differentiable Dice, one value per tissue: (CSF, GM, WM).
 
-    Le fond est ecarte : le segmenter est trivial et l'inclure gonflerait
-    le score sans rien mesurer d'utile.
+    Background is left out: segmenting it is trivial, and including it
+    would inflate the score without measuring anything useful.
     """
     probs = F.softmax(logits, dim=1)[:, 1:]
     onehot = F.one_hot(target, n_classes).permute(0, 3, 1, 2).float()[:, 1:]
@@ -40,10 +39,10 @@ class DiceCELoss(nn.Module):
 
 @torch.no_grad()
 def dice_volume(pred, target, n_classes=4):
-    """Dice par classe sur un volume entier.
+    """Per-class Dice over a whole volume.
 
-    Par volume et non par coupe : une moyenne des Dice coupe par coupe
-    donne un chiffre different, incomparable a celui du challenge.
+    Per volume rather than per slice: averaging slice-wise Dice gives a
+    different number, not comparable to the challenge's.
     """
     out = []
     for c in range(1, n_classes):

@@ -1,10 +1,10 @@
-"""Export d'un checkpoint vers un .onnx quantifie, pret a embarquer.
+"""Export a checkpoint to a quantized .onnx, ready to embed.
 
     python -m iseg.export --checkpoint runs/separable.pt
     python -m iseg.export --checkpoint runs/separable.pt --deploy webdemo
 
-Produit le .onnx float32 et sa version int8, environ 3,5x plus petite.
-Avec --deploy, l'int8 est aussi copie dans le dossier du site.
+Produces the float32 .onnx and its int8 version, about 3.5x smaller.
+With --deploy, the int8 model is also copied into the site folder.
 """
 
 import argparse
@@ -17,14 +17,14 @@ import torch
 from . import model as models
 from .data import ISegSlices
 
-# Taille des coupes attendue par le reseau, fixee par le recadrage de data.py
+# Slice size the network expects, set by the crop window in data.py
 SIZE = 144
 
 
 def to_onnx(checkpoint, out_path):
-    """Exporte le reseau, poids compris, dans un fichier .onnx unique.
+    """Export the network, weights included, into a single .onnx file.
 
-    Retourne le checkpoint charge et le reseau reconstruit."""
+    Returns the loaded checkpoint and the rebuilt network."""
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     net = models.build(ckpt["variant"], ckpt["in_channels"])
     net.load_state_dict(ckpt["state_dict"])
@@ -34,15 +34,15 @@ def to_onnx(checkpoint, out_path):
     torch.onnx.export(
         net, dummy, str(out_path),
         input_names=["input"], output_names=["logits"],
-        # Lot dynamique : l'application segmente une coupe a la fois, mais
-        # on peut vouloir en grouper plusieurs.
+        # Dynamic batch: the app segments one slice at a time, but
+        # grouping several may be useful.
         dynamic_axes={"input": {0: "batch"}, "logits": {0: "batch"}},
         opset_version=17,
     )
 
-    # L'exportateur dynamo de torch >= 2.5 ecrit les poids dans un fichier
-    # ".onnx.data" separe. On les reintegre, sinon le .onnx ne contient que
-    # le graphe et le modele est inutilisable seul.
+    # The dynamo exporter of torch >= 2.5 writes the weights into a
+    # separate ".onnx.data" file. Fold them back in, otherwise the .onnx
+    # holds only the graph and the model is unusable on its own.
     import onnx
     m = onnx.load(str(out_path), load_external_data=True)
     onnx.save(m, str(out_path), save_as_external_data=False)
@@ -53,10 +53,11 @@ def to_onnx(checkpoint, out_path):
 
 
 def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_samples=200):
-    """Quantification statique int8, calibree sur de vraies coupes.
+    """Static int8 quantization, calibrated on real slices.
 
-    Statique plutot que dynamique : sur un reseau convolutif, la
-    dynamique ne touche pas les convolutions et ne gagne presque rien.
+    Static rather than dynamic: on a convolutional network, dynamic
+    quantization leaves the convolutions untouched and gains almost
+    nothing.
     """
     from onnxruntime.quantization import CalibrationDataReader, QuantType, quantize_static
     from onnxruntime.quantization.shape_inference import quant_pre_process
@@ -80,28 +81,28 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
 
 
 def deploy(onnx_path, site_dir, variant):
-    """Copie le modele sous le nom que la page attend : le nom porte la
-    variante, la page en propose plusieurs et les charge a la demande."""
-    cible = Path(site_dir) / f"model-{variant}.onnx"
-    if not cible.parent.is_dir():
-        raise ValueError(f"dossier du site introuvable : {site_dir}")
-    shutil.copyfile(onnx_path, cible)
-    return cible
+    """Copy the model under the name the page expects: the name carries
+    the variant, since the page offers several and loads them on demand."""
+    target = Path(site_dir) / f"model-{variant}.onnx"
+    if not target.parent.is_dir():
+        raise ValueError(f"site folder not found: {site_dir}")
+    shutil.copyfile(onnx_path, target)
+    return target
 
 
-def mo(path):
+def mb(path):
     return Path(path).stat().st_size / 1024 ** 2
 
 
 def main():
-    p = argparse.ArgumentParser(description="Export ONNX quantifie")
-    p.add_argument("--checkpoint", required=True, help="fichier .pt produit par train.py")
-    p.add_argument("--cache", default="cache", help="coupes servant a la calibration")
+    p = argparse.ArgumentParser(description="Quantized ONNX export")
+    p.add_argument("--checkpoint", required=True, help=".pt file produced by train.py")
+    p.add_argument("--cache", default="cache", help="slices used for calibration")
     p.add_argument("--calib-subjects", type=int, nargs="+", default=[1, 2])
     p.add_argument("--out", default="export")
-    p.add_argument("--deploy", metavar="DOSSIER",
-                   help="copier le modele int8 dans le dossier du site")
-    p.add_argument("--no-quant", action="store_true", help="float32 seulement")
+    p.add_argument("--deploy", metavar="FOLDER",
+                   help="copy the int8 model into the site folder")
+    p.add_argument("--no-quant", action="store_true", help="float32 only")
     args = p.parse_args()
 
     out_dir = Path(args.out)
@@ -110,20 +111,20 @@ def main():
 
     fp32 = out_dir / f"{stem}.onnx"
     ckpt, net = to_onnx(args.checkpoint, fp32)
-    print(f"{ckpt['variant']:<12} {models.count_parameters(net):>9,} parametres")
-    print(f"  float32   {fp32.name:<32} {mo(fp32):>6.2f} Mo")
+    print(f"{ckpt['variant']:<12} {models.count_parameters(net):>9,} parameters")
+    print(f"  float32   {fp32.name:<32} {mb(fp32):>6.2f} MB")
 
     final = fp32
     if not args.no_quant:
         final = out_dir / f"{stem}.int8.onnx"
         quantize(fp32, final, args.cache, args.calib_subjects,
                  ckpt["context"], ckpt["modalities"])
-        print(f"  int8      {final.name:<32} {mo(final):>6.2f} Mo   "
-              f"(/{mo(fp32) / mo(final):.1f})")
+        print(f"  int8      {final.name:<32} {mb(final):>6.2f} MB   "
+              f"(/{mb(fp32) / mb(final):.1f})")
 
     if args.deploy:
-        cible = deploy(final, args.deploy, ckpt["variant"])
-        print(f"  copie     {cible}")
+        target = deploy(final, args.deploy, ckpt["variant"])
+        print(f"  copied    {target}")
 
 
 if __name__ == "__main__":

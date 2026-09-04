@@ -1,10 +1,9 @@
-"""Chargement, pretraitement et dataset 2.5D pour iSeg-2017.
+"""Loading, preprocessing and 2.5D dataset for iSeg-2017.
 
-Les coupes sont coronales et recadrees a 144 x 144, une fenetre qui
-couvre la boite englobante du cerveau des 10 sujets avec 13 a 17 voxels
-de marge, et qui est divisible par 16 : ni redimensionnement, ni
-remplissage. Pas de correction N4 : SimpleITK ne s'embarque pas dans un
-navigateur, l'augmentation simule des champs de biais a la place.
+Slices are coronal and cropped to 144 x 144, a window that covers the
+brain bounding box of the 10 subjects with 13 to 17 voxels of margin and
+is divisible by 16: no resize, no padding. No N4 correction: SimpleITK
+does not ship in a browser, augmentation simulates bias fields instead.
 """
 
 from pathlib import Path
@@ -13,37 +12,37 @@ import numpy as np
 import nibabel as nib
 from torch.utils.data import Dataset
 
-# Fenetre de recadrage dans le plan coronal : (x, z)
+# Crop window in the coronal plane: (x, z)
 CROP_X = (0, 144)
 CROP_Z = (72, 216)
 
-# Valeurs d'etiquette du challenge -> indices de classe
+# Challenge label values -> class indices
 LABEL_MAP = {0: 0, 10: 1, 150: 2, 250: 3}
-TISSUE_NAMES = ["LCR", "GM", "WM"]
+TISSUE_NAMES = ["CSF", "GM", "WM"]
 
-# Une coupe entre dans l'entrainement si au moins cette fraction de ses
-# voxels est annotee (ecarte les coupes quasi vides des extremites).
+# A slice enters training if at least this fraction of its voxels is
+# labelled (drops the nearly empty slices at both ends).
 MIN_OCCUPANCY = 0.02
 
 
 def _read(path):
-    """Les fichiers iSeg sont en 4D avec une derniere dimension singleton."""
+    """iSeg files are 4D with a singleton last dimension."""
     return np.squeeze(np.asarray(nib.load(path).dataobj))
 
 
 def zscore(vol, mask):
-    """Z-score calcule sur le cerveau seul : inclure le fond ecraserait
-    la statistique sous des millions de voxels vides."""
+    """Z-score computed on the brain alone: including the background would
+    crush the statistic under millions of empty voxels."""
     vals = vol[mask]
     return (vol - vals.mean()) / (vals.std() + 1e-8)
 
 
 def preprocess_subject(root, subject, with_label=True):
-    """Charge un sujet, normalise et recadre.
+    """Load one subject, normalise and crop.
 
-    Retourne t1, t2 en float32 et le label en uint8 (0-3), de forme
-    (144, Y, 144). Le label vaut None pour les sujets de test, qui n'ont
-    pas d'annotation publique.
+    Returns t1, t2 as float32 and the label as uint8 (0-3), shaped
+    (144, Y, 144). The label is None for test subjects, which have no
+    public annotation.
     """
     root = Path(root)
     t1 = _read(root / f"subject-{subject}-T1.hdr").astype(np.float32)
@@ -58,13 +57,13 @@ def preprocess_subject(root, subject, with_label=True):
     label = None
     if with_label:
         raw = _read(root / f"subject-{subject}-label.hdr").astype(np.int16)
-        # Le recadrage ne doit couper aucun voxel annote.
+        # The crop must not cut through any labelled voxel.
         outside = raw.copy()
         outside[xs, :, zs] = 0
         if (outside > 0).any():
             raise ValueError(
-                f"sujet {subject} : {(outside > 0).sum()} voxels annotes hors "
-                f"de la fenetre de recadrage {CROP_X} x {CROP_Z}")
+                f"subject {subject}: {(outside > 0).sum()} labelled voxels outside "
+                f"the crop window {CROP_X} x {CROP_Z}")
         lut = np.zeros(raw.max() + 1, dtype=np.uint8)
         for src, dst in LABEL_MAP.items():
             lut[src] = dst
@@ -74,15 +73,15 @@ def preprocess_subject(root, subject, with_label=True):
 
 
 def build_cache(raw_dir, cache_dir, subjects, with_label=True):
-    """Pretraite une fois pour toutes et ecrit un .npz par sujet : relire
-    et renormaliser a chaque epoque dominerait le cout de l'entrainement."""
+    """Preprocess once and write one .npz per subject: re-reading and
+    re-normalising every epoch would dominate the cost of training."""
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
     for s in subjects:
         out = cache_dir / f"subject-{s}.npz"
         if out.exists():
-            # Un cache complet dispense d'avoir les .hdr/.img sous la main,
-            # ce qui allege le transfert vers Colab.
+            # A complete cache removes the need for the .hdr/.img files,
+            # which keeps the transfer to Colab small.
             continue
         t1, t2, label = preprocess_subject(raw_dir, s, with_label)
         payload = {"t1": t1.astype(np.float16), "t2": t2.astype(np.float16)}
@@ -104,10 +103,10 @@ def load_cached(cache_dir, subject):
 
 
 def stack_context(vols, y, context, modalities):
-    """Empile `context` coupes adjacentes par modalite autour de y.
+    """Stack `context` adjacent slices per modality around y.
 
-    Aux extremites du volume la coupe de bord est repliquee : remplir de
-    zeros creerait un bord noir artificiel, trompeur pour le reseau.
+    At the ends of the volume the edge slice is repeated: padding with
+    zeros would create an artificial black border, misleading the network.
     """
     half = context // 2
     n = vols["t1"].shape[1]
@@ -117,10 +116,10 @@ def stack_context(vols, y, context, modalities):
 
 
 class ISegSlices(Dataset):
-    """Coupes coronales 2.5D.
+    """2.5D coronal slices.
 
-    Entree : (context * n_modalites, 144, 144)
-    Cible  : (144, 144) entiers 0-3, pour la coupe centrale uniquement
+    Input  : (context * n_modalities, 144, 144)
+    Target : (144, 144) integers 0-3, for the centre slice only
     """
 
     def __init__(self, cache_dir, subjects, context=5, modalities=("t1", "t2"),

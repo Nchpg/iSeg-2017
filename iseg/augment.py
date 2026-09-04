@@ -1,10 +1,10 @@
-"""Augmentation des coupes 2.5D.
+"""Augmentation of 2.5D slices.
 
-Avec 8 sujets d'entrainement, c'est ici que se joue la generalisation.
-Les canaux sont ordonnes par modalite : les `context` premiers sont les
-coupes T1, les suivants les coupes T2. Les transformations d'intensite
-sont donc appliquees par groupe, pour rester coherentes entre coupes
-voisines d'un meme volume.
+With 8 training subjects, this is where generalisation is won or lost.
+Channels are ordered by modality: the first `context` ones are the T1
+slices, the next ones the T2 slices. Intensity transforms are therefore
+applied per group, so they stay consistent across neighbouring slices of
+the same volume.
 """
 
 import numpy as np
@@ -28,7 +28,7 @@ class Augment:
         self.rng = np.random.default_rng(seed)
 
     def _affine(self, x, target):
-        """Rotation + translation + zoom, en une seule interpolation."""
+        """Rotation + translation + zoom, in a single interpolation."""
         angle = np.deg2rad(self.rng.uniform(-self.max_rotation, self.max_rotation))
         scale = 1.0 + self.rng.uniform(-self.max_scale, self.max_scale)
         tx, ty = self.rng.uniform(-self.max_shift, self.max_shift, size=2)
@@ -42,17 +42,18 @@ class Augment:
         grid = F.affine_grid(theta, img.shape, align_corners=False)
         img = F.grid_sample(img, grid, mode="bilinear",
                             padding_mode="border", align_corners=False)
-        # Plus proche voisin sur l'etiquette : une interpolation bilineaire
-        # creerait des classes intermediaires inexistantes.
+        # Nearest neighbour on the label: bilinear interpolation would
+        # invent intermediate classes that do not exist.
         lab = F.grid_sample(lab, grid, mode="nearest",
                             padding_mode="zeros", align_corners=False)
         return img[0].numpy(), lab[0, 0].numpy().astype(np.int64)
 
     def _bias_field(self, x):
-        """Inhomogeneite multiplicative lisse, tiree a basse resolution.
+        """Smooth multiplicative inhomogeneity, drawn at low resolution.
 
-        Simule ce que N4 aurait corrige : le reseau apprend a ignorer ces
-        variations plutot qu'on ne les retire au pretraitement.
+        Simulates what N4 would have corrected: the network learns to
+        ignore these variations rather than having them removed during
+        preprocessing.
         """
         h, w = x.shape[-2:]
         for m in range(self.n_modalities):
@@ -66,7 +67,7 @@ class Augment:
         return x
 
     def _gamma(self, x):
-        """Correction gamma, appliquee par modalite sur une plage [0, 1]."""
+        """Gamma correction, applied per modality over a [0, 1] range."""
         for m in range(self.n_modalities):
             sl = slice(m * self.context, (m + 1) * self.context)
             block = x[sl]
@@ -82,7 +83,7 @@ class Augment:
         target = np.ascontiguousarray(target)
 
         if self.rng.random() < self.p_flip:
-            # axe -2 = axe x du plan coronal, donc gauche/droite
+            # axis -2 = the x axis of the coronal plane, so left/right
             x = np.ascontiguousarray(x[:, ::-1, :])
             target = np.ascontiguousarray(target[::-1, :])
 

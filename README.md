@@ -135,10 +135,24 @@ webdemo/
   app.css         styles
   app.js          lecture Analyze, prétraitement, inférence, rendu
   model.onnx      le modèle int8 (0,43 Mo)
+  sample.bin.gz   IRM de démonstration (2,4 Mo)
   sw.js           service worker (cache hors ligne)
   manifest.json   déclaration PWA
   icon-*.png      icônes d'application
+  test.js         test sans navigateur : node webdemo/test.js
 ```
+
+Un lien « load an example » charge une IRM embarquée, pour qui n'a pas de données sous
+la main. Elle est régénérée par :
+
+```bash
+python -m iseg.sample --subject 1 --out webdemo/sample.bin.gz
+```
+
+Le fichier ne contient que la fenêtre de recadrage et les coupes contenant du cerveau,
+compressées : 2,4 Mo au lieu des 28 Mo des `.hdr/.img` d'origine, pour une
+reconstruction exacte au voxel près. *Les données iSeg-2017 étant distribuées sous
+conditions, vérifier que leur republication est autorisée avant de déployer.*
 
 Le dossier se publie tel quel sur GitHub Pages, Vercel ou Netlify. En HTTPS le
 service worker met tout en cache dès la première visite et l'application devient
@@ -167,7 +181,8 @@ iseg/augment.py         augmentation (géométrie + intensité, dont champ de bi
 iseg/model.py           U-Net 2.5D et variantes frugales
 iseg/losses.py          Dice + entropie croisée, Dice volumique
 iseg/train.py           entraînement, 8 sujets / 2 en validation
-iseg/export.py          ONNX, quantification int8, injection dans la page web
+iseg/export.py          ONNX, quantification int8, copie vers le site
+iseg/sample.py          IRM de démonstration compacte pour la page web
 colab_iseg.ipynb        orchestration Colab
 webdemo/                site statique : démonstration mobile (PWA)
 ```

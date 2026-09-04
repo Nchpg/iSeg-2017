@@ -342,9 +342,91 @@ async function segmentSlice(y) {
   }
 }
 
+/* ============================ bundled sample =========================
+   The original .hdr/.img pair weighs 28 MB per subject. The sample only
+   carries what the app reads — the crop window plus the slices holding
+   brain — gzipped down to about 2.4 MB, and is unpacked back into a
+   full-size volume so the rest of the code sees no difference.
+   Layout is described in iseg/sample.py. */
+
+const SAMPLE_URL = "sample.bin.gz";
+
+function unpackSample(buffer) {
+  const dv = new DataView(buffer);
+  const magic = String.fromCharCode(dv.getUint8(0), dv.getUint8(1), dv.getUint8(2), dv.getUint8(3));
+  if (magic !== "ISG1") throw new Error("unrecognised sample file");
+
+  const n = [];
+  for (let i = 0; i < 9; i++) n.push(dv.getInt32(4 + i * 4, true));
+  const [x0, y0, z0, nx, ny, nz, fx, fy, fz] = n;
+
+  const voxels = nx * ny * nz;
+  const build = (offset) => {
+    const block = new Int16Array(buffer, offset, voxels);
+    const full = new Int16Array(fx * fy * fz);   // le reste vaut zero, comme le fond
+    let ptr = 0;
+    for (let iz = 0; iz < nz; iz++) {
+      for (let iy = 0; iy < ny; iy++) {
+        const base = (y0 + iy) * fx + (z0 + iz) * fx * fy;
+        for (let ix = 0; ix < nx; ix++) full[base + x0 + ix] = block[ptr++];
+      }
+    }
+    return full;
+  };
+
+  const header = 4 + 9 * 4;
+  return {
+    t1: { X: fx, Y: fy, Z: fz, raw: build(header), name: "sample T1" },
+    t2: { X: fx, Y: fy, Z: fz, raw: build(header + voxels * 2), name: "sample T2" },
+  };
+}
+
+async function loadSample() {
+  const btn = $("btnSample");
+  btn.disabled = true;
+  btn.textContent = "loading…";
+  clearError();
+  try {
+    const response = await fetch(SAMPLE_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
+    const buffer = await new Response(stream).arrayBuffer();
+
+    const { t1, t2 } = unpackSample(buffer);
+    volT1 = t1;
+    volT2 = t2;
+    for (const [id, vol] of [["rowT1", t1], ["rowT2", t2]]) {
+      const row = $(id);
+      row.classList.add("ok");
+      row.querySelector(".name").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
+    }
+    normaliseVolumes();
+    $("dropZone").classList.add("filled");
+    $("shell").classList.add("loaded");
+    $("btnBrowse").textContent = "Change volumes";
+    enableWhenReady();
+  } catch (e) {
+    showError("Could not load the example: " + e.message);
+    btn.disabled = false;
+    btn.textContent = "load an example";
+  }
+}
+
 /* ================================ files ==============================
    All 4 files of a subject are dropped at once: T1 and T2 are picked
    out by filename, then .hdr is paired with .img. */
+
+/* The brain mask comes from T1 (data.py: brain = t1 > 0) and also
+   normalises T2: both modalities share the same statistics, exactly as
+   during training. */
+function normaliseVolumes() {
+  if (!volT1) return;
+  const mask = new Uint8Array(volT1.raw.length);
+  for (let i = 0; i < mask.length; i++) mask[i] = volT1.raw[i] > 0 ? 1 : 0;
+  volT1.norm = zscoreInMask(volT1.raw, mask);
+  if (volT2) volT2.norm = zscoreInMask(volT2.raw, mask);
+  occupancy = computeOccupancy(volT1);
+}
 
 async function acceptFiles(fileList) {
   clearError();
@@ -371,16 +453,7 @@ async function acceptFiles(fileList) {
       throw new Error("the T1 and T2 volumes have different dimensions");
     }
 
-    // The brain mask comes from T1 (data.py: brain = t1 > 0) and also
-    // normalises T2: both modalities share the same statistics, exactly
-    // as during training.
-    if (volT1) {
-      const mask = new Uint8Array(volT1.raw.length);
-      for (let i = 0; i < mask.length; i++) mask[i] = volT1.raw[i] > 0 ? 1 : 0;
-      volT1.norm = zscoreInMask(volT1.raw, mask);
-      if (volT2) volT2.norm = zscoreInMask(volT2.raw, mask);
-      occupancy = computeOccupancy(volT1);
-    }
+    normaliseVolumes();
 
     const complete = !!(volT1 && volT2);
     $("dropZone").classList.toggle("filled", complete);
@@ -437,6 +510,7 @@ function step(delta) {
 
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
 $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
+$("btnSample").addEventListener("click", loadSample);
 
 const dropArea = $("dropZone");
 ["dragenter", "dragover"].forEach((ev) =>

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=8">
+<link rel="stylesheet" href="app.css?v=9">
 </head>
 <body>
 
@@ -147,35 +147,18 @@
 </main>
 
 <footer>
-  <div class="plate">
-    <div class="row">
-      <span class="key">model</span>
-      <span class="what">2.5D separable U-Net</span>
-      <span class="figs">386,782 params &middot; 0.43 MB int8</span>
-    </div>
-    <div class="row">
-      <span class="key">training</span>
-      <span class="what">iSeg-2017, 6-month-old infants</span>
-      <span class="figs">T1 + T2 &middot; Dice 0.86 held out</span>
-    </div>
-    <div class="row">
-      <span class="key">runtime</span>
-      <span class="what">ONNX Runtime on WebAssembly</span>
-      <span class="figs">~100 ms per slice &middot; on-device</span>
-    </div>
-  </div>
-
   <div class="installbar" id="installBar" hidden>
     <button id="btnInstall">Install app</button>
   </div>
 
   <p class="privacy">
-    Your images never leave your device: everything is computed in the browser,
+    Trained on iSeg-2017 — T1 and T2 MRI of 6-month-old infants.<br>
+    Your images never leave your device: everything runs in the browser,
     with nothing sent over the network.
   </p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

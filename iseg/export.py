@@ -22,7 +22,9 @@ SIZE = 144
 
 
 def to_onnx(checkpoint, out_path):
-    """Exporte le reseau, poids compris, dans un fichier .onnx unique."""
+    """Exporte le reseau, poids compris, dans un fichier .onnx unique.
+
+    Retourne le checkpoint charge et le reseau reconstruit."""
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     net = models.build(ckpt["variant"], ckpt["in_channels"])
     net.load_state_dict(ckpt["state_dict"])
@@ -47,7 +49,7 @@ def to_onnx(checkpoint, out_path):
     for extra in Path(out_path).parent.glob(f"{Path(out_path).name}.data*"):
         extra.unlink(missing_ok=True)
 
-    return ckpt
+    return ckpt, net
 
 
 def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_samples=200):
@@ -107,8 +109,8 @@ def main():
     stem = Path(args.checkpoint).stem
 
     fp32 = out_dir / f"{stem}.onnx"
-    ckpt = to_onnx(args.checkpoint, fp32)
-    print(f"{ckpt['variant']:<12} {models.count_parameters(models.build(ckpt['variant'], ckpt['in_channels'])):>9,} parametres")
+    ckpt, net = to_onnx(args.checkpoint, fp32)
+    print(f"{ckpt['variant']:<12} {models.count_parameters(net):>9,} parametres")
     print(f"  float32   {fp32.name:<32} {mo(fp32):>6.2f} Mo")
 
     final = fp32

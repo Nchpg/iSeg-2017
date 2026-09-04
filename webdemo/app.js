@@ -34,6 +34,12 @@ const COLOURS = {
 };
 
 const $ = (id) => document.getElementById(id);
+const buttons = (sel) => [...document.querySelectorAll(sel)];
+
+/* Marks the active button of a segmented control. */
+function markActive(sel, key, value) {
+  for (const b of buttons(sel)) b.classList.toggle("on", b.dataset[key] === value);
+}
 
 let session = null;
 let volT1 = null;          // {X, Y, Z, raw: Int16Array, norm: Float32Array, name}
@@ -59,15 +65,13 @@ function showModelSpec(variant) {
   $("mParams").textContent = m.params.toLocaleString("en-US");
   $("mSize").textContent = m.size;
   $("mDice").textContent = m.dice;
-  for (const b of document.querySelectorAll(".segmented .mdl")) {
-    b.classList.toggle("on", b.dataset.variant === variant);
-  }
+  markActive(".segmented .mdl", "variant", variant);
 }
 
 async function loadModel(variant = currentModel) {
   ort.env.wasm.numThreads = 1;   // avoids the COOP/COEP requirement of plain hosting
-  const buttons = [...document.querySelectorAll(".segmented .mdl")];
-  buttons.forEach((b) => { b.disabled = true; });
+  const btns = buttons(".segmented .mdl");
+  btns.forEach((b) => { b.disabled = true; });
   setModelStatus("busy", `loading ${variant}…`);
   try {
     session = await ort.InferenceSession.create(MODEL_URL(variant), { executionProviders: ["wasm"] });
@@ -86,7 +90,7 @@ async function loadModel(variant = currentModel) {
         : "Could not load the model: " + e.message
     );
   } finally {
-    buttons.forEach((b) => { b.disabled = false; });
+    btns.forEach((b) => { b.disabled = false; });
   }
 }
 
@@ -311,11 +315,7 @@ async function segmentSlice(y) {
   $("segStateLabel").textContent = "computing…";
 
   try {
-    const t0 = performance.now();
-    lastInput = drawInput(y);
     const data = buildTensor(y);
-    const msPrep = performance.now() - t0;
-
     const t1 = performance.now();
     const output = await session.run({
       input: new ort.Tensor("float32", data, [1, 2 * CONTEXT, SIZE, SIZE]),
@@ -388,15 +388,9 @@ function unpackSample(buffer) {
   };
 }
 
-function markExample(subject) {
-  for (const b of document.querySelectorAll(".segmented .ex")) {
-    b.classList.toggle("on", b.dataset.subject === subject);
-  }
-}
-
 async function loadSample(subject) {
-  const buttons = [...document.querySelectorAll(".segmented .ex")];
-  buttons.forEach((b) => { b.disabled = true; });
+  const btns = buttons(".segmented .ex");
+  btns.forEach((b) => { b.disabled = true; });
   clearError();
   try {
     const response = await fetch(SAMPLE_URL(subject));
@@ -417,22 +411,25 @@ async function loadSample(subject) {
     t2.name = `example ${subject} T2`;
     volT1 = t1;
     volT2 = t2;
-    for (const [id, vol] of [["rowT1", t1], ["rowT2", t2]]) {
-      const row = $(id);
-      row.classList.add("ok");
-      row.querySelector(".name").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
-    }
+    showRow("rowT1", t1);
+    showRow("rowT2", t2);
     normaliseVolumes();
     $("dropZone").classList.add("filled");
     $("shell").classList.add("loaded");
     $("btnBrowse").textContent = "Change volumes";
-    markExample(subject);
-    buttons.forEach((b) => { b.disabled = false; });
+    markActive(".segmented .ex", "subject", subject);
     enableWhenReady();
   } catch (e) {
     showError("Could not load the example: " + e.message);
-    buttons.forEach((b) => { b.disabled = false; });
+  } finally {
+    btns.forEach((b) => { b.disabled = false; });
   }
+}
+
+function showRow(id, vol) {
+  const row = $(id);
+  row.classList.add("ok");
+  row.querySelector(".name").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
 }
 
 /* The brain mask comes from T1 (data.py: brain = t1 > 0) and normalises
@@ -459,9 +456,7 @@ async function acceptFiles(fileList) {
       if (!hdr || !img) continue;
       const vol = await readVolume(hdr, img);
       if (target === "t1") volT1 = vol; else volT2 = vol;
-      const row = $(target === "t1" ? "rowT1" : "rowT2");
-      row.classList.add("ok");
-      row.querySelector(".name").textContent = `${vol.name} — ${vol.X}x${vol.Y}x${vol.Z}`;
+      showRow(target === "t1" ? "rowT1" : "rowT2", vol);
     }
 
     if (!volT1 && !volT2) {
@@ -475,7 +470,7 @@ async function acceptFiles(fileList) {
 
     const complete = !!(volT1 && volT2);
     $("dropZone").classList.toggle("filled", complete);
-    markExample(null);
+    markActive(".segmented .ex", "subject", null);
     // the image moves to the top, the drop area moves down
     $("shell").classList.toggle("loaded", complete);
     if (complete) $("btnBrowse").textContent = "Change volumes";
@@ -498,6 +493,8 @@ function enableWhenReady() {
   $("dimsLabel").textContent = `${volT1.X}×${volT1.Y}×${volT1.Z}`;
   updateSliceReadout();
   showTouchHint();
+  // Greyscale first, so the image appears without waiting for inference.
+  refreshBackground(+s.value);
   requestSegmentation();
 }
 
@@ -516,13 +513,19 @@ function showTouchHint() {
   setTimeout(() => h.classList.remove("on"), 2600);
 }
 
-function step(delta) {
+/* Every way of changing slice — slider, buttons, keys, scrub bar, swipe —
+   goes through here: readout, immediate greyscale, then inference. */
+function setSlice(y) {
   const s = $("sliceSlider");
   if (s.disabled) return;
-  s.value = Math.min(+s.max, Math.max(0, +s.value + delta));
+  s.value = Math.min(+s.max, Math.max(0, y));
   updateSliceReadout();
   refreshBackground(+s.value);
   requestSegmentation();
+}
+
+function step(delta) {
+  setSlice(+$("sliceSlider").value + delta);
 }
 
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
@@ -550,11 +553,7 @@ const dropArea = $("dropZone");
   dropArea.addEventListener(ev, (e) => { e.preventDefault(); dropArea.classList.remove("hover"); }));
 dropArea.addEventListener("drop", (e) => acceptFiles(e.dataTransfer.files));
 
-$("sliceSlider").addEventListener("input", () => {
-  updateSliceReadout();
-  refreshBackground(+$("sliceSlider").value);
-  requestSegmentation();
-});
+$("sliceSlider").addEventListener("input", () => setSlice(+$("sliceSlider").value));
 $("btnPrev").addEventListener("click", () => step(-1));
 $("btnNext").addEventListener("click", () => step(+1));
 
@@ -576,14 +575,8 @@ function sliceFromProfile(clientX) {
 }
 
 function scrubTo(clientX) {
-  const s = $("sliceSlider");
-  if (s.disabled) return;
   const target = sliceFromProfile(clientX);
-  if (target === +s.value) return;
-  s.value = target;
-  updateSliceReadout();
-  refreshBackground(+$("sliceSlider").value);
-  requestSegmentation();
+  if (target !== +$("sliceSlider").value) setSlice(target);
 }
 
 const profileCanvas = $("occupancy");
@@ -611,14 +604,8 @@ segWrap.addEventListener("touchstart", (e) => {
 segWrap.addEventListener("touchmove", (e) => {
   if (dragStartX === null) return;
   const delta = Math.round((e.touches[0].clientX - dragStartX) / 14);
-  const s = $("sliceSlider");
-  const target = Math.min(+s.max, Math.max(0, dragStartSlice + delta));
-  if (target !== +s.value) {
-    s.value = target;
-    updateSliceReadout();
-    refreshBackground(target);
-    requestSegmentation();
-  }
+  const target = Math.min(+$("sliceSlider").max, Math.max(0, dragStartSlice + delta));
+  if (target !== +$("sliceSlider").value) setSlice(target);
 }, { passive: true });
 segWrap.addEventListener("touchend", () => { dragStartX = null; }, { passive: true });
 
@@ -635,12 +622,7 @@ for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
     $("btnT1").classList.toggle("on", mod === "t1");
     $("btnT2").classList.toggle("on", mod === "t2");
     $("modLabel").textContent = mod.toUpperCase();
-    if (volT1 && volT2) {
-      lastInput = drawInput(+$("sliceSlider").value);
-      if (lastClasses) {
-        drawSegmentation(lastInput, lastClasses, +$("opacitySlider").value / 100);
-      }
-    }
+    refreshBackground(+$("sliceSlider").value);
   });
 }
 

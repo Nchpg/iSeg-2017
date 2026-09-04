@@ -135,7 +135,7 @@ webdemo/
   app.css         styles
   app.js          lecture Analyze, prétraitement, inférence, rendu
   model.onnx      le modèle int8 (0,43 Mo)
-  sample-*.bin.gz IRM de démonstration, 3 sujets (2,0 à 2,4 Mo chacun)
+  sample-*.bin    IRM de démonstration, 3 sujets (2,0 à 2,4 Mo chacun)
   sw.js           service worker (cache hors ligne)
   manifest.json   déclaration PWA
   icon-*.png      icônes d'application
@@ -147,7 +147,7 @@ Seule la première est préchargée par le service worker ; les deux autres sont
 cache à leur première utilisation, pour ne pas alourdir l'installation. Régénération :
 
 ```bash
-for n in 1 2 3; do python -m iseg.sample --subject $n --out webdemo/sample-$n.bin.gz; done
+for n in 1 2 3; do python -m iseg.sample --subject $n --out webdemo/sample-$n.bin; done
 ```
 
 Le fichier ne contient que la fenêtre de recadrage et les coupes contenant du cerveau,

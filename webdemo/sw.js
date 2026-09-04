@@ -16,7 +16,7 @@
    After one successful segmentation while online, everything needed is
    cached and aeroplane mode works. */
 
-const CACHE = "iseg-viewer-v5";
+const CACHE = "iseg-viewer-v6";
 
 // application code: always revalidated
 const APP = [
@@ -32,7 +32,7 @@ const BINARIES = [
   "./model.onnx",
   // seul le premier echantillon est preinstalle : les autres sont mis
   // en cache a la premiere utilisation, pour ne pas alourdir l'install
-  "./sample-1.bin.gz",
+  "./sample-1.bin",
   "./icon-192.png",
   "./icon-512.png",
 ];

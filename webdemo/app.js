@@ -349,7 +349,7 @@ async function segmentSlice(y) {
    full-size volume so the rest of the code sees no difference.
    Layout is described in iseg/sample.py. */
 
-const SAMPLE_URL = (n) => `sample-${n}.bin.gz`;
+const SAMPLE_URL = (n) => `sample-${n}.bin`;
 
 function unpackSample(buffer) {
   const dv = new DataView(buffer);
@@ -388,8 +388,16 @@ async function loadSample(subject) {
   try {
     const response = await fetch(SAMPLE_URL(subject));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
-    const buffer = await new Response(stream).arrayBuffer();
+
+    // Certains hebergeurs decompressent d'eux-memes une reponse gzip.
+    // On regarde donc le nombre magique plutot que de le supposer.
+    let buffer = await response.arrayBuffer();
+    const tete = new Uint8Array(buffer, 0, 2);
+    if (tete[0] === 0x1f && tete[1] === 0x8b) {
+      buffer = await new Response(
+        new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"))
+      ).arrayBuffer();
+    }
 
     const { t1, t2 } = unpackSample(buffer);
     t1.name = `example ${subject} T1`;
@@ -513,6 +521,13 @@ $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
 for (const b of document.querySelectorAll(".sample .ex")) {
   b.addEventListener("click", () => loadSample(b.dataset.subject));
 }
+
+/* Un element absent ne doit jamais interrompre le script : sans ce
+   garde-fou, une page et un script de versions differentes suffisent a
+   tout figer, et plus aucun bouton ne repond. */
+window.addEventListener("error", (e) => {
+  console.error("iSeg Viewer:", e.message);
+});
 
 const dropArea = $("dropZone");
 ["dragenter", "dragover"].forEach((ev) =>

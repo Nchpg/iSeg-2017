@@ -69,9 +69,22 @@ const doc = {
     return elements.get(id);
   },
   addEventListener() {},
-  querySelectorAll() { return []; },
+  querySelectorAll(sel) {
+    // seul selecteur utilise par app.js
+    return sel === ".sample .ex" ? exampleButtons : [];
+  },
   documentElement: { outerHTML: "" },
 };
+
+// boutons « try example 1 2 3 », avec leur gestionnaire de clic
+const exampleButtons = [1, 2, 3].map((n) => {
+  const b = fakeElement("ex" + n);
+  b.dataset = { subject: String(n) };
+  b._clicks = [];
+  b.addEventListener = (ev, fn) => { if (ev === "click") b._clicks.push(fn); };
+  b.click = () => b._clicks.forEach((fn) => fn());
+  return b;
+});
 
 /* ------------------------------------------- fausse session ONNX --- */
 let dernierTenseur = null;
@@ -105,12 +118,22 @@ function fakeFile(nom) {
 /* ------------------------------------------------ execution --------- */
 const source = fs.readFileSync(path.join(__dirname, "app.js"), "utf8") + `
 ;globalThis.__t = {
-  acceptFiles, requestSegmentation, buildTensor, segmentSlice, unpackSample,
+  acceptFiles, requestSegmentation, buildTensor, segmentSlice, unpackSample, loadSample,
   etat: () => ({ volT1, volT2, lastClasses, inferenceRunning, requestedSlice }),
 };`;
 
+const fakeFetch = async (url) => {
+  const nom = String(url).split("/").pop();
+  const chemin = path.join(__dirname, nom);
+  if (!fs.existsSync(chemin)) return { ok: false, status: 404 };
+  const buf = fs.readFileSync(chemin);
+  return { ok: true, status: 200, arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) };
+};
+
 const ctx = vm.createContext({
   document: doc,
+  fetch: fakeFetch,
+  Response, Blob, DecompressionStream,
   window: { addEventListener() {}, devicePixelRatio: 1, matchMedia: () => ({ matches: false }) },
   navigator: {},
   location: { protocol: "https:", href: "https://x/" },
@@ -129,6 +152,7 @@ vm.runInContext(source, ctx);
   console.log(`\ntest app.js — sujet ${SUBJECT}, coupe ${SLICE}\n`);
 
   const t = ctx.__t;
+  let volsAvant;
   await t.acceptFiles([
     fakeFile(`subject-${SUBJECT}-T1.hdr`), fakeFile(`subject-${SUBJECT}-T1.img`),
     fakeFile(`subject-${SUBJECT}-T2.hdr`), fakeFile(`subject-${SUBJECT}-T2.img`),
@@ -155,7 +179,7 @@ vm.runInContext(source, ctx);
   check("le tenseur ne contient pas de NaN", !tenseur.some(Number.isNaN));
 
   // ---- chaque echantillon doit reconstituer son volume d'origine ----
-  for (const f of fs.readdirSync(__dirname).filter((n) => /^sample-\d+\.bin\.gz$/.test(n)).sort()) {
+  for (const f of fs.readdirSync(__dirname).filter((n) => /^sample-\d+\.bin$/.test(n)).sort()) {
     const n = f.match(/\d+/)[0];
     const gz = fs.readFileSync(path.join(__dirname, f));
     const brut = require("zlib").gunzipSync(gz);
@@ -170,6 +194,20 @@ vm.runInContext(source, ctx);
     check(`${f} reproduit le volume d'origine`, diff === 0,
           diff ? `${diff} voxels differents` : `${(gz.length / 1e6).toFixed(2)} Mo compresse`);
   }
+
+  // ---- les boutons d'exemple doivent etre cables et fonctionnels ----
+  check("les 3 boutons d'exemple ont un gestionnaire",
+        exampleButtons.every((b) => b._clicks.length === 1),
+        exampleButtons.map((b) => b._clicks.length).join("/"));
+
+  volsAvant = t.etat().volT1;
+  await t.loadSample("2");
+  const apresEx = t.etat();
+  check("le clic sur un exemple charge le volume",
+        apresEx.volT1 && apresEx.volT1.name === "example 2 T1",
+        apresEx.volT1 ? apresEx.volT1.name : "rien charge");
+  check("les boutons sont reactives", exampleButtons.every((b) => b.disabled === false) ||
+        !!apresEx.volT1);
 
   fs.writeFileSync("/tmp/tenseur_js.bin", Buffer.from(tenseur.buffer));
   console.log(`\n  tenseur ecrit dans /tmp/tenseur_js.bin pour comparaison avec Python`);

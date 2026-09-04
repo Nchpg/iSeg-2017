@@ -1,174 +1,170 @@
-# iSeg-2017 — segmentation frugale du cerveau du nourrisson
+# iSeg-2017 — frugal infant brain segmentation
 
-Segmentation en trois tissus (LCR, substance grise, substance blanche) sur IRM T1 et
-T2 de bébés de 6 mois, avec un objectif de déploiement mobile ou embarqué.
+Three-tissue segmentation (CSF, grey matter, white matter) on T1 and T2 MRI of
+6-month-old infants, sized for mobile and embedded deployment.
 
-## Protocole d'évaluation
+## Evaluation protocol
 
-Les 13 sujets du dossier `iSeg-2017-Testing/` **n'ont pas d'étiquettes** : elles n'ont
-jamais été publiées, elles servaient au classement du challenge. Toute évaluation
-chiffrée se fait donc sur les 10 sujets d'entraînement : **8 pour apprendre, les
-sujets 1 et 2 mis de côté pour mesurer**. Le dossier de test ne sert qu'à produire
-des prédictions qualitatives et à mesurer un temps d'inférence.
+The 13 subjects in `iSeg-2017-Testing/` **have no labels** — they were never
+released, they served the challenge leaderboard. Every number below therefore
+comes from the 10 training subjects: **8 to train, subjects 1 and 2 held out to
+measure**. The test folder only yields qualitative predictions and an inference
+timing.
 
-Le découpage est fait **par sujet**, jamais par coupe : deux coupes voisines d'un
-même volume sont quasi identiques, les mélanger entre entraînement et validation
-donnerait un Dice artificiellement élevé.
+The split is **by subject, never by slice**: two neighbouring slices of the same
+volume are nearly identical, and mixing them across train and validation inflates
+Dice for free.
 
-Le Dice se calcule **par volume**, après réassemblage de toutes les coupes.
+Dice is computed **per volume**, after reassembling all slices.
 
-## Ce que les données imposent
+## What the data dictates
 
-Constats mesurés sur les 10 sujets (le script d'analyse qui les a produits est dans
-l'historique git : `git show HEAD~1:explore.py`, figures dans `figures/`).
+Measured on the 10 training subjects (the exploration script is in git history:
+`git show HEAD~1:explore.py`).
 
-**Géométrie.** 10 sujets, 144×192×256, 1 mm isotrope. T1, T2 et label partagent la
-même matrice affine : les modalités sont déjà recalées, aucun réalignement à faire.
+**Geometry.** 10 subjects, 144×192×256, 1 mm isotropic. T1, T2 and label share the
+same affine, so the modalities are already registered.
 
-**Répartition des classes**, à l'intérieur du cerveau : LCR 22 %, GM 47 %, WM 31 %.
-Déséquilibre modéré (facteur 2,2), qui ne justifie pas de pondération agressive.
+**Class balance** inside the brain: CSF 22 %, GM 47 %, WM 31 %. A 2.2× imbalance,
+mild enough that aggressive weighting is not warranted.
 
-**Le faible contraste, quantifié.** Intersection des histogrammes d'intensité
-(1 = distributions confondues, 0 = séparables) :
+**Low contrast, quantified.** Intensity histogram intersection (1 = indistinguishable,
+0 = separable):
 
-| paire | T1 | T2 |
+| pair | T1 | T2 |
 |---|---|---|
-| **GM / WM** | 0,702 | **0,901** |
-| LCR / GM | 0,362 | 0,360 |
-| LCR / WM | 0,268 | 0,347 |
+| **GM / WM** | 0.702 | **0.901** |
+| CSF / GM | 0.362 | 0.360 |
+| CSF / WM | 0.268 | 0.347 |
 
-Ratio de Fisher pour GM/WM : **0,269 en T1 seul, 0,001 en T2 seul**, et 0,297 pour la
-meilleure combinaison linéaire des deux — soit 10 % de gain seulement.
+Fisher ratio for GM/WM: **0.269 on T1 alone, 0.001 on T2 alone**, and 0.297 for the
+best linear combination of the two — a 10 % gain.
 
-Conséquence structurante : à 6 mois, **aucune combinaison d'intensités ne sépare GM et
-WM**. C'est la phase iso-intense, et elle rend le contexte spatial indispensable
-plutôt qu'accessoire. Le T2 est conservé (son coût est dérisoire, et un réseau
-convolutif exploite des relations non linéaires que le critère de Fisher ne capte
-pas). Son apport réel n'a pas été mesuré par ablation — `--modalities t1` permet
-de le faire si la question se pose.
+So at 6 months **no combination of intensities separates GM from WM**. This is the
+iso-intense phase, and it makes spatial context mandatory rather than helpful. T2 is
+kept anyway: it costs almost nothing, and a convnet exploits non-linear relations
+that a Fisher ratio does not capture. Its real contribution was never ablated —
+`--modalities t1` is there if the question comes up.
 
-## Choix de conception
+## Design choices
 
-| Décision | Justification |
+| Decision | Why |
 |---|---|
-| Orientation **coronale** | symétrie gauche/droite visible dans le plan : repère anatomique, et le flip horizontal devient une augmentation légitime |
-| Recadrage fixe **144×144** | couvre la boîte englobante du cerveau avec 13-17 voxels de marge ; divisible par 16, donc ni redimensionnement ni remplissage |
-| **Pas de correction N4** | SimpleITK ne s'embarque pas dans un navigateur ; compensé par une augmentation qui simule des champs de biais. Arbitrage assumé au profit d'un prétraitement reproductible à l'inférence |
-| Normalisation z-score **dans le masque cérébral** | inclure le fond écraserait la statistique sous des millions de voxels vides |
-| **2.5D** plutôt que 3D | aucune convolution 3D, donc un modèle que les runtimes mobiles savent accélérer et quantifier ; les convolutions 3D sont mal supportées par NNAPI et Core ML |
-| Perte **Dice + entropie croisée** | l'entropie croisée donne des gradients stables au démarrage, le Dice optimise directement la métrique et ignore la taille des classes |
+| **Coronal** orientation | left/right symmetry is visible in-plane, which gives an anatomical cue and makes the horizontal flip a legitimate augmentation |
+| Fixed **144×144** crop | covers the brain bounding box with 13–17 voxels of margin, divisible by 16, so no resize and no padding |
+| **No N4 correction** | SimpleITK does not ship in a browser; compensated by an augmentation that simulates bias fields. Traded for preprocessing that is reproducible at inference |
+| Z-score **inside the brain mask** | including background would crush the statistic under millions of empty voxels |
+| **2.5D** rather than 3D | no 3D convolution, so mobile runtimes can accelerate and quantize the model — NNAPI and Core ML support 3D convolutions poorly |
+| **Dice + cross-entropy** loss | cross-entropy gives stable gradients early on, Dice optimises the metric directly and ignores class size |
 
-## Modèles
+## Models
 
-Un U-Net 2D dont les canaux d'entrée portent la troisième dimension : `context`
-coupes coronales adjacentes par modalité (5 par défaut, soit 10 canaux avec T1+T2).
+A 2D U-Net whose input channels carry the third dimension: `context` adjacent
+coronal slices per modality (5 by default, so 10 channels with T1+T2).
 
-| variante | description | paramètres | int8 | Dice |
+| variant | description | params | int8 | Dice |
 |---|---|---|---|---|
-| `standard` | convolutions 3×3 pleines, base 16, 4 niveaux | 1 943 636 | 1,89 Mo | 0,8927 |
-| **`separable`** | depthwise 3×3 + pointwise 1×1 | 386 782 | **0,43 Mo** | **0,8624** |
-| `tiny` | separable, base 8, 3 niveaux | 26 974 | 0,07 Mo | 0,8281 |
+| `standard` | full 3×3 convolutions, base 16, 4 levels | 1,943,636 | 1.89 MB | 0.8927 |
+| **`separable`** | depthwise 3×3 + pointwise 1×1 | 386,782 | **0.43 MB** | **0.8624** |
+| `tiny` | separable, base 8, 3 levels | 26,974 | 0.07 MB | 0.8281 |
 
-`separable` est le modèle retenu : **97 % du Dice de `standard` pour 20 % de sa
-taille**. Descendre plus bas (`tiny`) coûte 3,4 points de Dice supplémentaires pour
-un gain de taille sans effet pratique — les deux tiennent déjà largement sur un
-téléphone.
+`separable` is the one shipped: **97 % of `standard`'s Dice at 20 % of its size**.
+Going smaller (`tiny`) costs another 3.4 Dice points for a size gain with no
+practical effect — both already fit on a phone comfortably.
 
-Détail par tissu pour `separable` : LCR 0,8969, GM 0,8606, WM 0,8297 — la substance
-blanche est bien la plus difficile, comme le chevauchement d'histogrammes de 0,702
-le laissait prévoir.
+Per-tissue Dice for `separable`: CSF 0.8969, GM 0.8606, WM 0.8297. White matter is
+the hardest, as the 0.702 histogram overlap predicted.
 
-Ces chiffres viennent d'une validation croisée 5 blocs faite une fois (écart entre
-le meilleur et le pire bloc : 0,0085, donc la performance ne dépend pas du
-découpage). Le code actuel se contente d'un découpage unique, suffisant pour
-mesurer un modèle.
+These numbers come from a 5-fold cross-validation run once (best-to-worst fold
+spread: 0.0085, so performance does not hinge on the split). The code itself uses a
+single split, which is enough to measure a model.
 
-## Utilisation
+## Usage
 
-### Environnement local
-
-Sous NixOS, les wheels manylinux ont besoin de `libstdc++` et `zlib` dans le chemin
-des bibliothèques ; `env.sh` s'en charge.
+### Local environment
 
 ```bash
 uv venv .venv
 uv pip install --python .venv/bin/python numpy nibabel torch onnx onnxruntime onnxscript
+```
+
+On NixOS the manylinux wheels need `libstdc++` and `zlib` on the library path;
+`env.sh` puts them there:
+
+```bash
 source env.sh
 ```
 
-### Entraînement (Colab, GPU T4)
+### Training (Colab, T4 GPU)
 
-Ouvrir `colab_iseg.ipynb`. Le notebook n'orchestre que des appels au paquet `iseg/`,
-qui reste versionné dans git.
+Open `colab_iseg.ipynb`. The notebook only orchestrates calls into the `iseg/`
+package, which stays versioned in git.
 
 ```bash
-python -m iseg.train                       # separable, 60 epoques, ~10 min sur T4
-python -m iseg.train --variant standard    # la reference haute
-python -m iseg.train --variant tiny        # la plus petite
+python -m iseg.train                       # separable, 60 epochs, ~10 min on a T4
+python -m iseg.train --variant standard    # the high-end reference
+python -m iseg.train --variant tiny        # the smallest
 ```
 
-Le Dice sur les deux sujets de validation s'affiche toutes les 5 époques, et les
-poids du meilleur passage sont écrits dans `runs/<variante>.pt`.
+Dice on the two validation subjects prints every 5 epochs, and the best weights land
+in `runs/<variant>.pt`.
 
-### Export du modèle
+### Export
 
 ```bash
 python -m iseg.export --checkpoint runs/separable.pt
 ```
 
-Produit le `.onnx` float32 et sa version quantifiée int8, environ 3,5× plus petite
-(1,49 Mo → 0,43 Mo pour `separable`). La quantification est statique, calibrée sur
-de vraies coupes — sur un réseau convolutif, la quantification dynamique ne touche
-pas les convolutions et n'apporte presque rien.
+Produces the float32 `.onnx` and its int8 version, about 3.5× smaller (1.49 MB →
+0.43 MB for `separable`). Quantization is static, calibrated on real slices —
+dynamic quantization leaves convolutions untouched and buys almost nothing here.
 
-### Démonstration mobile
+### Mobile demo
 
-`webdemo/` est un site statique qui lit les fichiers `.hdr/.img`, laisse choisir une
-coupe et segmente **sur l'appareil**, en WebAssembly. Aucune image ne quitte la
-machine, et il n'y a aucun serveur d'inférence.
-
-Mesuré sur téléphone : **97 ms par coupe**, soit environ 13 s pour un volume complet.
+`webdemo/` is a static site that reads `.hdr/.img` files, lets you pick a slice and
+segments it **on the device**, in WebAssembly. No image leaves the machine and there
+is no inference server. Measured on a phone: **97 ms per slice**, about 13 s for a
+full volume.
 
 ```
 webdemo/
   index.html      structure
   app.css         styles
-  app.js          lecture Analyze, prétraitement, inférence, rendu
-  model-*.onnx    les 3 variantes en int8, choisies dans l'interface
-  sample-*.bin    IRM de démonstration, 3 sujets (2,0 à 2,4 Mo chacun)
-  sw.js           service worker (cache hors ligne)
-  manifest.json   déclaration PWA
-  icon-*.png      icônes d'application
-  test.js         test sans navigateur : node webdemo/test.js
+  app.js          Analyze reader, preprocessing, inference, rendering
+  model-*.onnx    the 3 variants in int8, selectable in the UI
+  sample-*.bin    3 demo MRIs (2.0–2.4 MB each)
+  sw.js           service worker (offline cache)
+  manifest.json   PWA manifest
+  icon-*.png      app icons
+  test.js         headless test: node webdemo/test.js
 ```
 
-Trois IRM de démonstration sont embarquées, pour qui n'a pas de données sous la main.
-Seule la première est préchargée par le service worker ; les deux autres sont mises en
-cache à leur première utilisation, pour ne pas alourdir l'installation. Régénération :
+The three bundled MRIs are for anyone without data at hand. Only the first is
+preloaded by the service worker; the other two are cached on first use. To
+regenerate them:
 
 ```bash
 for n in 1 2 3; do python -m iseg.sample --subject $n --out webdemo/sample-$n.bin; done
 ```
 
-Le fichier ne contient que la fenêtre de recadrage et les coupes contenant du cerveau,
-compressées : 2,4 Mo au lieu des 28 Mo des `.hdr/.img` d'origine, pour une
-reconstruction exacte au voxel près. *Les données iSeg-2017 étant distribuées sous
-conditions, vérifier que leur republication est autorisée avant de déployer.*
+Each file holds only the crop window and the slices containing brain, compressed:
+2.4 MB instead of the 28 MB of the original `.hdr/.img`, reconstructed voxel-exact.
+*iSeg-2017 data is distributed under conditions — check that redistribution is
+allowed before deploying.*
 
-Le dossier se publie tel quel sur GitHub Pages, Vercel ou Netlify. En HTTPS le
-service worker met tout en cache dès la première visite et l'application devient
-installable sur l'écran d'accueil ; elle fonctionne ensuite sans réseau, à condition
-d'avoir lancé **une segmentation en ligne** au préalable — c'est ce qui déclenche la
-mise en cache du moteur ONNX Runtime, chargé depuis un CDN.
+The folder publishes as-is on GitHub Pages, Vercel or Netlify. Over HTTPS the service
+worker caches everything on the first visit and the app becomes installable. It then
+works without a network, provided **one segmentation ran online** first — that is what
+caches the ONNX Runtime engine, which is loaded from a CDN.
 
-Ouvrir `index.html` en `file://` ne marche pas : les navigateurs interdisent à une
-page locale de charger `model.onnx`. Pour un essai local, servir le dossier :
+Opening `index.html` over `file://` does not work: browsers forbid a local page from
+loading `model.onnx`. To try it locally, serve the folder:
 
 ```bash
 cd webdemo && python3 -m http.server 8000
 ```
 
-Pour y placer un autre modèle :
+To put another model in it:
 
 ```bash
 for v in standard separable tiny; do
@@ -176,20 +172,20 @@ for v in standard separable tiny; do
 done
 ```
 
-La page laisse choisir la variante et affiche pour chacune ses paramètres, sa taille,
-son Dice et le temps d'inférence mesuré sur l'appareil. Seule `separable` est
-préchargée ; les deux autres sont mises en cache à la sélection.
+The page lets you switch variants and shows each one's parameter count, size, Dice
+and the inference time measured on the device. Only `separable` is preloaded; the
+other two are cached when selected.
 
-## Structure
+## Layout
 
 ```
-iseg/data.py            prétraitement, cache, dataset 2.5D
-iseg/augment.py         augmentation (géométrie + intensité, dont champ de biais)
-iseg/model.py           U-Net 2.5D et variantes frugales
-iseg/losses.py          Dice + entropie croisée, Dice volumique
-iseg/train.py           entraînement, 8 sujets / 2 en validation
-iseg/export.py          ONNX, quantification int8, copie vers le site
-iseg/sample.py          IRM de démonstration compacte pour la page web
-colab_iseg.ipynb        orchestration Colab
-webdemo/                site statique : démonstration mobile (PWA)
+iseg/data.py            preprocessing, cache, 2.5D dataset
+iseg/augment.py         augmentation (geometry + intensity, including bias field)
+iseg/model.py           2.5D U-Net and frugal variants
+iseg/losses.py          Dice + cross-entropy, volume Dice
+iseg/train.py           training, 8 subjects / 2 held out
+iseg/export.py          ONNX, int8 quantization, copy to the site
+iseg/sample.py          compact demo MRI for the web page
+colab_iseg.ipynb        Colab orchestration
+webdemo/                static site: mobile demo (PWA)
 ```

@@ -245,10 +245,10 @@ function drawProfile() {
   const max = Math.max(...occupancy) || 1;
   const x0 = THUMB / 2;
 
-  ctx.fillStyle = "#1a2029";
+  ctx.fillStyle = "#232629";
   ctx.fillRect(0, 0, width, h);
 
-  ctx.fillStyle = "#313c4b";
+  ctx.fillStyle = "#3c4145";
   for (let i = 0; i < usable; i++) {
     const v = occupancy[Math.min(occupancy.length - 1, Math.floor((i / usable) * occupancy.length))] / max;
     const hb = Math.max(1, v * (h - 4));
@@ -257,7 +257,7 @@ function drawProfile() {
 
   // current slice marker, on the same range as the thumb
   const frac = +$("sliceSlider").value / (+$("sliceSlider").max || 1);
-  ctx.fillStyle = "#38c6b0";
+  ctx.fillStyle = "#d0d5d8";
   ctx.fillRect(x0 + frac * usable - 1, 0, 2, h);
 }
 

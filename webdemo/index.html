@@ -6,18 +6,14 @@
 <title>iSeg Viewer</title>
 <meta name="description" content="Cerebrospinal fluid, grey matter and white matter segmentation on infant T1/T2 MRI, computed on your device.">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0d12">
+<meta name="theme-color" content="#101214">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=16">
+<link rel="stylesheet" href="app.css?v=17">
 </head>
 <body>
 
 <header class="topbar">
   <div class="brand">
-    <span class="mark" aria-hidden="true"></span>
     <h1>iSeg&nbsp;Viewer</h1>
     <span class="sub">Infant brain tissue segmentation</span>
   </div>
@@ -61,7 +57,6 @@
         <div class="canvaswrap">
           <canvas id="canvasInput" width="144" height="144"></canvas>
           <div class="empty" id="emptyInput">
-            <span class="big" aria-hidden="true">&#9633;</span>
             <span>waiting for volumes</span>
           </div>
         </div>
@@ -72,7 +67,6 @@
         <div class="canvaswrap" id="wrapSeg">
           <canvas id="canvasSeg" width="144" height="144"></canvas>
           <div class="empty" id="emptySeg">
-            <span class="big" aria-hidden="true">&#9673;</span>
             <span id="emptySegTxt">Drop an MRI to get started</span>
           </div>
           <div class="swipehint" id="swipeHint">Swipe to change slice</div>
@@ -159,6 +153,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
 </body>
 </html>

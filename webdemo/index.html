@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=7">
+<link rel="stylesheet" href="app.css?v=8">
 </head>
 <body>
 
@@ -85,6 +85,21 @@
   <!-- ===================== controls ===================== -->
   <aside class="side">
 
+    <section class="panel" id="panelModel">
+      <h2>Model</h2>
+      <div class="segmented" role="group" aria-label="model variant">
+        <button type="button" class="mdl" data-variant="tiny">tiny</button>
+        <button type="button" class="mdl on" data-variant="separable">separable</button>
+        <button type="button" class="mdl" data-variant="standard">standard</button>
+      </div>
+      <dl class="modelspec">
+        <div><dt>parameters</dt><dd id="mParams">&mdash;</dd></div>
+        <div><dt>size, int8</dt><dd id="mSize">&mdash;</dd></div>
+        <div><dt>Dice, held out</dt><dd id="mDice">&mdash;</dd></div>
+        <div><dt>inference</dt><dd id="mTime">&mdash;</dd></div>
+      </dl>
+    </section>
+
     <section class="panel off" id="panelSlice">
       <h2>Coronal slice</h2>
       <div class="sliceval"><span id="sliceNum">&mdash;</span><small id="sliceMax"></small></div>
@@ -125,10 +140,6 @@
         <li><i class="s-gm"></i>grey matter<b id="pctGM">&mdash;</b></li>
         <li><i class="s-wm"></i>white matter<b id="pctWM">&mdash;</b></li>
       </ul>
-      <div class="tiles">
-        <div class="tile"><span class="k">preprocessing</span><span class="v" id="tPrep">&mdash;<small>ms</small></span></div>
-        <div class="tile"><span class="k">inference</span><span class="v" id="tInfer">&mdash;<small>ms</small></span></div>
-      </div>
     </section>
 
   </aside>
@@ -165,6 +176,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

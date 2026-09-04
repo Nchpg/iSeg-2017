@@ -19,7 +19,18 @@ const CROP_X = [0, 144];
 const CROP_Z = [72, 216];
 const CONTEXT = 5;
 const SIZE = 144;
-const MODEL_URL = "model.onnx";
+/* Les trois variantes entrainees, du plus frugal au plus performant.
+   Les chiffres viennent de la validation croisee 5 blocs (voir README) ;
+   ils sont figes ici parce qu'ils decrivent l'entrainement, pas
+   l'execution. Le temps d'inference, lui, est mesure sur l'appareil. */
+const MODELS = {
+  tiny:      { params: 26974,   size: "0.07 MB", dice: "0.828" },
+  separable: { params: 386782,  size: "0.43 MB", dice: "0.862" },
+  standard:  { params: 1943636, size: "1.89 MB", dice: "0.893" },
+};
+const DEFAULT_MODEL = "separable";
+const MODEL_URL = (v) => `model-${v}.onnx`;
+let currentModel = DEFAULT_MODEL;
 
 const COLOURS = {
   1: [0x4c, 0x9b, 0xe8],   // cerebrospinal fluid
@@ -52,12 +63,30 @@ function setModelStatus(classe, texte) {
 
 /* ============================ model loading ========================== */
 
-async function loadModel() {
+function showModelSpec(variant) {
+  const m = MODELS[variant];
+  $("mParams").textContent = m.params.toLocaleString("en-US");
+  $("mSize").textContent = m.size;
+  $("mDice").textContent = m.dice;
+  for (const b of document.querySelectorAll(".segmented .mdl")) {
+    b.classList.toggle("on", b.dataset.variant === variant);
+  }
+}
+
+async function loadModel(variant = currentModel) {
   ort.env.wasm.numThreads = 1;   // avoids the COOP/COEP requirement of plain hosting
+  const buttons = [...document.querySelectorAll(".segmented .mdl")];
+  buttons.forEach((b) => { b.disabled = true; });
+  setModelStatus("busy", `loading ${variant}…`);
   try {
     const t0 = performance.now();
-    session = await ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
-    setModelStatus("ok", `model ready (${(performance.now() - t0).toFixed(0)} ms)`);
+    session = await ort.InferenceSession.create(MODEL_URL(variant), { executionProviders: ["wasm"] });
+    currentModel = variant;
+    showModelSpec(variant);
+    setModelStatus("ok", `${variant} ready (${(performance.now() - t0).toFixed(0)} ms)`);
+    $("mTime").textContent = "—";
+    // relance la coupe courante avec le nouveau modele
+    if (volT1 && volT2) requestSegmentation();
   } catch (e) {
     setModelStatus("err", "model unavailable");
     showError(
@@ -67,6 +96,8 @@ async function loadModel() {
           "(python3 -m http.server) or use the hosted version."
         : "Could not load the model: " + e.message
     );
+  } finally {
+    buttons.forEach((b) => { b.disabled = false; });
   }
 }
 
@@ -332,8 +363,9 @@ async function segmentSlice(y) {
     drawSegmentation(lastInput, classes, +$("opacitySlider").value / 100);
     updateStats(classes);
 
-    $("tPrep").innerHTML = msPrep.toFixed(1) + "<small>ms</small>";
-    $("tInfer").innerHTML = msInf.toFixed(1) + "<small>ms</small>";
+    const cible = $("mTime");
+    cible.textContent = `${msInf.toFixed(0)} ms`;
+    cible.classList.add("live");
     $("segStateLabel").textContent = "slice " + y;
     $("panelStats").classList.remove("off");
   } catch (e) {
@@ -531,6 +563,12 @@ for (const b of document.querySelectorAll(".segmented .ex")) {
   b.addEventListener("click", () => loadSample(b.dataset.subject));
 }
 
+for (const b of document.querySelectorAll(".segmented .mdl")) {
+  b.addEventListener("click", () => {
+    if (b.dataset.variant !== currentModel) loadModel(b.dataset.variant);
+  });
+}
+
 /* Un element absent ne doit jamais interrompre le script : sans ce
    garde-fou, une page et un script de versions differentes suffisent a
    tout figer, et plus aucun bouton ne repond. */
@@ -661,4 +699,5 @@ $("btnInstall").addEventListener("click", async () => {
 
 window.addEventListener("resize", () => { if (occupancy) drawProfile(); });
 
-loadModel();
+showModelSpec(DEFAULT_MODEL);
+loadModel(DEFAULT_MODEL);

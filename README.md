@@ -134,7 +134,7 @@ webdemo/
   index.html      structure
   app.css         styles
   app.js          lecture Analyze, prétraitement, inférence, rendu
-  model.onnx      le modèle int8 (0,43 Mo)
+  model-*.onnx    les 3 variantes en int8, choisies dans l'interface
   sample-*.bin    IRM de démonstration, 3 sujets (2,0 à 2,4 Mo chacun)
   sw.js           service worker (cache hors ligne)
   manifest.json   déclaration PWA
@@ -171,8 +171,14 @@ cd webdemo && python3 -m http.server 8000
 Pour y placer un autre modèle :
 
 ```bash
-python -m iseg.export --checkpoint runs/separable.pt --deploy webdemo
+for v in standard separable tiny; do
+  python -m iseg.export --checkpoint runs/$v.pt --deploy webdemo
+done
 ```
+
+La page laisse choisir la variante et affiche pour chacune ses paramètres, sa taille,
+son Dice et le temps d'inférence mesuré sur l'appareil. Seule `separable` est
+préchargée ; les deux autres sont mises en cache à la sélection.
 
 ## Structure
 

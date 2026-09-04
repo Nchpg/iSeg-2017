@@ -79,9 +79,13 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
     prepared.unlink(missing_ok=True)
 
 
-def deploy(onnx_path, site_dir):
-    """Place le modele la ou la page ira le chercher."""
-    cible = Path(site_dir) / "model.onnx"
+def deploy(onnx_path, site_dir, variant):
+    """Place le modele la ou la page ira le chercher.
+
+    Le nom porte la variante : la page en propose plusieurs et les
+    charge a la demande.
+    """
+    cible = Path(site_dir) / f"model-{variant}.onnx"
     if not cible.parent.is_dir():
         raise ValueError(f"dossier du site introuvable : {site_dir}")
     shutil.copyfile(onnx_path, cible)
@@ -121,7 +125,7 @@ def main():
               f"(/{mo(fp32) / mo(final):.1f})")
 
     if args.deploy:
-        cible = deploy(final, args.deploy)
+        cible = deploy(final, args.deploy, ckpt["variant"])
         print(f"  copie     {cible}")
 
 

@@ -70,11 +70,23 @@ const doc = {
   },
   addEventListener() {},
   querySelectorAll(sel) {
-    // seul selecteur utilise par app.js
-    return sel === ".segmented .ex" ? exampleButtons : [];
+    if (sel === ".segmented .ex") return exampleButtons;
+    if (sel === ".segmented .mdl") return modelButtons;
+    return [];
   },
   documentElement: { outerHTML: "" },
 };
+
+const boutonFactice = (id, cle, valeur) => {
+  const b = fakeElement(id);
+  b.dataset = { [cle]: valeur };
+  b._clicks = [];
+  b.addEventListener = (ev, fn) => { if (ev === "click") b._clicks.push(fn); };
+  b.click = () => b._clicks.forEach((fn) => fn());
+  return b;
+};
+
+const modelButtons = ["tiny", "separable", "standard"].map((v) => boutonFactice("mdl-" + v, "variant", v));
 
 // boutons « try example 1 2 3 », avec leur gestionnaire de clic
 const exampleButtons = [1, 2, 3].map((n) => {
@@ -208,6 +220,24 @@ vm.runInContext(source, ctx);
         apresEx.volT1 ? apresEx.volT1.name : "rien charge");
   check("les boutons sont reactives", exampleButtons.every((b) => b.disabled === false) ||
         !!apresEx.volT1);
+
+  // ---- selecteur de modele ----
+  check("les 3 boutons de modele ont un gestionnaire",
+        modelButtons.every((b) => b._clicks.length === 1),
+        modelButtons.map((b) => b._clicks.length).join("/"));
+
+  for (const v of ["tiny", "separable", "standard"]) {
+    check(`model-${v}.onnx est present`,
+          fs.existsSync(path.join(__dirname, `model-${v}.onnx`)),
+          fs.existsSync(path.join(__dirname, `model-${v}.onnx`))
+            ? `${(fs.statSync(path.join(__dirname, `model-${v}.onnx`)).size / 1e6).toFixed(2)} Mo` : "");
+  }
+
+  modelButtons.find((b) => b.dataset.variant === "tiny").click();
+  await new Promise((r) => setTimeout(r, 30));
+  check("changer de modele met la fiche a jour",
+        doc.getElementById("mParams").textContent === "26,974",
+        `"${doc.getElementById("mParams").textContent}"`);
 
   fs.writeFileSync("/tmp/tenseur_js.bin", Buffer.from(tenseur.buffer));
   console.log(`\n  tenseur ecrit dans /tmp/tenseur_js.bin pour comparaison avec Python`);

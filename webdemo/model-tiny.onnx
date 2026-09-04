@@ -1,0 +1,1459 @@
+
+onnx.quantize0.1.0:Ê«
+Ý
+#bottleneck.block.0.weight_quantized
+bottleneck.block.0.weight_scale
+$bottleneck.block.0.weight_zero_point1bottleneck.block.0.weight_DequantizeLinear_Output*bottleneck.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(bottleneck.block.1.weight_bias_quantized
+.bottleneck.block.1.weight_bias_quantized_scale
+3bottleneck.block.1.weight_bias_quantized_zero_pointbottleneck.block.1.weight_bias/bottleneck.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#bottleneck.block.1.weight_quantized
+bottleneck.block.1.weight_scale
+$bottleneck.block.1.weight_zero_point1bottleneck.block.1.weight_DequantizeLinear_Output*bottleneck.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#bottleneck.block.4.weight_quantized
+bottleneck.block.4.weight_scale
+$bottleneck.block.4.weight_zero_point1bottleneck.block.4.weight_DequantizeLinear_Output*bottleneck.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(bottleneck.block.5.weight_bias_quantized
+.bottleneck.block.5.weight_bias_quantized_scale
+3bottleneck.block.5.weight_bias_quantized_zero_pointbottleneck.block.5.weight_bias/bottleneck.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#bottleneck.block.5.weight_quantized
+bottleneck.block.5.weight_scale
+$bottleneck.block.5.weight_zero_point1bottleneck.block.5.weight_DequantizeLinear_Output*bottleneck.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.0.block.0.weight_quantized
+decoders.0.block.0.weight_scale
+$decoders.0.block.0.weight_zero_point1decoders.0.block.0.weight_DequantizeLinear_Output*decoders.0.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.0.block.1.weight_bias_quantized
+.decoders.0.block.1.weight_bias_quantized_scale
+3decoders.0.block.1.weight_bias_quantized_zero_pointdecoders.0.block.1.weight_bias/decoders.0.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.0.block.1.weight_quantized
+decoders.0.block.1.weight_scale
+$decoders.0.block.1.weight_zero_point1decoders.0.block.1.weight_DequantizeLinear_Output*decoders.0.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.0.block.4.weight_quantized
+decoders.0.block.4.weight_scale
+$decoders.0.block.4.weight_zero_point1decoders.0.block.4.weight_DequantizeLinear_Output*decoders.0.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.0.block.5.weight_bias_quantized
+.decoders.0.block.5.weight_bias_quantized_scale
+3decoders.0.block.5.weight_bias_quantized_zero_pointdecoders.0.block.5.weight_bias/decoders.0.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.0.block.5.weight_quantized
+decoders.0.block.5.weight_scale
+$decoders.0.block.5.weight_zero_point1decoders.0.block.5.weight_DequantizeLinear_Output*decoders.0.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.1.block.0.weight_quantized
+decoders.1.block.0.weight_scale
+$decoders.1.block.0.weight_zero_point1decoders.1.block.0.weight_DequantizeLinear_Output*decoders.1.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.1.block.1.weight_bias_quantized
+.decoders.1.block.1.weight_bias_quantized_scale
+3decoders.1.block.1.weight_bias_quantized_zero_pointdecoders.1.block.1.weight_bias/decoders.1.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.1.block.1.weight_quantized
+decoders.1.block.1.weight_scale
+$decoders.1.block.1.weight_zero_point1decoders.1.block.1.weight_DequantizeLinear_Output*decoders.1.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.1.block.4.weight_quantized
+decoders.1.block.4.weight_scale
+$decoders.1.block.4.weight_zero_point1decoders.1.block.4.weight_DequantizeLinear_Output*decoders.1.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.1.block.5.weight_bias_quantized
+.decoders.1.block.5.weight_bias_quantized_scale
+3decoders.1.block.5.weight_bias_quantized_zero_pointdecoders.1.block.5.weight_bias/decoders.1.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.1.block.5.weight_quantized
+decoders.1.block.5.weight_scale
+$decoders.1.block.5.weight_zero_point1decoders.1.block.5.weight_DequantizeLinear_Output*decoders.1.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.2.block.0.weight_quantized
+decoders.2.block.0.weight_scale
+$decoders.2.block.0.weight_zero_point1decoders.2.block.0.weight_DequantizeLinear_Output*decoders.2.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.2.block.1.weight_bias_quantized
+.decoders.2.block.1.weight_bias_quantized_scale
+3decoders.2.block.1.weight_bias_quantized_zero_pointdecoders.2.block.1.weight_bias/decoders.2.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.2.block.1.weight_quantized
+decoders.2.block.1.weight_scale
+$decoders.2.block.1.weight_zero_point1decoders.2.block.1.weight_DequantizeLinear_Output*decoders.2.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.2.block.4.weight_quantized
+decoders.2.block.4.weight_scale
+$decoders.2.block.4.weight_zero_point1decoders.2.block.4.weight_DequantizeLinear_Output*decoders.2.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(decoders.2.block.5.weight_bias_quantized
+.decoders.2.block.5.weight_bias_quantized_scale
+3decoders.2.block.5.weight_bias_quantized_zero_pointdecoders.2.block.5.weight_bias/decoders.2.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#decoders.2.block.5.weight_quantized
+decoders.2.block.5.weight_scale
+$decoders.2.block.5.weight_zero_point1decoders.2.block.5.weight_DequantizeLinear_Output*decoders.2.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.0.block.0.weight_quantized
+encoders.0.block.0.weight_scale
+$encoders.0.block.0.weight_zero_point1encoders.0.block.0.weight_DequantizeLinear_Output*encoders.0.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.0.block.1.weight_bias_quantized
+.encoders.0.block.1.weight_bias_quantized_scale
+3encoders.0.block.1.weight_bias_quantized_zero_pointencoders.0.block.1.weight_bias/encoders.0.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.0.block.1.weight_quantized
+encoders.0.block.1.weight_scale
+$encoders.0.block.1.weight_zero_point1encoders.0.block.1.weight_DequantizeLinear_Output*encoders.0.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.0.block.4.weight_quantized
+encoders.0.block.4.weight_scale
+$encoders.0.block.4.weight_zero_point1encoders.0.block.4.weight_DequantizeLinear_Output*encoders.0.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.0.block.5.weight_bias_quantized
+.encoders.0.block.5.weight_bias_quantized_scale
+3encoders.0.block.5.weight_bias_quantized_zero_pointencoders.0.block.5.weight_bias/encoders.0.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.0.block.5.weight_quantized
+encoders.0.block.5.weight_scale
+$encoders.0.block.5.weight_zero_point1encoders.0.block.5.weight_DequantizeLinear_Output*encoders.0.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.1.block.0.weight_quantized
+encoders.1.block.0.weight_scale
+$encoders.1.block.0.weight_zero_point1encoders.1.block.0.weight_DequantizeLinear_Output*encoders.1.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.1.block.1.weight_bias_quantized
+.encoders.1.block.1.weight_bias_quantized_scale
+3encoders.1.block.1.weight_bias_quantized_zero_pointencoders.1.block.1.weight_bias/encoders.1.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.1.block.1.weight_quantized
+encoders.1.block.1.weight_scale
+$encoders.1.block.1.weight_zero_point1encoders.1.block.1.weight_DequantizeLinear_Output*encoders.1.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.1.block.4.weight_quantized
+encoders.1.block.4.weight_scale
+$encoders.1.block.4.weight_zero_point1encoders.1.block.4.weight_DequantizeLinear_Output*encoders.1.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.1.block.5.weight_bias_quantized
+.encoders.1.block.5.weight_bias_quantized_scale
+3encoders.1.block.5.weight_bias_quantized_zero_pointencoders.1.block.5.weight_bias/encoders.1.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.1.block.5.weight_quantized
+encoders.1.block.5.weight_scale
+$encoders.1.block.5.weight_zero_point1encoders.1.block.5.weight_DequantizeLinear_Output*encoders.1.block.5.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.2.block.0.weight_quantized
+encoders.2.block.0.weight_scale
+$encoders.2.block.0.weight_zero_point1encoders.2.block.0.weight_DequantizeLinear_Output*encoders.2.block.0.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.2.block.1.weight_bias_quantized
+.encoders.2.block.1.weight_bias_quantized_scale
+3encoders.2.block.1.weight_bias_quantized_zero_pointencoders.2.block.1.weight_bias/encoders.2.block.1.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.2.block.1.weight_quantized
+encoders.2.block.1.weight_scale
+$encoders.2.block.1.weight_zero_point1encoders.2.block.1.weight_DequantizeLinear_Output*encoders.2.block.1.weight_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.2.block.4.weight_quantized
+encoders.2.block.4.weight_scale
+$encoders.2.block.4.weight_zero_point1encoders.2.block.4.weight_DequantizeLinear_Output*encoders.2.block.4.weight_DequantizeLinear"DequantizeLinear
+ע
+(encoders.2.block.5.weight_bias_quantized
+.encoders.2.block.5.weight_bias_quantized_scale
+3encoders.2.block.5.weight_bias_quantized_zero_pointencoders.2.block.5.weight_bias/encoders.2.block.5.weight_bias_DequantizeLinear"DequantizeLinear
+Ý
+#encoders.2.block.5.weight_quantized
+encoders.2.block.5.weight_scale
+$encoders.2.block.5.weight_zero_point1encoders.2.block.5.weight_DequantizeLinear_Output*encoders.2.block.5.weight_DequantizeLinear"DequantizeLinear
+‰
+head.bias_quantized
+head.bias_quantized_scale
+head.bias_quantized_zero_point	head.biashead.bias_DequantizeLinear"DequantizeLinear
+—
+head.weight_quantized
+head.weight_scale
+head.weight_zero_point#head.weight_DequantizeLinear_Outputhead.weight_DequantizeLinear"DequantizeLinear
+i
+input
+input_scale
+input_zero_pointinput_QuantizeLinear_Outputinput_QuantizeLinear"QuantizeLinear
+
+ups.0.bias_quantized
+ups.0.bias_quantized_scale
+ups.0.bias_quantized_zero_point
+ups.0.biasups.0.bias_DequantizeLinear"DequantizeLinear
+
+ups.0.weight_quantized
+ups.0.weight_scale
+ups.0.weight_zero_point$ups.0.weight_DequantizeLinear_Outputups.0.weight_DequantizeLinear"DequantizeLinear
+
+ups.1.bias_quantized
+ups.1.bias_quantized_scale
+ups.1.bias_quantized_zero_point
+ups.1.biasups.1.bias_DequantizeLinear"DequantizeLinear
+
+ups.1.weight_quantized
+ups.1.weight_scale
+ups.1.weight_zero_point$ups.1.weight_DequantizeLinear_Outputups.1.weight_DequantizeLinear"DequantizeLinear
+
+ups.2.bias_quantized
+ups.2.bias_quantized_scale
+ups.2.bias_quantized_zero_point
+ups.2.biasups.2.bias_DequantizeLinear"DequantizeLinear
+
+ups.2.weight_quantized
+ups.2.weight_scale
+ups.2.weight_zero_point$ups.2.weight_DequantizeLinear_Outputups.2.weight_DequantizeLinear"DequantizeLinear
+…
+input_QuantizeLinear_Output
+input_scale
+input_zero_pointinput_DequantizeLinear_Outputinput_DequantizeLinear"DequantizeLinear
+
+input_DequantizeLinear_Output
+1encoders.0.block.0.weight_DequantizeLinear_Outputconv2dnode_Conv_94"Conv*
+group
+ *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+n
+conv2d
+conv2d_scale
+conv2d_zero_pointconv2d_QuantizeLinear_Outputconv2d_QuantizeLinear"QuantizeLinear
+
+conv2d_QuantizeLinear_Output
+conv2d_scale
+conv2d_zero_pointconv2d_DequantizeLinear_Outputconv2d_DequantizeLinear"DequantizeLinear
+ֳ
+conv2d_DequantizeLinear_Output
+1encoders.0.block.1.weight_DequantizeLinear_Output
+encoders.0.block.1.weight_biasrelunode_Conv_96"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+d
+relu
+
+relu_scale
+relu_zero_pointrelu_QuantizeLinear_Outputrelu_QuantizeLinear"QuantizeLinear
+€
+relu_QuantizeLinear_Output
+
+relu_scale
+relu_zero_pointrelu_DequantizeLinear_Outputrelu_DequantizeLinear"DequantizeLinear
+
+relu_DequantizeLinear_Output
+1encoders.0.block.4.weight_DequantizeLinear_Outputconv2d_2node_Conv_97"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+x
+conv2d_2
+conv2d_2_scale
+conv2d_2_zero_pointconv2d_2_QuantizeLinear_Outputconv2d_2_QuantizeLinear"QuantizeLinear
+”
+conv2d_2_QuantizeLinear_Output
+conv2d_2_scale
+conv2d_2_zero_point conv2d_2_DequantizeLinear_Outputconv2d_2_DequantizeLinear"DequantizeLinear
+ַ
+ conv2d_2_DequantizeLinear_Output
+1encoders.0.block.5.weight_DequantizeLinear_Output
+encoders.0.block.5.weight_biasrelu_1node_Conv_99"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_1
+relu_1_scale
+relu_1_zero_pointrelu_1_QuantizeLinear_Outputrelu_1_QuantizeLinear"QuantizeLinear
+
+relu_1_QuantizeLinear_Output
+relu_1_scale
+relu_1_zero_pointrelu_1_DequantizeLinear_Outputrelu_1_DequantizeLinear"DequantizeLinear
+ױ
+relu_1_DequantizeLinear_Output
+max_pool2dnode_max_pool2d"MaxPool*
+storage_order  *
+	dilations@@ *
+	ceil_mode  *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+kernel_shape@@ 
+z
+
+max_pool2d
+relu_1_scale
+relu_1_zero_point max_pool2d_QuantizeLinear_Outputmax_pool2d_QuantizeLinear"QuantizeLinear
+–
+ max_pool2d_QuantizeLinear_Output
+relu_1_scale
+relu_1_zero_point"max_pool2d_DequantizeLinear_Outputmax_pool2d_DequantizeLinear"DequantizeLinear
+•
+"max_pool2d_DequantizeLinear_Output
+1encoders.1.block.0.weight_DequantizeLinear_Outputconv2d_4node_Conv_100"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+x
+conv2d_4
+conv2d_4_scale
+conv2d_4_zero_pointconv2d_4_QuantizeLinear_Outputconv2d_4_QuantizeLinear"QuantizeLinear
+”
+conv2d_4_QuantizeLinear_Output
+conv2d_4_scale
+conv2d_4_zero_point conv2d_4_DequantizeLinear_Outputconv2d_4_DequantizeLinear"DequantizeLinear
+ָ
+ conv2d_4_DequantizeLinear_Output
+1encoders.1.block.1.weight_DequantizeLinear_Output
+encoders.1.block.1.weight_biasrelu_2node_Conv_102"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_2
+relu_2_scale
+relu_2_zero_pointrelu_2_QuantizeLinear_Outputrelu_2_QuantizeLinear"QuantizeLinear
+
+relu_2_QuantizeLinear_Output
+relu_2_scale
+relu_2_zero_pointrelu_2_DequantizeLinear_Outputrelu_2_DequantizeLinear"DequantizeLinear
+‘
+relu_2_DequantizeLinear_Output
+1encoders.1.block.4.weight_DequantizeLinear_Outputconv2d_6node_Conv_103"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+x
+conv2d_6
+conv2d_6_scale
+conv2d_6_zero_pointconv2d_6_QuantizeLinear_Outputconv2d_6_QuantizeLinear"QuantizeLinear
+”
+conv2d_6_QuantizeLinear_Output
+conv2d_6_scale
+conv2d_6_zero_point conv2d_6_DequantizeLinear_Outputconv2d_6_DequantizeLinear"DequantizeLinear
+ָ
+ conv2d_6_DequantizeLinear_Output
+1encoders.1.block.5.weight_DequantizeLinear_Output
+encoders.1.block.5.weight_biasrelu_3node_Conv_105"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_3
+relu_3_scale
+relu_3_zero_pointrelu_3_QuantizeLinear_Outputrelu_3_QuantizeLinear"QuantizeLinear
+
+relu_3_QuantizeLinear_Output
+relu_3_scale
+relu_3_zero_pointrelu_3_DequantizeLinear_Outputrelu_3_DequantizeLinear"DequantizeLinear
+Ù
+relu_3_DequantizeLinear_Outputmax_pool2d_1node_max_pool2d_1"MaxPool*
+storage_order  *
+	dilations@@ *
+	ceil_mode  *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+kernel_shape@@ 
+€
+max_pool2d_1
+relu_3_scale
+relu_3_zero_point"max_pool2d_1_QuantizeLinear_Outputmax_pool2d_1_QuantizeLinear"QuantizeLinear
+
+"max_pool2d_1_QuantizeLinear_Output
+relu_3_scale
+relu_3_zero_point$max_pool2d_1_DequantizeLinear_Outputmax_pool2d_1_DequantizeLinear"DequantizeLinear
+—
+$max_pool2d_1_DequantizeLinear_Output
+1encoders.2.block.0.weight_DequantizeLinear_Outputconv2d_8node_Conv_106"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+x
+conv2d_8
+conv2d_8_scale
+conv2d_8_zero_pointconv2d_8_QuantizeLinear_Outputconv2d_8_QuantizeLinear"QuantizeLinear
+”
+conv2d_8_QuantizeLinear_Output
+conv2d_8_scale
+conv2d_8_zero_point conv2d_8_DequantizeLinear_Outputconv2d_8_DequantizeLinear"DequantizeLinear
+ָ
+ conv2d_8_DequantizeLinear_Output
+1encoders.2.block.1.weight_DequantizeLinear_Output
+encoders.2.block.1.weight_biasrelu_4node_Conv_108"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_4
+relu_4_scale
+relu_4_zero_pointrelu_4_QuantizeLinear_Outputrelu_4_QuantizeLinear"QuantizeLinear
+
+relu_4_QuantizeLinear_Output
+relu_4_scale
+relu_4_zero_pointrelu_4_DequantizeLinear_Outputrelu_4_DequantizeLinear"DequantizeLinear
+’
+relu_4_DequantizeLinear_Output
+1encoders.2.block.4.weight_DequantizeLinear_Output	conv2d_10node_Conv_109"Conv*
+group  *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_10
+conv2d_10_scale
+conv2d_10_zero_pointconv2d_10_QuantizeLinear_Outputconv2d_10_QuantizeLinear"QuantizeLinear
+™
+conv2d_10_QuantizeLinear_Output
+conv2d_10_scale
+conv2d_10_zero_point!conv2d_10_DequantizeLinear_Outputconv2d_10_DequantizeLinear"DequantizeLinear
+ֹ
+!conv2d_10_DequantizeLinear_Output
+1encoders.2.block.5.weight_DequantizeLinear_Output
+encoders.2.block.5.weight_biasrelu_5node_Conv_111"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_5
+relu_5_scale
+relu_5_zero_pointrelu_5_QuantizeLinear_Outputrelu_5_QuantizeLinear"QuantizeLinear
+
+relu_5_QuantizeLinear_Output
+relu_5_scale
+relu_5_zero_pointrelu_5_DequantizeLinear_Outputrelu_5_DequantizeLinear"DequantizeLinear
+Ù
+relu_5_DequantizeLinear_Outputmax_pool2d_2node_max_pool2d_2"MaxPool*
+storage_order  *
+	dilations@@ *
+	ceil_mode  *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+kernel_shape@@ 
+€
+max_pool2d_2
+relu_5_scale
+relu_5_zero_point"max_pool2d_2_QuantizeLinear_Outputmax_pool2d_2_QuantizeLinear"QuantizeLinear
+
+"max_pool2d_2_QuantizeLinear_Output
+relu_5_scale
+relu_5_zero_point$max_pool2d_2_DequantizeLinear_Outputmax_pool2d_2_DequantizeLinear"DequantizeLinear
+˜
+$max_pool2d_2_DequantizeLinear_Output
+1bottleneck.block.0.weight_DequantizeLinear_Output	conv2d_12node_Conv_112"Conv*
+group  *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_12
+conv2d_12_scale
+conv2d_12_zero_pointconv2d_12_QuantizeLinear_Outputconv2d_12_QuantizeLinear"QuantizeLinear
+™
+conv2d_12_QuantizeLinear_Output
+conv2d_12_scale
+conv2d_12_zero_point!conv2d_12_DequantizeLinear_Outputconv2d_12_DequantizeLinear"DequantizeLinear
+ֹ
+!conv2d_12_DequantizeLinear_Output
+1bottleneck.block.1.weight_DequantizeLinear_Output
+bottleneck.block.1.weight_biasrelu_6node_Conv_114"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_6
+relu_6_scale
+relu_6_zero_pointrelu_6_QuantizeLinear_Outputrelu_6_QuantizeLinear"QuantizeLinear
+
+relu_6_QuantizeLinear_Output
+relu_6_scale
+relu_6_zero_pointrelu_6_DequantizeLinear_Outputrelu_6_DequantizeLinear"DequantizeLinear
+’
+relu_6_DequantizeLinear_Output
+1bottleneck.block.4.weight_DequantizeLinear_Output	conv2d_14node_Conv_115"Conv*
+group@ *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_14
+conv2d_14_scale
+conv2d_14_zero_pointconv2d_14_QuantizeLinear_Outputconv2d_14_QuantizeLinear"QuantizeLinear
+™
+conv2d_14_QuantizeLinear_Output
+conv2d_14_scale
+conv2d_14_zero_point!conv2d_14_DequantizeLinear_Outputconv2d_14_DequantizeLinear"DequantizeLinear
+ֹ
+!conv2d_14_DequantizeLinear_Output
+1bottleneck.block.5.weight_DequantizeLinear_Output
+bottleneck.block.5.weight_biasrelu_7node_Conv_117"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_7
+relu_7_scale
+relu_7_zero_pointrelu_7_QuantizeLinear_Outputrelu_7_QuantizeLinear"QuantizeLinear
+
+relu_7_QuantizeLinear_Output
+relu_7_scale
+relu_7_zero_pointrelu_7_DequantizeLinear_Outputrelu_7_DequantizeLinear"DequantizeLinear
+ק
+relu_7_DequantizeLinear_Output
+$ups.0.weight_DequantizeLinear_Output
+
+ups.0.biasconvolutionnode_convolution"ConvTranspose*
+group *
+auto_pad"NOTSET *
+strides@@ *
+pads@ @ @ @  *
+output_padding@ @  *
+	dilations@@ 
+‡
+convolution
+convolution_scale
+convolution_zero_point!convolution_QuantizeLinear_Outputconvolution_QuantizeLinear"QuantizeLinear
+£
+!convolution_QuantizeLinear_Output
+convolution_scale
+convolution_zero_point#convolution_DequantizeLinear_Outputconvolution_DequantizeLinear"DequantizeLinear
+i
+relu_5_DequantizeLinear_Output
+#convolution_DequantizeLinear_Outputcatnode_cat"Concat*
+axis 
+_
+cat
+	cat_scale
+cat_zero_pointcat_QuantizeLinear_Outputcat_QuantizeLinear"QuantizeLinear
+{
+cat_QuantizeLinear_Output
+	cat_scale
+cat_zero_pointcat_DequantizeLinear_Outputcat_DequantizeLinear"DequantizeLinear
+
+cat_DequantizeLinear_Output
+1decoders.0.block.0.weight_DequantizeLinear_Output	conv2d_16node_Conv_118"Conv*
+group@ *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_16
+conv2d_16_scale
+conv2d_16_zero_pointconv2d_16_QuantizeLinear_Outputconv2d_16_QuantizeLinear"QuantizeLinear
+™
+conv2d_16_QuantizeLinear_Output
+conv2d_16_scale
+conv2d_16_zero_point!conv2d_16_DequantizeLinear_Outputconv2d_16_DequantizeLinear"DequantizeLinear
+ֹ
+!conv2d_16_DequantizeLinear_Output
+1decoders.0.block.1.weight_DequantizeLinear_Output
+decoders.0.block.1.weight_biasrelu_8node_Conv_120"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_8
+relu_8_scale
+relu_8_zero_pointrelu_8_QuantizeLinear_Outputrelu_8_QuantizeLinear"QuantizeLinear
+
+relu_8_QuantizeLinear_Output
+relu_8_scale
+relu_8_zero_pointrelu_8_DequantizeLinear_Outputrelu_8_DequantizeLinear"DequantizeLinear
+’
+relu_8_DequantizeLinear_Output
+1decoders.0.block.4.weight_DequantizeLinear_Output	conv2d_18node_Conv_121"Conv*
+group  *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_18
+conv2d_18_scale
+conv2d_18_zero_pointconv2d_18_QuantizeLinear_Outputconv2d_18_QuantizeLinear"QuantizeLinear
+™
+conv2d_18_QuantizeLinear_Output
+conv2d_18_scale
+conv2d_18_zero_point!conv2d_18_DequantizeLinear_Outputconv2d_18_DequantizeLinear"DequantizeLinear
+ֹ
+!conv2d_18_DequantizeLinear_Output
+1decoders.0.block.5.weight_DequantizeLinear_Output
+decoders.0.block.5.weight_biasrelu_9node_Conv_123"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+n
+relu_9
+relu_9_scale
+relu_9_zero_pointrelu_9_QuantizeLinear_Outputrelu_9_QuantizeLinear"QuantizeLinear
+
+relu_9_QuantizeLinear_Output
+relu_9_scale
+relu_9_zero_pointrelu_9_DequantizeLinear_Outputrelu_9_DequantizeLinear"DequantizeLinear
+û
+relu_9_DequantizeLinear_Output
+$ups.1.weight_DequantizeLinear_Output
+
+ups.1.biasconvolution_1node_convolution_1"ConvTranspose*
+group *
+auto_pad"NOTSET *
+strides@@ *
+pads@ @ @ @  *
+output_padding@ @  *
+	dilations@@ 
+‘
+convolution_1
+convolution_1_scale
+convolution_1_zero_point#convolution_1_QuantizeLinear_Outputconvolution_1_QuantizeLinear"QuantizeLinear
+­
+#convolution_1_QuantizeLinear_Output
+convolution_1_scale
+convolution_1_zero_point%convolution_1_DequantizeLinear_Outputconvolution_1_DequantizeLinear"DequantizeLinear
+o
+relu_3_DequantizeLinear_Output
+%convolution_1_DequantizeLinear_Outputcat_1
+node_cat_1"Concat*
+axis 
+i
+cat_1
+cat_1_scale
+cat_1_zero_pointcat_1_QuantizeLinear_Outputcat_1_QuantizeLinear"QuantizeLinear
+…
+cat_1_QuantizeLinear_Output
+cat_1_scale
+cat_1_zero_pointcat_1_DequantizeLinear_Outputcat_1_DequantizeLinear"DequantizeLinear
+‘
+cat_1_DequantizeLinear_Output
+1decoders.1.block.0.weight_DequantizeLinear_Output	conv2d_20node_Conv_124"Conv*
+group  *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_20
+conv2d_20_scale
+conv2d_20_zero_pointconv2d_20_QuantizeLinear_Outputconv2d_20_QuantizeLinear"QuantizeLinear
+™
+conv2d_20_QuantizeLinear_Output
+conv2d_20_scale
+conv2d_20_zero_point!conv2d_20_DequantizeLinear_Outputconv2d_20_DequantizeLinear"DequantizeLinear
+Ê
+!conv2d_20_DequantizeLinear_Output
+1decoders.1.block.1.weight_DequantizeLinear_Output
+decoders.1.block.1.weight_biasrelu_10node_Conv_126"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+s
+relu_10
+relu_10_scale
+relu_10_zero_pointrelu_10_QuantizeLinear_Outputrelu_10_QuantizeLinear"QuantizeLinear
+
+relu_10_QuantizeLinear_Output
+relu_10_scale
+relu_10_zero_pointrelu_10_DequantizeLinear_Outputrelu_10_DequantizeLinear"DequantizeLinear
+“
+relu_10_DequantizeLinear_Output
+1decoders.1.block.4.weight_DequantizeLinear_Output	conv2d_22node_Conv_127"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_22
+conv2d_22_scale
+conv2d_22_zero_pointconv2d_22_QuantizeLinear_Outputconv2d_22_QuantizeLinear"QuantizeLinear
+™
+conv2d_22_QuantizeLinear_Output
+conv2d_22_scale
+conv2d_22_zero_point!conv2d_22_DequantizeLinear_Outputconv2d_22_DequantizeLinear"DequantizeLinear
+Ê
+!conv2d_22_DequantizeLinear_Output
+1decoders.1.block.5.weight_DequantizeLinear_Output
+decoders.1.block.5.weight_biasrelu_11node_Conv_129"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+s
+relu_11
+relu_11_scale
+relu_11_zero_pointrelu_11_QuantizeLinear_Outputrelu_11_QuantizeLinear"QuantizeLinear
+
+relu_11_QuantizeLinear_Output
+relu_11_scale
+relu_11_zero_pointrelu_11_DequantizeLinear_Outputrelu_11_DequantizeLinear"DequantizeLinear
+ü
+relu_11_DequantizeLinear_Output
+$ups.2.weight_DequantizeLinear_Output
+
+ups.2.biasconvolution_2node_convolution_2"ConvTranspose*
+group *
+auto_pad"NOTSET *
+strides@@ *
+pads@ @ @ @  *
+output_padding@ @  *
+	dilations@@ 
+‘
+convolution_2
+convolution_2_scale
+convolution_2_zero_point#convolution_2_QuantizeLinear_Outputconvolution_2_QuantizeLinear"QuantizeLinear
+­
+#convolution_2_QuantizeLinear_Output
+convolution_2_scale
+convolution_2_zero_point%convolution_2_DequantizeLinear_Outputconvolution_2_DequantizeLinear"DequantizeLinear
+o
+relu_1_DequantizeLinear_Output
+%convolution_2_DequantizeLinear_Outputcat_2
+node_cat_2"Concat*
+axis 
+i
+cat_2
+cat_2_scale
+cat_2_zero_pointcat_2_QuantizeLinear_Outputcat_2_QuantizeLinear"QuantizeLinear
+…
+cat_2_QuantizeLinear_Output
+cat_2_scale
+cat_2_zero_pointcat_2_DequantizeLinear_Outputcat_2_DequantizeLinear"DequantizeLinear
+‘
+cat_2_DequantizeLinear_Output
+1decoders.2.block.0.weight_DequantizeLinear_Output	conv2d_24node_Conv_130"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_24
+conv2d_24_scale
+conv2d_24_zero_pointconv2d_24_QuantizeLinear_Outputconv2d_24_QuantizeLinear"QuantizeLinear
+™
+conv2d_24_QuantizeLinear_Output
+conv2d_24_scale
+conv2d_24_zero_point!conv2d_24_DequantizeLinear_Outputconv2d_24_DequantizeLinear"DequantizeLinear
+Ê
+!conv2d_24_DequantizeLinear_Output
+1decoders.2.block.1.weight_DequantizeLinear_Output
+decoders.2.block.1.weight_biasrelu_12node_Conv_132"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+s
+relu_12
+relu_12_scale
+relu_12_zero_pointrelu_12_QuantizeLinear_Outputrelu_12_QuantizeLinear"QuantizeLinear
+
+relu_12_QuantizeLinear_Output
+relu_12_scale
+relu_12_zero_pointrelu_12_DequantizeLinear_Outputrelu_12_DequantizeLinear"DequantizeLinear
+“
+relu_12_DequantizeLinear_Output
+1decoders.2.block.4.weight_DequantizeLinear_Output	conv2d_26node_Conv_133"Conv*
+group *
+pads@@@@ *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ J?
+!pkg.onnxscript.rewriter.rule_nameRemoveOptionalBiasFromConv
+}
+	conv2d_26
+conv2d_26_scale
+conv2d_26_zero_pointconv2d_26_QuantizeLinear_Outputconv2d_26_QuantizeLinear"QuantizeLinear
+™
+conv2d_26_QuantizeLinear_Output
+conv2d_26_scale
+conv2d_26_zero_point!conv2d_26_DequantizeLinear_Outputconv2d_26_DequantizeLinear"DequantizeLinear
+Ê
+!conv2d_26_DequantizeLinear_Output
+1decoders.2.block.5.weight_DequantizeLinear_Output
+decoders.2.block.5.weight_biasrelu_13node_Conv_135"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ JV
+!pkg.onnxscript.rewriter.rule_name1FuseBatchNormIntoConv, RemoveOptionalBiasFromConv
+s
+relu_13
+relu_13_scale
+relu_13_zero_pointrelu_13_QuantizeLinear_Outputrelu_13_QuantizeLinear"QuantizeLinear
+
+relu_13_QuantizeLinear_Output
+relu_13_scale
+relu_13_zero_pointrelu_13_DequantizeLinear_Outputrelu_13_DequantizeLinear"DequantizeLinear
+ג
+relu_13_DequantizeLinear_Output
+#head.weight_DequantizeLinear_Output
+	head.biaslogits_QuantizeLinear_Inputnode_conv2d_28"Conv*
+group *
+pads@ @ @ @  *
+auto_pad"NOTSET *
+strides@@ *
+	dilations@@ 
+ƒ
+logits_QuantizeLinear_Input
+logits_scale
+logits_zero_pointlogits_QuantizeLinear_Outputlogits_QuantizeLinear"QuantizeLinear
+r
+logits_QuantizeLinear_Output
+logits_scale
+logits_zero_pointlogitslogits_DequantizeLinear"DequantizeLinear
+main_graph**:Binput_zero_point*"­=Binput_scale**©Bconv2d_zero_point*"7ג¼=Bconv2d_scale*+* B$encoders.0.block.0.weight_zero_point*)"Izt;Bencoders.0.block.0.weight_scale*‹
+B#encoders.0.block.0.weight_quantizedJZEּÝפ(U׳פ¯·׃(;¡₪‎$·שÿ%§±ÚÙ0¼נַ¿¾J3)ץֳאךAEט AW>־´¹ֽ!ֱ'.עû_±ָך!%Þ·N=¹כער6׃*+* B$encoders.0.block.1.weight_zero_point*)"ß[<Bencoders.0.block.1.weight_scale*
+B#encoders.0.block.1.weight_quantizedJPםפקüנ#צשורßÙßנ‎נ‏‎ ‎‏ןלמתנ¶&(':םכע‎ מתפנüסכש‎צ	ץ ** Brelu_zero_point*"Ê­=B
+relu_scale**CBconv2d_2_zero_point*"N~ׂ<Bconv2d_2_scale*+* B$encoders.0.block.4.weight_zero_point*)"ײc3;Bencoders.0.block.4.weight_scale*yB#encoders.0.block.4.weight_quantizedJHbײt,₪\עÚnָזp00Kע™>^Q₪¯ְֲ0ֱת‏I•¥±Cכa%כÚׁל±ÊY©רJ’7¥ÚׁיbMQֶ[סHYv*+* B$encoders.0.block.5.weight_zero_point*)" ֻ¯<Bencoders.0.block.5.weight_scale*qB#encoders.0.block.5.weight_quantizedJ@םüLsֵן־א‏9סננֹ4Þװױ#<Ûב`'Êּ§ל״ßÚװ40ֻצסֶ$ ÿׂJ׳נסׂ־** Brelu_1_zero_point*"ֶ&¯<Brelu_1_scale**ABconv2d_4_zero_point*"ְ ¾<Bconv2d_4_scale*+* B$encoders.1.block.0.weight_zero_point*)"ָ•f;Bencoders.1.block.0.weight_scale*yB#encoders.1.block.0.weight_quantizedJH2ס²רי2GÞ8‏·‏7Q$"־¹·YQײ UT?קל;(½F*2´ײ?ü>Ù+ׁ¾˜§X-9aֳֻט÷0¶Ý ׀ZH*+* B$encoders.1.block.1.weight_zero_point*)"}L=Bencoders.1.block.1.weight_scale*²B#encoders.1.block.1.weight_quantizedJ€>,פ83%קלגחט6ךû'$״H*כ«O³ףֶײ3אן.³״לÜ,מק נלסנ‎%געק
+ß	נחץחס	חס״ח%=ץßיסדןעûüרםûמפנ** Brelu_2_zero_point*"?צ	=Brelu_2_scale**aBconv2d_6_zero_point*"ü3=Bconv2d_6_scale*+* B$encoders.1.block.4.weight_zero_point*)"FP;Bencoders.1.block.4.weight_scale*ֲB#encoders.1.block.4.weight_quantizedJ)הÙEÙױ$6Ü‏Iם,¼ֽÙsסÝjk½»µÿתֳß,ד"ּL–דזgֶGאװײ(ק´דק<ּtדr1W0Ù¯אP־‡(`Ú©צ»	,a_כ₪°T%0×iZc©ְֿkױֻ)ױֽכק³@ַ g2nאa—Ý¶^ס§קB(0כױ³(¿&÷\ִL¥ה*+* B$encoders.1.block.5.weight_zero_point*)"&§<Bencoders.1.block.5.weight_scale*²B#encoders.1.block.5.weight_quantizedJ€פ"ףישף5Üצ‎טףÜüזûש*ßׂC9%×ZN'»GWע²JÝ&ט+ֳפ?׃(‎ׁ½ׁ)Ý3נלßÙÞ#׳ט4¸û½ûׂסגA·״ֶּן(Y+&ֵ[׃‚eֿ.ßמ1ױÛ#ח7ג.ֿÜערב¾ר'4ÛÜֶÿ,כDׂוBS״8üעצ!ן;נ$ףף‎דֻ3ֳר÷ֶ
+צזיףץףכףÜץמ,²/kNHסהֱשחµ3 שֿר	
+כ"#קÛף* ** Brelu_3_zero_point*"	|1=Brelu_3_scale**‘Bconv2d_8_zero_point*"׃ָY=Bconv2d_8_scale*+* B$encoders.2.block.0.weight_zero_point*)"K&R;Bencoders.2.block.0.weight_scale*ֲB#encoders.2.block.0.weight_quantizedJ₪־זִ0#f“²'ק'¢93µ?¼\3dֱָ;=DG@±ק½Ù	׀ל‰’ ׀ֲ׀¬­>Oא?Ù>¥†û₪DoXׁOV *׀— µ´³תז6‎\&אBבתפע£¬גE­¬ע״‎"­תAgש¾/°ֳ#ן¦ÚÊ0!צמבû	¯נ¢BֽVד¿:31™3*+* B$encoders.2.block.1.weight_zero_point*)"G¨u<Bencoders.2.block.1.weight_scale*² B#encoders.2.block.1.weight_quantizedJ€פטריי)/לזֹפ/׳א>¦¾עXא=ן1.קֵÞHׂ8ךנֳביÚײ82ׁ=¦גֻ÷ג׃=״´û¿³ִ³»¹ßך׃)ְ«(‎/ך¥
+N•קH״ץÊי׃ֵ׀û*ַה.ְבנ3יû	װב+ׂ׳ÿüףגךüû ׃ףךס!ֳ(מֶÿח &(&םד־ׁעכףחדֵֻÙ
+'ק ֿ" ל(üרßףךÝ ָנױ‎"ÿOׁ	"ױ3״ש5מ(?Aה6ײחַט0G/ָר+÷&Úײt>זס¬4ק6­ׂא6>7ּׁײYףÙ»I¯Û_ÿûוÚ!רזזםה+ען!ו׳2ל&ׂ3ß+9+כךש7ם-)יװ)׳#״ÿEה Þ/2Ýמן#+לעßכ‏חװ
+׀‏נKן¿צװײךױ%Ú׀ֲזוÚ‎ֱָJׁגײצ׃ ֲGC4"װץנג״ךגֵפÚ$!ו:יׁ 1&ַvבkM3¥ְױ¼תP¾1סÞקÜ7ה?
+	ֳ‰Ý¹ע׀-לü(ֹמשüEן=/עֶּ9ףh÷# ûRÝÝנז׀ֿך** Brelu_4_zero_point*"ÊI=Brelu_4_scale**jBconv2d_10_zero_point*"רנC=Bconv2d_10_scale*+* B$encoders.2.block.4.weight_zero_point*)"µHO;Bencoders.2.block.4.weight_scale*ׂ B#encoders.2.block.4.weight_quantizedJ װ0½Þִ£׳K׀ױו&³üש«,/ו±+7ך;/ױo½	+ךםE7ך‏#ִ
+דןֵÿ£'ץ² ²ֳnXCJ%MRטRצׁ¬(bQûP¢¥QÜ8פָ&¸¶E¾˜ֲ*JךGֳhN&,ׁ%בfÜ½˜Lּ±סֲ׀0¾18=יMa'R©ךת„·׃ּ1ֵץ9]/כב@j0`¸RÞגףךa¿±WC^N סfCֿXשלßײק׳ֱü<8¬ףÜֳ׀ֳ%¸ע÷הLÊv1ִ²Ù״ִYוÚ-T`Ù8ֵה°›BüI[C8ל33$רû³¼?ÚףÜY½>>D+FL!/×ה ״Ù@–ן(׀oecרֹ״¹°2"lÙ*+* B$encoders.2.block.5.weight_zero_point*)"פ<Bencoders.2.block.5.weight_scale*²  B#encoders.2.block.5.weight_quantizedJ€$ט @'ז&5דנפת<¼‏ֲרְזזh־ßÛןקבÜ0'ü״ץרÿצßריÙ Ûק(üû6	ֵּף!Ú5רÊ×ע;Jז/+גְּ±ור&2%¹W
+טשBׁפ1׀יoÚגÚÙÞÝ-WעםÛß#1ָ+ַד סכ4‎‏׃(עÿ.ÿימי6״üÙסמבסֹף‎ÿ‎Û׃!,ײוזךü&ו%NֽÊ*ß'ךײפמ2)‎ן.׃ױפß0עאוףךל3םßייז4״פױ,ײסü&G!‎Hטְ¿6 ג#ׁ‏א.E,!¿דמװפם8÷AֿA™‏ÙWֱ¢,9Y(ר/ׂ±¼!^ןוÞעÝל&½ץQ#&ךרנAֿזAףרקפ(ו‏הֽֶמ ח'¼	ֲֽודÝ5'<קׂ"קר Aַ5״זףבױ	##Ûכ‎שÙש!‎תףב!ÜPÿ־6SÝ|Ý›N3נךןװ®³÷ר">נDדü&׃ױµב3ע״ Ú&6לÚלרÊüש3#	א
+סÿ׳ÿ¾ י[.גנאטBצביט4ְg-שה&גÞגגֵ׳1״ׁ=ד'+ג׃!ְ״@םֿו1י¥EבÜGדÙQ׳Ý¸ֱֲּ?גח,ֵ­פכ$Ûֻ ה־¾נ'7Dהאש
+(נײֻ6עדת(ם3װ׃/ ‎ת׀)רקה@Ê׀ך,ךLמײרÿüÚף	 הצֵ2½!2ָ%*Ú5װ 9ׁ3ק‏<ֳ‎ׁפֵץ«ß:ֿן>ד	9WֽÙֻמ×ִµ¶עו¸ץ)קû(¿ג;ÿןÞץשתÝֽצ)ֹÿװ2((‏ ¾3ד²3ױ
+ט2-#‎%8Ùׁ׀)10מ¿יַך°א־ ֶ׳ל›(ןשױ:למןüד%ß:טLֽÚטױ=3nסנםֳ =ג5ו3)'ת)וÜ#ÿ&¿ץכ`·עֻ8)׳@׳‎ס%ֽ üו÷נ%הֹװ
+Ýריכ‎üר ששזנÛרכ׃ÞדפÙוü5שצמüת1ךז!י;ָץ:
+גל1&ü	ײ&צ %נג#תזּיבמקס	üר‎ÿ
+ÝKתשםÊû‏ֻ!‎9ףÜחמכםע8;‏נÿÿץ5ױַהאוûָÿÞןס!ץ
+ק!
+ÊףמÝמÊ** Brelu_5_zero_point*"mq=Brelu_5_scale**‹Bconv2d_12_zero_point*"2„y=Bconv2d_12_scale*+* B$bottleneck.block.0.weight_zero_point*)"8H;Bbottleneck.block.0.weight_scale*ׂ B#bottleneck.block.0.weight_quantizedJ ם­רע,¯ׁ	$*pחNZ¨8צ8קY·d1W!EZ‎)®ü«J =[ rֳץEף_ט¶ÝuV¬Pע־©P=B¸ש־»UבÞרQ×[< ֵת©/¿‡0ODQ%S@ ֶֻEןEE/ן’"ס£+T-ז‎ָ#£C׳ג²וצׂJ<£0gקFדJ­]xר W(ד‏«C¾$נ"9ֶ¶ֳ¦¾ֵװוÞעZ,ײְ	/EW)AÜ]ֿױµ8@ֿ1+Qif±אJÊח"2)Oל>-Üµ]זN;ע˜ע¼‎¸T¬ן	cה±_(<½ָװ‎ִפןcֿd¼ֻ¬G­#ֽV
+–‎eÿפ#ױfe4א¬¼d›‚פ
+ƒ“שÚF¥@נ*+* B$bottleneck.block.1.weight_zero_point*)"´<Bbottleneck.block.1.weight_scale*²@ B#bottleneck.block.1.weight_quantizedJ€ף‎גןלßקףיו רנתװ/ָ‎לרֿÞח	Þ‏'ופפ1:ׁ(׀ךÙ$>Sפ¦-ב ?צÞ= ,˜§]ך*^ט·ק´ּ>¬÷½"םֱ¿ֲÙכ¾¯ֱװÞזO¶nׁ×!ֱ?ֳ&:		@$ם‏״Fרפװיר
+כ
+2%ח	0ּל
+)װ"־Bתß7בÝְ: ¹ֵע,ֽֹHהףלף7± ך.‏$ÚךּÊִÙג׃חכÝ+÷ז¾תעחEזL‎ש ןÞיױÿת‎"ÙÝÙ
+ר
+1ח,ךדר׳׀*צ׳RûüÞ+כ,‎8ֵֵ÷'-דׂיÛ2Û¾׳#זרהיִûףֵ½Ýעױכּםץיװ8&ת&ָ7ֲֵ»׃י0ןט‎ׂׂט*לז׀קפץָ
+גףײט1%±כתת ױ·י ½ָ!Êֻאסי׀)ת	%1ל‏ֶ>־Ýל²לR
+ßיֽם :ףױ@ִ"׀$סףÝÚׂעףּÝבכׁןה#
+ּüזן"ÚטFH%ןÿהִתפ³ךןÚ1ןתֶקÛתמÚ)!דÚכü´ ָה^#6‎ַ'כג,ל	Üך/צגזÚר!‎ש Ýאׁ0לנÜ׀0	זÙ/.ה"־ש3ױש$כ״׳ן%ץססר	?פ+Kמß#ך0ָ%-ֹ$ֹ.עזÚ-$Oף%ך_§זלÙֻ)צÝÿױֽ''ָןסׂ,F*ײ!ך	=Ù2רÞ׃Ú"$סםכןAÚÛ$·ןßם״÷ֿ2ß@£¸3$עשֱדן0‏נ@‎@IחP
+>Ê%Gט
+%ז#זקחתשßü!‎ü‏ףףעפמÚG,:ט5ױ׀ûנ״ץ7מֿ­%°ה)Þ;Ý!קE'׃#'נß(9׳ְֵכק*ץג4וצח+ ו!לÙÜ!׃ Úמםנחז/ף‎Üפ-ײÙשגדÞü ײ1)4ÿף.(Û/ ׂׂ 8 *ק%*ֶז
+‎®	ח›אם™Cֽ;ֻ­ױױ״)ÚÚ­ז!א(ןחÚךףÝÞפÚע״תס#דפפ!!ױÛױÝגכ&‏טז*Ýט׃םאמ'שר"ֽ'ׁס׳פ פבÜ
+!װו3ד
+*ב‎!מ 
+ְעל¸עױ-״׃ץֻTI	ק#Ý¥זבן.ח;ץ׀הג
+ûÞ/צמלך‏ü0Ûûןֽû	ßק4מ6לÿ$4&ßû־התׁ‎ÿû6גר‏ץ(#בֻ¶ע+ק#׃¼מפÛלד&‏'ֽאÙֱתׂךז9ֻר.ןןתֳװףפÝץר¦ C״
+נ‏ü$"באך ט"קוחßיױח."Úן¿ÊAתNךדאִ@¥ָא&+ JטּÚס÷סÚ>י׳ְÊׂ—צ!>Xמגֶ	‎ֿÙײ.TGץץרטנְ*³ךָ2Y)û9םַDךרÊüכרן3=ÿÞ ף)ֲ.IÜ‎,ײ
+נכûגיûסÚ, קטזץ-3ÛU9ף94כ&‎ֿ#BםיC9+/ױ5¼%₪°»9
+זûװצßד"ÚÚהG
+ÿסץֶַן־ב!7חִצ'וֱעשןÿßצ,ק־ÚשעץÚ Úךüסׂאב.*Û$!' דßפף(-שצח	ß/Üµ*נ 34Gץטש¼8bן”Þ¯ֱקט(ֲ*÷ּי"ßאÞי£ָ;"ש(־¾אֿרץ6ג¿חךנֳµחמ)ֵ2²
+üֵ¸üרץׂ$גקם װ1ח״עÿ°û®׳]ֶמ* *8ְüז¿וֶױ‏ךײ86 ‏;גßױ,5ן׳ר(עתצֶ$‏ךק‎Ù
+ מ*ם%ßÛףÿÞ9״Ý&ת-ףפה6!דץüÝÛ	מָן'Ýה,Ù׀פ"טü,ןחב‎-'ןקßֵא =ךßךE!*E041(¿ׁָּ­1בן;¸ֹ»½ףֳÝ0מ"‎׳״־
+לְ×א¹’¬Û°T(§ )מ%ֵ".½לממ.ן‎ױÊPBÚVb¾ּח3ע‏=בֹֿדMÊמ׃ֻ0טצ׀פÜLßץג5­1(ּGִ‎ײ)³ü!‎ÞײÛןװ.״ֵ²Üֶם*‏םIֿ˜
+וץצשַף/נױָֿMÜקÛß'Ü‏.פ/װ ÙנÙ!צך""
+*0,#(צÞ	כעÙפעררנב,ֿÙÜש‎:6שא	0ר¸מ׳רֽטÞץתַ‏ד®)1ûֳסִ‎ ן4מ)5-םA7!ֱְWJ״_JZ.Üװ'קףש&÷µפ,¶דד9(׃והוכ!6-92Þ0ַב·>׃6rפA‏ך** Brelu_6_zero_point*"¯
+=Brelu_6_scale**‚Bconv2d_14_zero_point*"ע=Bconv2d_14_scale*+* B$bottleneck.block.4.weight_zero_point*)"'B;Bbottleneck.block.4.weight_scale*ע@B#bottleneck.block.4.weight_quantizedJְסÙI<ֿ—:™ע—\F»ֱÜß¾3µף_ֵ?,ּ1»פ1^÷¼»“Ù¼ק±ות®<¯TMדג­J%£hD$Yc₪³ױ־ױ<crpÊםנ;=שb¼÷ תְ–
+ט¿oe2˜DA>Þצגילט’#©×+­dfßם ע¼ûÞ“§uֽKפ»פ _ÚµfלDAB J¨ףf'V\¼©¾ ÛI??=ֵֿß¹bמּפׂQ‹	‹-MP %×ז¦>+ֲג >K6E°9aװֻײכׂsֹ‹(T¨׳­6iֽ¡sdה״ש4”÷׳ֵןI§kd7B.^“´ג׳ֱ§כZ@¹װךaÝSµd_—½¡IֿװכwאשDְכ´²ׁ^’ך.K­ם„5%ל2b[T½VJ¯\ “עeבחּ÷צ'ףÛן‹ֻ«4
+ [a/Bה/ֶT¶nOk*?2^L8םַץB׃ e^¸.2—C®­ױֱָ 1.V¿–©ָֹ+¦§3§¯ I²2ֽIh#O_F¸ט¸ץכיל“k?N¦¡U¿
+9‏ך/gע³ׁTa׳•&׀¼D
+סqf£›ֻ×¸:­[‏“ףNXכ²"”dY.Kָ›»6¯¢	±פ¹ל4»Ú÷[ױ'¾ך¼LN‎06ֻ¬סMÛ@%÷?את	/]ץPA£YףT^”תם¢M½2WךW&ב>$ֶW³¥״ !ת°I&ד*+* B$bottleneck.block.5.weight_zero_point*)"2<Bbottleneck.block.5.weight_scale*² @@B#bottleneck.block.5.weight_quantizedJ€ =ֵ‎"&׳(עךK*ׂ½ב,דפß,ב;ֳײ#ְֻ)־ה קûÙצ,ע1זדױK$ÿ/+)"[צ "‏H49ֽ÷ט)ֽיֽ#־״8נרסÙÛ'ךװעה"?ׁצ5¹ױ‏ןס*מ³&Ü+Ù־קךְׁÝ:5*אײ	ףÚ+%$.טלה-ט/ַיױ 
+ÝיÝח #ף6‎אס
+הכ;ן-׳4בס$3גלהד"¼ף.ֻ$`Gִ+Û!³מֱ²ÿMÚÝÿֵ'%<4ץג4פ)ר$#:ַפצסc7מת1'
+ל15׳ד#
+Ùנ+3.װעץ-ן/8ּרך*ש#ׂרסך!.<ÜI׃+3$&+Ù"מ(ׂ$ֽץ‏ֹÿּ(
+ÙÜÛַׁמאףף#Ü)Êו2ûהִכ‏‎ײ	ַס¸ûםֽשׂ‎ובÙנ|Û׳דדהß:ב4ו½$‏Oײ¬,7הÿÿז6װװפֵװ[9ן²ח%ֵÚי+¿Jדִ*״ûןם>(נד׳יÚÿ=¡ַ/פ)‏ מ ו÷-½ *Üֹÿױ!üÝלנ:/ֽD+3ֿ׀ׂ!$
+:ׂ¾µהױ3ּײ 3#®י־:'4במ\יֵ שם‎הN\ז*ֵקח?ּ$םרפנü>ףüßÚםû&׳׃ש י!א׀זלכ‏דÜף(<ײ,ÝעPA	7ֶ1¾יֿÛßֽÜױ7טרף‏*׃!ב:ץׂ0ֳןצר*³ײױK-Û¹7ױךDָ,/Êßַ$ה4חקטײ״וד#Þתתץ
+ÙמÜח‎ח	נ	ף חףטזכץךתעמכ	Þו‎ÿתףףממךך'ןןÿזעוÜשÝץץןÞÚח.דף	ףßףףל*מ
+עפיüיכזמûÿ1מר׃ִ¶ק9שװÛץ"A*/ת9'ßIÿ\צÙוR<<(%‎Dÿכ	ק״‎»ָ עH²ÿֿ5M&ּְE<ׂ9«׀G®3ױז1Ýר)ב" ßכ'ָט׃װ0 0ף<עאGS²Þ#ךורוÿFÜ חצ
+כדו-*ללרü‎&ע
+ יר‎שזתץ‏ףהסצג‏ûס(פ‏׳*ֶז.לןÝמÞ#!Ü4+´&ֽ&$תז+.ש%8־÷ִצָףטנת.µ״·	ֻיױטוֻMװ!'צDפצ -דא"Ýון!אפÝ'	ו׃תף‎כ(־ר¿ֽûה ע#תףדף*ף״ם	Ûֶÿױßרר‏צÝר‎הת׳Ê$E'Ù5ÜÚגC'« קû$ז$צ‎  כ‏ÿקג.ע!&ׂ ֻÞדתן‎!&‏ױ	מו !])ח טנײ
+נ#$Ê!
+*%ךחך%ךנײÚקה @יּûן¹;ײבו(ÝÞ‏ֱüNחך׃נ÷3 ¡Þ!מ-׃¶ß‎״הü׀>)26׃‏נחב9נ¸׳פװ4יûÛ׀ױ0ׂ)'ר
+‎,
+תכ.נף	‎?לת22הצ‎ק-‏ץׂ(ױךילü<&ג%ü[ִ+2מ ש
+מ׃ֿֶ(ßָ°ף&G»¾ץא9ûIת).9!ֻ%Þ24ח79עֿ6ץ8נ+ט 4ֵ²ּ)תצCF!! §ֲ§Ê6 ״הױִעסטBֻנÝ-$@שוֽ7C(װ=ס5&ֹ+U
+ֹ)ׁ5­חַג‎׀¼ü#Þ7צז.ÿיזßM44סםַלß ÷לֲ
+ םÿÿ&Ýÿßָךר3צ´:ה(
+ ָFüֹױ;ו64ןזKל	םח"»ה&הÜ%פִ9"%9$,	ֳ
+©ּ%ןּ%שS8.ֲÙנ.ֽÚךװמנßמÚ .ןקללÚ+סאצשבש1#ׂ.נסÙ	‏הלצחÜױ'‎#קב"אָ:Aעÿ	+IÙמÞרצֽֽ ּNל סא)ֳכ¸ÿ!צS0אפ‏רעßֽ»Ûן‎4ר?םû‎ױUןB׀נהק)1¼ֿKד§A+Iאß$Úֹ¼Üצםֱױפֲ=)ÝTאִטÚüû7¸תÙ#חג >ח=?חֻטאכ*ַחֿׂ!.ֿ¾$ִ% ‎{ü£—ַÊ'¿>?״׳Iיף ₪(חJÝס(5שÿ¼ס"_ֲֿßֶ¬ָ$רַÚױ פרןÚ3אןלה,ךצהךװפנױןשכןÛ2ל-Ûגב)ספ"ûÞ%ןח׃&ֵ׀רצ׳.צ$וצזסךקׁד/ֽדÝר +ע1Þ+ß#%ÜÝ$נÊÝ%זצß9 ûהַ$ד#קםHץ9ֶÊפHKשב׃Úת/צß)נצדױםץש/ֿ‏3ֽßB-FÿכÚOנב7ז₪ßץ‎	לט;ה*Ù;ְDÚ׳'¿	KÞרֻ‘‏‎ִד1=ץüשֳֿ9.=ן!ו/%‎-ס אÿ>2טE×ס״$ק‎ן!איךשץף8ד	%פגרüÚ%כ6׳? Êתיצסג(חטסש"ֵÚם<־û9צüֲִ	׀ױֱ/3¸@ט÷8ק‏(פ*°Sו¾V׃ְ ·לױש
+…₪ֿÝü״־ןא/א!Ùא$לײיֱ׳
+ßט%ׂןûÞ5#מ ד״)ÝןזÙכ"אׂ)ßן'אÜו*‎"א E*>וטמּ3û#סÙ"ץÙ³י‎-$ֱÚןףR(נ	מטֻיÙ$ד¹ֵשםH¼ךס0)5 ְ¥%כִ‏'ר3׳#:ְ$ָֻ¯"  ½זßµ HמÝÿ׀‏	§Lה׃כ3V
+FÚ­Cָי@#ß¢	*=כ׃מק3¸%+Qֽ*ֲה75ותץע16û #¿>;M9ײ(ÜÙ¦L&»'ע,/3ÛÊ$מף¶ב,"%ן÷(5ü8A9ױ$®&?B8§	:ױH׳—½סףהOÜעÚ&לRי4שמ& ק ״
+תףתÝה‎+ׂ-&האץÿנׂכא	/גÞכײת'ײÙחֿü
++Ê׃מü!ץ, וִ׳3חקטנ!ם"עאןףץZתהמי/גו×+68דב3ורױ,כןü3ׂוÊא$5"ßחמj&.‏ A@ׂ.7	׀ְ+-Þ$ץר?ג־ר2ÞF#ן&לײץױ)=	+!Ü,Þָ	כÙ!´כ‎ד‎סףכ>ûD(‎ׂ ך³שצ=/A(=+מל-ןִÿץû)Bם5ÜßץÛר %'üרü8&פÿ2%(#כÙׂ)י½û5ר*ֻּו עפ׃ק41.+#ׁך% סױה‏ß02כװEוÛ?ןֹֿתDיסמף&ב	צ)רכ*זײ
+ק
+#י
+ּ%û0םוןץטכן‏%ÿדשעפף׳‘¶'ׂû
+&Iל/G/ֽאÛ3זשֲ%.4ױXן°גֳC*ֿגְלה¸AÚ!#סמTםךC‎$ױü;
+ /5טּר)"*נךץץ+<
+תבÙ²$8.בףץױה‎(פֻג8	־׃ױ>$ כ%ֶםףריסמחÿד%אצף%׳ןü‏י‎ף ץ״הקג ף&"ת ס=טצÿֵרבֹ,¾-־ךב"׃ה‎׃ם#ץגקץר ד""9-'üOûכÿענüס
+גזַ%טÛÝÚ"%OU6G–*1+ מָ%5ֳ;וףצד'לÊג1׳ױ*X!IÊ)ûק AÊקWÊRש…¬ֶ?-ט,ֿנ¬־Úגדקץַרפש(צÿI"״ #ֿß‏ףײֽ*זג*!Úקיßתןסüגת
+)Bû¥ [ַ©-ְףפצ"ֲÿָQAֱװוPה0ֿÝְעQ.ךûםÞן:
+ Ú—×4M…־ַûÜÜ&ת׀2j97G, ק¶Ù.!¿#ק/19מטן!ף
+=^‏ץ<¿9 ד	4ק÷ְ²ü0ÛדÚ׃ת״#ק=+DתÛמכ)ש;ׂ	ו¹ז &׃דױקֹי=ׂ2חמ0ֽעײ#׀חמ״פÜ9.ר09ֵÿ5ֵֽ*[-ררֿ&ת?ß!ש־דֳßכץרמןלü(טÛםü'ü‎פם&I$־לÞײ׃ה6ײ)0טפ#ָ»Rםף6כל‏ב,רüפבף הÿדÙ.זװשלÜט$!(ו‎2לצף׃כד׳Ûד׳	מםןזצ‎>LקÜ"M‘טר*צ»Þצ,ת%‎Ý#׃.4&ר<'ÊÊ²מגֵ@ג$צ.	יN׳1
+Ý>@3ױרטץס*üֱ״Ü״*יך<מכ;ÜֻÝקע׳ל פ3ץטבטÿדûצ צטֻ$״ֶיי׳עיג]*9*אןח©)Û$Fֹ(םטלײמ'ף19ְן3נװֶ/״"ץ'Rתז×םֻֻורÞריûִךד‏¶
+	לץßךנבֽ7$Ýכ¥ו/‏)טץ=ןך""&ר¶ ײנ:ָװ'ױ»)C״צף,5תא*לפִׂי5,ֽקּך>״Úנפ׀!ת‏+ַ$לה׃/׀ק.ףײײüב.ײ"Ü
+ױיÚ¿ֿ)ַ0׀פEױÞד
+ßנֹ3"ב±0=נ¦ÊֶKRבזׁױח)ץׁדתק@װUכר??ף5װׂ ‏** Brelu_7_zero_point*"Üץ<Brelu_7_scale**xBconvolution_zero_point*"lׂ״<Bconvolution_scale** Bups.0.weight_zero_point*"ֵ:Bups.0.weight_scale*¥@@ Bups.0.weight_quantizedJ€@ֹ7ג03סשûװװױרז¾ת>; Û׳	׃ױ׳7אחקלַ/ü	צ*ּ	הÿן12Üו6׀Ê¿Ú¾‎ü.4ס כûשמ®+	וßןֱ׳¼ּÚÜֿ6ו חסÛ'עּה‎:םם%	¾כÿס׀ה)קת‎Úכבמג״.ßוÞצֲױךִ‎דa%1וׂûÚ׳ ְ(&/½ח%1¼־ֱÜֱצÞ(ֶ¼ײ״%דא
+ױ·¿׳³»
+0דüַß=¼״ֶנ6	¹ךתצחװּכד=םי0כÚ/¸‏ֿ)װ¶אֱֱ0$ FABׂ5׳Bסׂ9ז%¿Þהץשז
+ת8-8״Þ ÝאûÜ5חגלß!פח׀מןרל1ײָבÞ ֽגְמ60Êהל,(ֻÝָ״Ûץ0 סאקBהל׀־ת»נפד
+üג"
+Ýִ»ע);צתומט%)FÛט״,ת<*I'¦זֲ7ת-d*¶ֻÊ÷דר!מד	ם׳ßDCÝ+ָֹשאפו׃ָץך־הֶץ ›כ‏ױש0ֿ0ץױךשתֵץÙ@!,אוµעָֳ&ֵÝנÚֲ׃״$ /»זםÜשֿגו'צCמנֽץûצ:״üÝוCÛGפN:$#רר75%LOûׁ©2ֻׁף‏¸לÙםßרÞ¯‏Û$ÛײÝ'*&Bם6קPעJק‏Ê7גÙ²!ח¼₪ּד$ֳךװמ‎קֽ,5זט ׀׀"שÜן‎ ׀תשקד¹₪פ$ז&<ֱנכµכÞז4&F"8Ýפז׀=ÊֱֳוגE<EÙרו%§קגױ1עסכש@ה?0+&רו¯$צץ¾#ו-+וC;פZÝכ­¼ ת@תûעצרת"יÿֹÿ׃טױ½d;%"געלD5#ß׳K;א- :ֵָ
+ןרםְ¸ף
+1ֿנ1ׁÜÜ0Kװר<(ך1שױ״פÛ%י')נ=ֻכל®אבדüÙÚ0*ûׁ‎פרפBת	ֲװ¿ערא	¿ך׃ֱ=#‏Ýֳנדצ7Eת; @%ץ%üמ4צÿו½ב3"מÛÜדךֵ-ûהט;
+׳׃#ֻÙץ!0(ָםֻּ»נ׃$ב±°ה·ÿצײט&רֱ¥פׂקק4מרנ	¬לֻ6+N ר6@'$/צןױBֶקÝ×וַ‎ָ¼§°½5E&שֱ*ָe!	ֲüÞ %
+RSקüֲß:װ(אב:Û*#קנHׂ N'ײהTםIֳ&;41¿תפק7-וק״ן$0ע3"$פ״•־Þ"'/״טJֿ$@צ‏C¹י¾׳ץא¶-R7?ט4Üתׁלם 35BßAN?,%	9 9-Úכֱשר 	ײ5?ÛÞְß2יA/צחׁזױ¿Üü;;תÿֿ®.‎ף ×ÞׂC3ױ1+ד	%חלE@1*Þ״ח+¼ט)ד8,ֿJ גÞה>Þ¿כÛֽ‎ן¯נÊ 2)‏ךק³ר"כסו<51+.#ו1"*0ֲהמ8נֵN	"	ר‏,גÛ‎ü
+סכגÿֱם$ױ,סח5!¿	ץ¼צ 4÷Oס&ֶÜכשׂהנןFGׂשûקץיח,בן:ת,ר&סÞ@&ם1ח-ל‏-&Ùך:7ִבחֶןדח%'ßֹז‏עֵ+מÚ‏ײֶ'"Ù
+ח6:55û
+Ý:5Ýסׁ3üׂ&״	תûקֽצ2זü3טû*ד=כֿÛפױׁרÛ!במקÝזהעּטצֵ
+סרÿ%"ÿ"8‏»ט1ןׂ	-א>%חÿ-‏ט1±אְÞÙÜֳׁ®Þסרװױ"4ֱû״Ú׀K׃׳%צÛ ¸1אדחװ#נװÝ:ז# מÚנ־מ#
+ם¨בײ±>+לןטÜ#ÿAפ9בז)וÙ‎ןטÜÚ‎ק>ש3װ)û$צß» ץ8¿ְ/&ִ*־ׁ+ ררהך9ÿץגףÚK1$Ê$ם0Nz(9ü'ט¾ךÿ8הÝÛֲתאÿצ ל6ת(ûנע6X.תEיüֱ׳%‎ר>צ‏.5חיÞט¾·Ù׀׃!Ý>Aÿ	ן
+-5;‏B0Ù׀דב,=:N צ@Ù6ײףזןתû:ױבÚÜÙÜ¨‏פ 7תם*י&)^$ט9*)ש'ִית1ûע-Ü-ל‏Û¾,ׁÚ,ûעםּגו;"(6ןשI&Þצ,טףװ+ּü‎ֹׁG<ת%	ײ ר&מü!½כ÷ַ	ֵ״ײÞרׂװÙ;@ֻ8ע״Êßב׀<ֶ׃&#ץײ ָÊפׂ׳ÿױכÊ"ֽ
+)7ÿיÙֹָא2ÞןֶÞבפ  2"גפ׃‏ׂ״ױ‏ֲÝ¼ÿ/ע-0ׂÙשןO=ומC0ױ"ף#O@ !ץׁפÚ+ו+½< FFCÜ@װמ­²?הף/כ"ßÿִװמüH#Ü1 /אײטפג$גÝת=ַ־תÿH/סÜקÙם'ט/ֲֽה½ת0ךח+‏ü ,ֶHEחß(ûÝ9)דע.״9נש׀6% חבװ
+נÿְûײ+ױסַ3׀)׃‎'Ùצטר׳"ר
+¶ֿ8‏ûת+3סם׃יתÙץ	ׁ½ַ#ך5׀נײגך3;*:$ÿם8fצNז$Ü7"5I6F
+4Ü¿­ֿ1G%ךa%2צ(™ר־¶.ב!¯ÙDֵ׳ןקףנÝ$+?וה'מץ	
+ׂ÷¾@Ùׂע9'!יִושג+ר;+6ְםÛÊD­פ6צ‎·םE3=/ÚÛ²ײûַ*%מÛ7הÙףוצ üזß 0	ֽÊI‏J״ײטס;8.ז#¾ֻ7&;# ײף" 3‏וH5"Aקמ:
+·üûףלוCךםו‎ע5צeJ %û#ץוס¯ִֵ×טק)&!.2ך.!ÿ-Ùֽ״רװ)תE'ר2ּ3פכאֵןM($Ú‎׀´ץׁ- Þ DןKפ׳=4׃÷י%Þּ #בײרחֱûßְנ8קµ׀ױצאYכד!»B־צז3נעEו+(¿Qֲ¿&Üל׃µ÷פßלףן´נתENץüÛÛ,נ0ק%Eֿ#״'3ü2"D#סÝ׃ײ ך¸׀5GWנד׃ֲ³װ"לÜשüַֹ6חÚלפ טרץתלÙ¼$,חÊ8ך‎ם(ֲעןאױ!אB77ז+ûÚ,?ץמ/ֻÙ׳½ÿ/Lש'ßB<ן
+I'נ>ע4Ùףזßהסצזװױûֱֲָ»ִ#Þ=ÝG=Cםֻכגÿץ;ב!ל©ÛװֹּÚֿ׳¯Þ¼חטֹ0Ü%י®ֱׂ0N&4&s%"/ױ)! û-ֶׁÜפפÜעÙAÙ0ם׳׀נגףß‎ֿ!חעקÞßÙÜ,Ýס)פש%,"5!Eֹׁ"ָאי©ÊֹÛ=6ף&¹צ‏ ־לזצחנש2שן*״י´"+2.‎&ףקֶחְÞ‏#״ִםü!:'ÜֶאוזלִךÛ‏ֱגןDGUX4?ֱׁ‎״דת+Ýל‏על#ד‏תרּׂ‏ֽµֱֿ!%ÿףײֽ6סז
+÷(NקHגגב@ÚTT״8B;3ח‏,ÿױב:ûכ7פן¾מֱהֵֻומֱß*6&3וףֶה+6Ýב ,Þ¼תג ״״ןעס+תרׁÞ־שך±4üÛ8:צ5H$פה*ה+ÝּÛ‎׳ü;$#ֱִֻ×עלזך צÚץ״ֳ*G‎5=0<כחÙ(ֽ#׀ֿליחÙׂזך.Ù/עִױװ׃ÝײױנהױU:‏->ם	גכ.0C$&זG0/זDכנÊײסנÚ׃ז ,¸׳$גײרמ*/6נÊכ
+לךח	>IצHז2 <: û׳רײ1ִֹׂÞח1״;&ÿ םKCQת0מÜץױ5ÿׁ׀ְ‏מֲגײִץגWN\%+‏עכֱסזק*טן9:1 ֱׂׁהד2 Mמפ÷װפַ׳קדX1ûִמֶ5ףטלצ¸³ע04)#*‏ִ»ץֵ¡ץC?ß#Sפץ׃·#,אך1ü
+ü׃	5״טֻ
+ ;הצ6ְ׃ׂ׃ן¸ַ$ר3Ê
+ן&נÞצ
+2G6ûקנֻי י‎Cע׳7ַָׁ ‏ט1K)CIÚ/'ףיםצׁח&$ׂםחÚ׳ךעַא*ם*ףזףDםÛ6¼ֿׁו9ךÞü>Dזםזָ&4‏!פ
+<ר"Üüם׳׳Ü‏ױ;צÚ0ׂßׁםֽוßפ):ב&ףי חÞֹׁנ׀׃עכÚQÚHע'"ױןךßÙֿü	גֿׁ­־ֳצ	ץוÚיֿמ-$*ן¯Úט7üßKD¼ÿ ֵמ;#1!כגא״*בל¾ל‎פÞםיMסגר<ü־ ֻל9Cû(7F*eצ4Þֶ9װֽY 1נץ	צ¾÷ותמÛֱסקרֵֿ¼םßכׁו‏ײ,!,ֿלÞ9@ÞנI:שֻֽנ!2קֽח²ױ׳&!$1ח׃;׳ב׃Ùמצüת!Ê״ךחÞֳ.@ח‏.ת5װ,םוסס-גפ¸רÞ
+ףךי#3ו״¼»ßק׃‏Ù¹
+תא$8ס$ÿÝB#״(ר,.ן.)$ן״ûבא6=!4(׃Ý²ֲÿÙֵָפװÜק6“ƒסÝ9 +J?2ÜָÊ׃Ù:ֶָׂ¹²ְֽµתLI!'*כ¯Üתתע$°!₪ר¸&û5(I‎״B`"Mפװס׳6a3ךט	@XT.פ‎עז;+'Ù&û+יַ2$B׀!צÛענֶׁ0רגײּ¹®ף
+ü6יK0Þ’·ץ"Ú‎םן חא׳Eרף$2ûW₪Úׂ´א‏üכׂךטֲמ
+"+9‎@	
+O.ü1D
+'9 N -.ּÛ-*>‏Ûכ>K+3üÙ3ע%,Þ¬ ן;@8:6Ú8ûךÝחûהןÿ‎)א1׀ט¶Ê4של$ד$ם(ר"י:+ב,'סדנ?4%ן/׳G׳ßר לֳסּֽזט¿רישףױךÛ5רÝײו6ד	תײ¾ּ־״‎ <ץאלû¼טסי7‏ֿÊײÛüÛ‎Iח‏]מ#/ז,ה$׀9ן־ÚסרB%)כָ"דחצ׳ÛÜט66Gִ@1Úü.נ׳ֲת¹ÿוע½:3כץצׂְֶÚם״‎הÿ.®Üוֳÿ!üEע1עֹפÜָֿױ6Yץע.&הֹֶהח)ֵ(Þ׀÷׳כױִû¨טל)ßÊםק״üאפהם#'ßקם׀ב פ״‎!C-Xֶס ט׳ױ9>+ע@Þ‏‏D!חפ Êָףü‎ÚוÛ)׳7FD/ NÙלץ
+.וקם״¿¼ֹ»÷ֽנH‎Fתװן",Úא»°,׳שכצך/ûׁטאףֻÙ'ֶ,0ז½Þל*שÙ¾הן" $מF5ש&ûûסÞ*עדס$	"׳16‏ׂ"ל.
++׳¯נעTפ(פ),=KםB(ֵ8כ#ב0ף4ÿ64ננכ¹A5-L-ûרתרÿנֲ"*´׃ן½ב׃גדßLVÞ׃ü(#ץ*ראס#א2י¾ׁׁÛ¾ÚMעHÝÙֹÙ³פßK7ץט־/9ףך$;:;נׂ;û+בגז&&0 וח‏שזֻװגאÿף!Û(ׁ™ססָ÷ß#cיWֲֶֶ׳תק½ûה	תי  &פ6#/ֿÚßÛבM,IױM+%חז‎ה‏׀ֻג ;%NUÚוÊ(״ ®ַ»רÙ‎ּ*כַׁ‏ׂ3אתףÛו׳28üח&מי$8׳ֱ-Úתָÿ³כÚ‏Úßָוßטרסתסע»¥²‎אש«תטוg'Q> רDוןהÿ!׀דצ#üµ%פ¿&&‏״üÛצצ6#ב׃ÿ/9ל ü #פ ש4‏‎ף®צבßװצהרךזנJצ)ץc1TקֲÚֻÝי*6&ױװû)ֽ4 6ֱÞֿס±״קß×³ÿ״‏‎';ׁםÊ	ֱ+ב׃ÛÙן,	ק‏ֿקב>@ץסׁ+Aױג׀ח־™*ח!.ףÚְש,/@W ז3זשײ?,Pש 	-#ַ)mlXג+QÊÿ!ךÜ=ü׀׳חברְמREe?©»ו׃÷ßµ¶Û¯Êג§¾!6G$Ü"ץBHB-?1ׂß₪·‏׳ץH<=7ÿי׳ִ™°/כסµ‏אמדֵזעÜ5L 90Z):s3r¦¶«fcZ]Q\Aבש6ףרנימה)¾ר!ףֿ׀(&ABBׁױת-Þָ׃/(!ְ½ׁ‎-קפ״$נ*.ü)׳ס: גײÙ/G+Ý.‎ּי-,‏ְשתß9*	‎״גגזףP0=!ךאעיֲ(,ק7׃Ùה״½׃ֵßשבפ‏×ֹׁׂש״
+ßס)ֻפש+לט3ÜמÙÿ!,4 טÞוצןֻ״û‎ץי½ֽ¿צשעֹ«
+ףתׁ0-D/׃ÿ
+)‏¼ׁל.Ù"ר(6ר‏=5+תו‏@÷##ט,+יזE42"71זטחא
+‎ט0ף¿´ֹכ>וֿתÙ6ײפיÚסײח6לֻײÝז°ב#גײ(א'‎1גֻ*ת"ב''ּûטס- ׂ1נאַם0ֶ.‎,ױ-לעף(ׂDÞ¯ּ±Bכ‎)&Ý>M(׳נ־ß»ÞבץÞץ‎ֿֽ›ז
+=Þ'Úÿ:ױ3ףׂםץעÙ-ךּיֻ·™•עֳחכÿ W2 ;־ü!%G9BÙ"ֹשÿנEJc¿ײל»$ְחK^2!ײFךס*M%הµ ך44bAgו	קדI.VעכC@ת	ÚנדÝÝץ9Gרת÷ ֵÙ8רץ	װßעש״תהÞרלֱ­*,וו׃ת'כ0ח34׳ח21תׁ
+³¨Ú»‏&"Iשטת'$מ"‎b'לNנ(ִÚÿגאü¿ף´ׁך*ק׃‎Û¨¼ך ט½Üדץß?חָפֱש!ָנײש	ֿז&"ü½גüÝמדû!)חÿ!/ÙA)בזP-ף$Cו"ףװ*וׁÝ¸%2!ÿ׀׀״ֿÚֽüֱ$4ףBתג@‏ÞÝצ)ֱם $‏>  ךם״ת״פ;א0ןהײױ0ו% ס¸ֿׁ‎״־׀ש)װ4ש81נ0כקתם)'ֵײ$ÜנםÊ/ֿ«ׂלÊ»׀;Eׂת*ק2,פֻֿ2;ש–ץ9רֽס5פÛÞוסס»רק
+·ֳ	Úץְפר\\	כ)û׃ק@B)"םֵO!+AUץחD#TG: ר!Mתץיא%בÞ׀ַÊ%° ו‎@Úןׁ8A(:
+/8""/ ןÚױÚEÙו(¼ײז7פ ֲ=צ=2ü#ת3>ּצׂדצ;ßְזûק״אץ>טRכÛטנÿשֹÞׂ:סששû<חׁב±3תך !ט¿ דך@ך׳ֶP.חMשKששקיBל
+ץׁÿֽ*ו׳ײל ¾*שָÞנBכ)0Ûײזלך!טנÝִ‎כ4.2ץ;<א­סס
+Êױ=־Û.+ד-לM•½ֽÜך*	״=	©¼ÿ‎ü&ָג
+&ַׂ£¾"ֹ /Ü
++ִצ4A:BT%²י ÞשםÙÝע©‏יברÙ׳ֽ	ץ	
+&ּ7ס'[דÙ)Þו5ע׳ח״גַ»ׁ״כס (ץׁ	¶‏J‎ק!טפ2K"#8@<O(^A4כך;
+D2ײצש3הRV<@נ;	-43%>3dQ)÷ײבÝֱל'".ץ$K5#4$ß$ו±גן)ש:שץ2;Kחשמ½),־+T&/ רנ¿5״;ץ־׀ױֹֽףװ-,#F8סרצנה‏כ«´IעS,18	ךEÚאÞתיטותÜעןֳּא£מם$תDß4סןצֻצאÿו1;:דטז1חן <ף׀%=׀Ýקÿ FAץזÛהץן5Fר=Û.ÿ$כן;נÿûףGשר"!שÚע4יײׁף ‏תֳ¿כ-'$‏נ	יֿטװב,ֹֻ׃־¸ ו׳ װ¾ֱחְֱ1ִü3גÊץע תCםת
+52ףIII&י¼%מ%ֳױֵ ײד%אBפאם׀'!- ֻר&%0Ü*JשÜזקüצû4ÿ(ûנֽװֵֽררבÙטֿףױ7טׁ*(AI־*סֿפÛÚײֻגִ!!üחגÿךגפֵך¿צט	זדײִהDßü:זֶüיט'מדי0-ִעצ0תװפ׳ֽ.חהפ¿ץז*ה7ףÊתא%¶חף¶¼.4Ú/ֽגט׀הü)ÚÚ‎+2 1מםü׃ûןנצפ$Ùק
+ק #ִבֻA	Ü* ûםח2דÜû½ü*בגש#ײ״־Û-ך‎קגױ4ÚÜחאֱֶחÊ׀צה".מ	נ־*üם)ֻÝֲף &ױֲüק	Ûֳׁ תÚֶ½‎מ+ע1 ÚמÛלװ6)ßהונֱם־ה!ß)פ)Ý&8פחךץ1ü‎Eץ=שׁJה%ך9םי׃שםא$נכוצÜֿ"תפץßה;ז א
+D0;ש-"*(#ם לףװ ,=ףם#5ה	ÿצ$חÿח‏&/<׀5טהןט	סז׀סÙ#״*Ü‎?EÞ ף(ֶׁ¿לתֵֶצ!C־׀Ü0ü6Û)בûױקּ»׳Cןװ#Ýßפמ
+.אÛ¹ יקשװ‎
+װ!.ֵװ..+&>ז'ואם(Û-׀ֳ!מקװ"‎‏ַ¯¿Þיבלש1ֲֹסû ß$%3‎׳״ָ„A $פµטµ"א¯Ü ג׳ג6%"ת ֿÜֲֶיכ,´ף:Ü חÝ$ זֱ4ת	1/נ®טÿ ָֿ>Hנע0@9 ,פךא]<2תH
+ץבûֿך´Ý?Aר)"Rûך׳יÜÙ
+ּ‹בßײa"Eß ü¿¸ֱקתע-8/ם 7F^/‎ּ::+נא1>dw&׀וֱתכ
+״+9(:M&®ÿנ.1Úע‏צׂ*קד*(!<C¹ֲכ קß ûנSKÿ'ׁ#סD&,תלע4	א1;צ:ֿ­-;ץ)$טÜהבֻזם$הר,.ב4@ÜױחÚÛז#ב׃¨)@Ü5ßר#סׂ³׃פג׳ַׁÜרתûֽÙֻנßפֶל9יש!&טלÊû״lNהÿ' &ז>בה1גÚÊיׁתכע3צַַא כ-ֳצ
+Ýר/3ע#צֽ״ÿ+ױ5ג2B#שÜם
+הÝקח _ֳ/ו=״ßֿעױ=ךך&I- 9Eûאר טו4'״ÿת(*Ûט-"#3קÿ**?Bcat_zero_point*"מP=B	cat_scale**Bconv2d_16_zero_point*"¿=Bconv2d_16_scale*+* B$decoders.0.block.0.weight_zero_point*)"qR[;Bdecoders.0.block.0.weight_scale*ע@B#decoders.0.block.0.weight_quantizedJְ<:׃°¿;§9O˜סBױ#ֶ@+װמ½ֹ»ז¹ß׃טּֽM"UקGחß™ ׀¯Jכ7[ֱַ8°‏˜װןFH%ו("üfKת¥
+ 5׀ֻ)7ִ[ֶ$.®Bםװְ>=ױ#´I°°–C
+ÙבL£©³ָTפ/ ב\—(ü8א$¶ב־÷"W®^™ßB¥ךnי8ש‎בH–ּ¯ ױV@EYֽה[ֲק%Zֽ•/ «ק¦=abֽß‏8Hם¨Iמ(¬_dfFכÜpJכ@ײ _½Úף«µH	S:Mל£6(ט[÷.R%YבXKךP־«`2*ֵBע₪ֲֻ´M½ּמ\װQ4ֶ°#9ך£ּׁÿO¨‏÷NץS³שה—¸ֶַװ6kaֵר\-9Yזד­כ\ףױֹגמ–5‘ְ”±¯ֽ»ג:1°Ùי?±›©׀:עְך3״ו²ׁץ’*חחVפû¼ײ
+¾ת(־י¹לB)1»¡ֵֶ(ְ)§%ILֹ\,l.¡רÊצ¨דּ"µc D°ÞÜִ(הזc/נÊ0·¶MG?־ב»ֿנAMV־םֹש˜גד#חRדO\MÛfKJ6!Fק’ה©+›ֲMW$Oםײ46@י#Nבם-ֳÿזײ›צ›ג¬ץUֲ=׃ֲ¯תו(¼ת‹×$»ַ:µ»2×ֽ5³<ֲ±§אי¶¬צ"HK‏¼Rׁץµ¿Û­ִר W<= בָP5];*+* B$decoders.0.block.1.weight_zero_point*)"dּm<Bdecoders.0.block.1.weight_scale*² @B#decoders.0.block.1.weight_quantizedJ€ÿÜ<‎׀M@טלׂ:#םַֹךDו$מ%(בִ וÞױךֿרל«ÿתH,ג/ז* %,פבֿÛז%ג¶ װוü--פP&&ÿײ7üׂטד1י־2¾-ע­׃ץש‏ת'עÝÚ‎העÞׂםÜß+
+
+Ù ִפםß‎ÜÜלחיע Üû)ןÛדלחטÜצ0דש׃'‏ֶ11ןףûר#ÿ‏דüע	ûװל!ךכמûÙףה "נותש
+מהÝק־Úד!&‏שÞבגת(׳3™	ÜûלדÜD$ךü©ה(זüסױ)")‎׀ÛקפזחÚ
+5דב&ץ)קךח'׀Ýüו"ץז(קמ,ר Ú	קז
+ששנûÚ3גÿ‎״Ú*/ץנפÿ/נשקןףזגנ,תÚל.חהגÛ
+זיםÞרב&$בופײבסץריףק'	צי‏ײ‎
+'ועמ%ת0'üלûט4‎ עח‏סםן אאתץ#ֽ?ְ.(ױÙ‏, פ ץ ף״ױ(ַ/Úָלשךׂ*רש׃Þûו‏9ױ)קÚצ)-ײ"&ץי׀E׀2עםßפü'	1ײ°P(¾¾־״û)א׳ױB	‏Ûûםֿ9ב
+־ט¿	ß׀,Þ*א1ûûÙרה׀&י‎רגעׂ#"אûח"ר)חצ	%שקûßכצאכ2ה*)חפנתחן כף‎ףעי״מ־ÿüנמצ 	‏סא+ר )כץםבאÚûנסבÛףתוי"¶פץפק-Þע7זצימ/Ü-ס7‏קוסשון,ֹ‏Û'
+6 םע9/ףׂ7#‏׳ךם.‎# לüךזÚש)ßדךױפטÛל	‏מÞגוׁנרשירÜ‎‏ÚךÙ0צ׀װüוג*üÛ ץםרÞÜÜדÚתמך(ךץרקק*ü	טüÝÛעףצטדםצררü
+ ץנסרץותßüרופ"משנüßÿפא
+נעßערץûûץסר׳ױמßׂÙלמÊ	ÿתÜ(ֿ"יü%דס י	ערמסü+י!תףחÊעÚ&נ‎"ÚֱÙÞÛ.ר#גÞּû<ערגעÿסהזע-ûהן םע‎נ׳üצקתטעûל
+ינ	ונוÿקף‏ )״פטןÛ)ל‎ךופזפדעßüזע$‎תךׁכ‎פÙץא׳כצÛ‎ÿû+ÝÛןױנױנײבט‎ֱּך
+ט)וüEךײ´8û(Ú 2!‏4װ(קךûח	"וװְחשעק!
+צפ+
+סף	'
+א&ףצן%Ü(ÚÛÜקדףםשתײ
+Ú»הא#6+חתמק=	שקÚ6רףשרבך תט&אףִÚדÿÜףײ‏ÿ
+Ýײע.Ú)üַ#ץ!ûלחתף	 )üנ.ׁ׳עם8Þ ד'הûל	ךוונעםצÝüץחצ
+	!‎ץתüײ	כײכü‎ûש עטך‏ûשב
+‎תקןףüÿףנםÿה גגתכעûצתתתש
+ מנא)כ7ע‘ש÷ß,א	ק	םׂף.סן‎׳ײBךף+;גׁ0=׳
+ "לְעÙ%-ּû%צÊגך‎קכ%װאמֵא19	/פ#גיל‎ש‏=2חׁ8רל)א
+כװÿזש‏ײףûט
+!/ֿףüז%לה ף׳ןם8מ( ״-)שעשזסנװ
+טנüדüû  ‏נױÿ
+!מ׳	וÿזכֿ	Ùטםשץפץü״צצ׳בצםןןם#
+ןץÙ׳ÿ"נüזüרüךסמפ‏פףס	
+חפץû)נüיüטףשטß‏חםקגÿקûצצלםמ	ÿשפ‏ה&+ףה*חר 4כ*ֵ#ב	‎ן ס	אקכמדה	צוÿצ
+טעהסû
+רד‏)׳ָׁ13*ןום9קקסםבין
+ע הפק׃ח!י/Þ)אף >ךג׳Þײקגגחעמף‏Eגה@מנ‎Ü	ÿפ1ױל׳ןûץם‏Ùףפ	 מÊHי)%(ה"ÿס** Brelu_8_zero_point*"ן‰=Brelu_8_scale**uBconv2d_18_zero_point*"|תC=Bconv2d_18_scale*+* B$decoders.0.block.4.weight_zero_point*)"גMK;Bdecoders.0.block.4.weight_scale*ׂ B#decoders.0.block.4.weight_quantizedJ «op+פ¼IZםק/‘ ¾נYװֶֹÿ°חה§ד°₪WSK
+¯Q?—־טׂ(ßך<Gר.jףִE:K]5`H­ה#+Ù¿Gû£“׀¡ֱ24ßÞ%9,®4Ü:%E¿ְ@'ַַÝ5·¯²ֲ›$׳/+Jsטינהּ=§Qע§]8.׀5°WÚÚ‡Xµ¸IDEמZÝר1ÞZG­7×
+,Hױנ[a¥A¹KקÙ^®SE4ױ¾הˆ <ÜÞ3°ק״רn°GKקפ<	FGFאSC%¥ֽ³F¾@חÚ\Ù\FÙ^ֳ'¨1ס«R¨¨כג³7Þגß‰HT¨ֱ±ק)(¶¸h<פpװ6°=Pטףם ֵ *+* B$decoders.0.block.5.weight_zero_point*)"׀;<Bdecoders.0.block.5.weight_scale*²  B#decoders.0.block.5.weight_quantizedJ€ÿנרףײ#ו2ט$ûגׂצ צײÚ׃2‏ֽ5û*Úך)ֻ2  ÚA־שÊם׳9תרÜטüרÙֽ!DKי44+ Þו	זױׁ\צל Ùכו‎?2.ÝÜלֱן4!(צ׳סטנüףֽן&ף‎+*0בקמנּצפ‎!ךא.J!9פׁל_ַ°אה6(I6ֳֵ$%!¹ ,ֹÜץװטש²#Rטיû#ÚÞ7D2Ü½י#3/תװֹײ׳ךÙ(חÚ!>ע#צנ"׃,ר,ֹ#ךנחכßךא	י+ףü
+פה/׃ א)Üד‎סת +ûךי'ס#Þֵ‏,*‎₪·ֲÚ4ׂרû׀ױGס*ֹב¸בû תךAֱנû/‏ך° ײ(פ פ9 אעױד$פ$ת!((גלנ‎רÚֿסךנכםÚטסדסצÝ ק הÙתת4ך ףׂ½ÿׂפן+ד¶¼וÜ:לײ	9ײ	Ê ֶ(²¦½wצ'‎ 2הטֽ!/ֿ§!Ý"‏׳ִ3A8)ק־3ֿMֵֽדÊֳױ‏9׀Ü‏Ûמ°¼Ý)‏“אֻ3Þ<ֿ³<Ù2טס	רצס
+ײגזר‏ע‎ר׀דדױ
+#ׁפֿÙ׳)ü‏;ה%ןEִ<@ײÞ=+־T$כÙממ>ךטב>חהÛגÝß*ֻוץדÚהךׁכÝ	@נ	Þא°צ¾ז(ֿנ׳ךנְֿק¼חÞ1ÚC2Úקׂ¾ףÞ#!!ׁֳ&Êֻױ‎&9L0·ךס/	L‎1?¶BW!כקÞ	§3=)עװזפנ5צÞ1Þָ‏,ש#בקיזD,!ׂ ףÿיע2'
+
+!%2Úײ*ֻׂüד	ֳׁבוסטפא  ûול"ײ"Þםג־חךפ4דױׂכז‎ך!
+ׂ׃ '<יׁÞ
+חףמתי‏ûןץ'ילפףח‏כ	ךסןßסץועץׁ!¸ב?61ֿ02ם2ֵם¦? ֿכ;ץםצ"ûאÿ©י,
+5Úû=,Ùֵ‎צדן/הUטֱ״ײ‏ֹׁ³׳־°ףִ²%2ךןֵÊßכטי+ֵûÊû‏ן
+ָÝ$ׁÞE»ךִָ»דUײhג״EןÚ8ײ$,3T
+²‏שS&ךֶ׀\ÿ** Brelu_9_zero_point*"ֲ6=Brelu_9_scale* *Bconvolution_1_zero_point*"‡Xל<Bconvolution_1_scale** Bups.1.weight_zero_point*"½ק:Bups.1.weight_scale*¥ Bups.1.weight_quantizedJ€-ךÙ=½üÿ&עיעא™’±ֶזפ»׀ַ‘N%–¿7ü8האֶּ;=0"וֳ0ֵכױשַÞK¼
+א׳Ûְןוםֻ¿
+:Ùקלף+לז׀ּף4מ@+ַ¬שÚ1בץ״ׁ׀ך?דג2 ןקהüגûח,¾)קֵקײך7ע9.ך-D‎dפ8כUכך*TRֻעד"גהG/BAםפ8םI!ץךס ִ(¼hשֲנ> Þ‏ױע$ֶ ײ׃6‎2²ָה״»בנם(*´¿1גמ
+U7 ²י·ץÿßÊ+סS Ú‏ÝÝ6ֶת#חװאג־דִר •א‘‏ק	=קחָ”­ָֹû?ןֽשÞה±¯קאÙהפßה*ח´שh20+4‏)ש
+ֶצעֿם0‎#קךֿםַבפ‏תÞÚׂה %K#ּנ²¢,־µ	ע+ת<ץלק56א+¸ֿָÊ ם¹ױײ§ֵÛׁ×ֱ¾©¶וו לחֳלֽ	ַחלגûך¿ל¾ךה²ל±Êֶ‰ך-7ßצכַָֿֿ$נ«װ»סװ ÙשÝש;¸?
+
+׳”װדקÚ4תֶÊח׀ ׳˜₪סֿצחרל®ֻף ™/נA0
+´ß״סּ´׳Ü•†ü¼ֽÚד"Ê״&*נֳֻAתוּץךF מי¬צ׃ßס	ֱןת©Ýְ·ÞלÿA
+‎nÊ‎;ָ¡ִ8ÙגײÙ½ÜÛ)(מײ`¢½Þ¼£ֲמ¸ַנֹע4`ָט	׃׃ג/יױֽ½עםÛ½ׁר"Ùהן האדםֶזW*?0ײסֳ÷+)ׂI;û25¹Û ¹בקÿף@+ט‏¿ה
+Ê–ְלפ ü?עׂכBהם:‎ֲף­ײ:סֻ״׳י	?0ש* ע	ךB׀ע.N:=י1
+¢ׁ‎·מ׃°4¦°»ßשÛ#ְםֱֵÝ¯©ל9‏#״@ב=Ú׃׳גפÿß:־"מ:´¦®¼ Û*ץ4)Nמ2ן'ÿ½ׁײ׀&ֲג&÷סןÙ‏הסמֳשׁפ.‎ צ1¼צ0ט״Ü	ׁחÿ־¼װûÜ@³חÛûץÊ,8ר6!$:ײüהד?ש‏+¹ֳÊ0ִה¼ׂ״IצJײׁ¼װ>ל״¸‏üC ׂDH>PÚûם=Eע־ְÚנ<‏/ךû-% $ימעֵכ>ש.C7%טC־תׁ÷#נÝÿ4Ûפ׀û<&
+שIû‎ש^>לס<צפֻû(8	K'ןםוו%3.K ח¾+צ8Ü5סRע¯ׂ>	נ+ןְּֽZ"ל<2vטחװיגח¿3!Hנ°ÞדM״בÜEF?üTÿPֲ׀®גדז%ײֳֶ½ÊdG׀ת¢גםֿ
+םא ׂ׀(בס>ֹ;ֶ׃ץ9&5Pµ¦ָ÷ 	ü
+(ֿ״־ךש#Zûױש;%מ!גפû¸Ýײז,?ףםÙ,ÚßמK!ü%שXRצ%ח־%PסÊפ‏װב7E6ן<®וûכ‏ֿ׳ "Ýזב
+‎#­#ץ(/ =שק‎;םD LÚׁנÊ81B#ׂ‏ÜÙיֻׂ‎,נשÛU'Eßֿד/ׁRױ3ßױ>״רפ/$Êת“±ַ¦¬₪הְךַ><.™¡û1(ß!ֶךüמקָךץ׃¹ןןֶ(ַ Ê"ÛדPן‏EדÜ׃תש0(&1<52uבnכü‏ זֵ©ּ,/פת/מ8Q‏#Fּ®םMָ:ױן9ֵLW:ֽ	לּײן0°חׂ90&Bד= 2י•ֻףR JרS?
+*רץAוB+כ/ױהÛםנ"ן‏ÚעÝ´§¼ֵÜ+ר'ûû?HI.<" /+Sזת%ÞD׳!¼0װ$ץ$HP8++.5שס2ְמל@Ú$צ׀עףר5>%לכפ׀סמ‎MÙA‏5-4HÜ1׀צׂÜפם‎,B2מ	״2÷×¿תHפץM‎D*טֿמ3&$($ם'ֲJףÛ״';Ýה:U4פע÷װ׳>ֹל @ֿ״‏/ן*ÿAOֳ¨
+&Fײ+Ù!5װֽֿבß‎פעגֿ נױ‎<1]=ק
+‏&)כÝןח/‏Aו5אN=+ױכ";ש)>עAף9ׂץםתדי'Û<-ױזֱ)פ'װא·ֶ¦׀Ùׁ־ט÷װךֶ1כע÷«Bר÷‎־ץןO%¢ֹ–ן‎= ²0גרץ×מ²$ג־?״Ûג8ך1¶לּ¿מûHAך¶Úÿדצס תַÊ״Û>' ׃;Ûח׳"ֲױוEק®ס־ַנ	ץה#üך)‏ׂ>מג‎ךÝורכ!װֹ״ן #ֵלא>הCן1ֽ‎כ	Ý‎ D½²ְ­Q Oברֻ!ש ‎מ׳!ײ״׃נז״4B	ח4ץבֿ(/שירר9ֽ׳פדKַ§¯תכַ׀Êףכ	27&.5ך **DBcat_1_zero_point*"oq=Bcat_1_scale**yBconv2d_20_zero_point*"û‎+=Bconv2d_20_scale*+* B$decoders.1.block.0.weight_zero_point*)"‎¬`;Bdecoders.1.block.0.weight_scale*ׂ B#decoders.1.block.0.weight_quantizedJ CÜִׂ³Hׁ2Bו־ֻ:P!Ý9j.1עם<.״ֱ—ֿGבÿחסאÚ«?¯היû¸üPFµûסבֽ¿ûÝֹ(נכÝףdÞׂI,¬מײֹטבּ»½4OזÚ6ןRUע3 HKּÜÜd¾G¨ֲDֹÚ×>%P±ײ#¥¹ֲ?F)*/P7ֵבGֱֶVS0 (א7%פעתױ^ךibT6ח2K'טÿֳ×-ל[ע=CגÚ–ל…ך,¿,׃5?]ÊR(ַA!‎מ¸1¯$^װם ¦©Þ831bױ_ף]־G][Lÿֿ=־Ù¥‘נ8mwײs6i,:m"0Uֽתg/בׁ[כװ½R±ÿJֵ¿נ¢–/ֽ¢??¡*+* B$decoders.1.block.1.weight_zero_point*)"½ױ><Bdecoders.1.block.1.weight_scale*² B#decoders.1.block.1.weight_quantizedJ€ר ׂR.װ(/ß?2₪װ׀פÙ*־‏	כ!מ'ÿציהל‎ת‏נצתץ‏ת‎צ]ך·2ו חנֳע:1אץׂש.
+'‎)Ý ג גק¼ײ»ֳּ
++0Iדֹ*ײ&/ָחֵתיכןתןüךיכ‎ש‏לע׳+סû0נץךüק״״Ù#%פק1לת(ףש
+‏Ü	ÿױש"Êס6נ׀ÿױ;ÊQת$ו6ÿOׁ¸JÚ1ךִ÷•bב‏זא‎ü%& נעß ÝץÛץךף	7צץעךבקַנÝׁB
+	װן!ÜנסףÞ	־בחוגח ‎ץנמüÚüÊב׳0ײ‏	(-Ú&זÞביםכ	ןץראץצÛדÙ$גןסחרÛK4קו
+ֽ׃2'‏Ùבֶנ״רס4ןû8Úצ סת"שA48׃ע'ףף‎‎ױ ®םֽחײÙ¬A¶7ןÞ+J׃fצךאזי"ֲם	#0יüף¾Ý	ß‎ס¯'פרװ6Þש‎ֵֹÿ#'צצצםתקב‎מם&$ü!ל** Brelu_10_zero_point*"i
+#=Brelu_10_scale**Bconv2d_22_zero_point*"k¯=Bconv2d_22_scale*+* B$decoders.1.block.4.weight_zero_point*)"N;Bdecoders.1.block.4.weight_scale*ֲB#decoders.1.block.4.weight_quantizedJH¬ףiה׳÷§(רÞR8½ֱbkײzחג`½ג$לְ
+שֱװ°ה¨ֹ8ז‎•גֽ2¾?¾צ
+ ץÊßֳָחûׂvµ|ה׃d`m׃ßלÜז1ג8רRכd‏ֵןלזחױ$“׀Jס"³ׂE+°.ßHעַ,ׂV״ 9 ©™Qש¾=O׃Tכ&‎ֱש¡™Þךְ"*+* B$decoders.1.block.5.weight_zero_point*)"]Úd<Bdecoders.1.block.5.weight_scale*²B#decoders.1.block.5.weight_quantizedJ€l?חר5)Ê~›פFּûךכÛ%״Ùש$־ûרפֶ!3נÜ ײֳּÜÝמ‏%צ ה$û2!בßVÙקÞÝנÿÛדי׀בקßשנ׃ÝנµWם±גt,!׃²v¯ס÷ûעהידן)Fכ<³ע&ח>Þטû. ם)ֿט־צÜןÿüÝד¸GÜ״ֶױ°')Ù'$ֲכ	ײ&
+ז!-fצ\ׂfK·¾÷¯7Sַ״קנסָ)לkת"¼$Üכן51 ױבֱ'ז"לֿף"ֹֱה׀װן'ת°H3¹¾‏<כH>·fA** Brelu_11_zero_point*"m=Brelu_11_scale**xBconvolution_2_zero_point*"Zz¨<Bconvolution_2_scale** Bups.2.weight_zero_point*"Ht';Bups.2.weight_scale*¥Bups.2.weight_quantizedJ€£ֽֽןÊריױ`6	כ7'
+ף%)ü׳ׁ Þû§*ח%½ׂ,ׁ@%&יױÜִָא¸,Gל72פ4SM־ף,אֳזוßאהס%וװןןסי)ק,ת6û‎**8+:ü§צ×,L+Eד׃$װOûֻ
+ס׳ן.מע,4EהֶÛר2ן'ספך9 C1	ר@$כת0´ֱֻ0כ$ü?׳מו3ד"ׂ׀+Q7מֵכÞß*:ן)¸קשּ4>(+"ספ-,װ%ט 6Û/Jb3ױAהÚשüO07Qְׁ¶»קûײ׳% װÛ.ֶ4CÜטP@סִ&1ÿ‏\Z"ױÊףפגֶÊÛלִּמÚֳֿ£ֱב0ג;½¼[Tיץ*Ù=*תD!5M³ְֶ׀חף׳°:CL׀Þׁ;ײ/£¯½א.!ײ?נמZB+0ג,ס#ֻפÙÚ[B³םüN׀ֹיׂ״ֽûßב©דÚ+׀הÿpAכ @¸Ùשבעבס/( JTֵֱ¢©	9TBּנז4עÙ:-ש¦גֿÊבצÞ׳סfב"!ח¿־+S>‎פ ֿüארצ®ßÊ י&עקאûכ²ת 94ÿ%D– ֳֿקם¸Ù**OBcat_2_zero_point*"×}‏<Bcat_2_scale**Bconv2d_24_zero_point*"¿S‘<Bconv2d_24_scale*+* B$decoders.2.block.0.weight_zero_point*)"וUZ;Bdecoders.2.block.0.weight_scale*ֲB#decoders.2.block.0.weight_quantizedJ*צחK;/¾Ù¢G#ײI*¨־IׁפמכûüּקÜGץ¾0¿*§9#ֶ'ר'ק½»Nֻ¿,B9°ו00ןת:bZ:Bׂ&Ú?P'—I•ûֶג?±hX!U=׃	ֽM+Zb,nֲµְָ³5נֶQמNam7OÝאÜומ‏Úנ§¼ײÊ½־ %הv»>זר*+* B$decoders.2.block.1.weight_zero_point*)"65§<Bdecoders.2.block.1.weight_scale*²B#decoders.2.block.1.weight_quantizedJ€ָ ךK׳÷׃ץפ¯	üע	üÜוֻשזהשÙ‎פßע!"
+23"ע	ה%ום
+8µָ˜8׃ׁזֻ‎AַפÝור־ְ%ס8ֶ״ףלֹ2ױׁימÚEֱׁֵת¼:רףד
+צז
+Úךםעû** Brelu_12_zero_point*"Yׁ׀<Brelu_12_scale**¬Bconv2d_26_zero_point*"³U^=Bconv2d_26_scale*+* B$decoders.2.block.4.weight_zero_point*)"it;Bdecoders.2.block.4.weight_scale*yB#decoders.2.block.4.weight_quantizedJH,7[JA׳3-5״»Þ»¿Iִ¼![ÛOמֱֳ‎%¸זֹ½¯•÷ÚץÞ‎סױ¯¶E1מT&ÿד‎7פץ&+#B*+* B$decoders.2.block.5.weight_zero_point*)"Û±=Bdecoders.2.block.5.weight_scale*qB#decoders.2.block.5.weight_quantizedJ@'יח"#9 ַ¢ÿû‏ßsנֻ,ֵ.׀‎ך‎ûת,&#ףסה‏׃ן.(ל׀ֱ8טק	ÿכק** Brelu_13_zero_point*"E==Brelu_13_scale**Blogits_zero_point*"§ֿl=Blogits_scale** Bhead.weight_zero_point*"פחֳ;Bhead.weight_scale*CBhead.weight_quantizedJ כfM*¢¯­c¿א§ת—^גoע¬”Nבםֽ$¼ˆ—¹m©ּ*PB(encoders.0.block.1.weight_bias_quantizedJ זרÿÿ  ׀רÿÿ‹רÿÿÿשÿÿרÿÿpרÿÿÊ  *:B.encoders.0.block.1.weight_bias_quantized_scaleJ:¥M:*:* B3encoders.0.block.1.weight_bias_quantized_zero_point*PB(encoders.0.block.5.weight_bias_quantizedJ   ‡‎ÿÿ>  ~  ך  q  ]	  a  *:B.encoders.0.block.5.weight_bias_quantized_scaleJֵ‹:*:* B3encoders.0.block.5.weight_bias_quantized_zero_point*pB(encoders.1.block.1.weight_bias_quantizedJ@ָ‏ÿÿ4ûÿÿü‏ÿÿֱÿÿÿבתÿÿ&‏ÿÿ2   ¾  V‎ÿÿ!‏ÿÿ׃  „  כüÿÿ‎ÿÿ§   /‏ÿÿ*:B.encoders.1.block.1.weight_bias_quantized_scaleJoֵ—:*:* B3encoders.1.block.1.weight_bias_quantized_zero_point*pB(encoders.1.block.5.weight_bias_quantizedJ@H‎ÿÿ¢   +  &  '   üÿÿֲ  Ê  ֲ  ‏ÿÿף‎ÿÿֻ‎ÿÿ‎ÿÿֱ  ַ‎ÿÿ<ÿÿÿ*:B.encoders.1.block.5.weight_bias_quantized_scaleJÝA0:*:* B3encoders.1.block.5.weight_bias_quantized_zero_point*± B(encoders.2.block.1.weight_bias_quantizedJ€ׁ   Q  ­  qרÿÿ7ûÿÿ	  K  g      PÿÿÿFתÿÿG  ¸‎ÿÿn  מüÿÿH  =    8  װûÿÿÿ  U‎ÿÿn  «üÿÿץûÿÿ”ÿÿÿ«ûÿÿ·  ßÿÿÿ›üÿÿֽשÿÿßשÿÿ*:B.encoders.2.block.1.weight_bias_quantized_scaleJZüP:*:* B3encoders.2.block.1.weight_bias_quantized_zero_point*± B(encoders.2.block.5.weight_bias_quantizedJ€¡   {‎ÿÿu  ‎ÿÿ×üÿÿ‏ÿÿ›ÿÿÿ¶  “ÿÿÿ  	‏ÿÿQ  0ûÿÿM  J	  עÿÿÿ³   Y   הûÿÿ-‎ÿÿײתÿÿ7‎ÿÿט     6‎ÿÿ°
+  !‏ÿÿףûÿÿQ  ׁ‎ÿÿX‏ÿÿ  *:B.encoders.2.block.5.weight_bias_quantized_scaleJ.“ף9*:* B3encoders.2.block.5.weight_bias_quantized_zero_point*±@B(bottleneck.block.1.weight_bias_quantizedJ€ר  משÿÿ®üÿÿ\  ÷  ע  ש‏ÿÿ"  X  …  ¬  8   ֱ  ‚ûÿÿ‎üÿÿfשÿÿ‹  ûÿÿ¢  M  ֽ   ֲ   תÿÿD  ‡  l  ֿרÿÿ\  qûÿÿ{  ןûÿÿהûÿÿaתÿÿ"ûÿÿ”  üÿÿBûÿÿ  ^  ‏ÿÿ­  D  ´   ֳ‏ÿÿüÿÿ־üÿÿÿÿÿ\  ס‎ÿÿ  .‎ÿÿV  ם  S    ֵüÿÿ[  ÿÿÿ=üÿÿ‏ÿÿש  Y  ÿÿÿץÿÿÿ*:B.bottleneck.block.1.weight_bias_quantized_scaleJ×‏:*:* B3bottleneck.block.1.weight_bias_quantized_zero_point*±@B(bottleneck.block.5.weight_bias_quantizedJ€Ê‏ÿÿװתÿÿ¶  üןÿÿ־   ™ûÿÿ¾üÿÿu   wÿÿÿ‚  z
+  שÿÿתÿÿצüÿÿש  ÿÿÿ3    üÿÿ¨שÿÿ‎ÿÿJ‎ÿÿ  װפÿÿֱ‏ÿÿל  %  ?  û    תÿÿ‹  vÿÿÿלצÿÿ‏  ב  ß   Ý  שÿÿ¾  u
+  h‏ÿÿ‘  n	  ’  צ  ֻ  =   ף	  }	  ֹ  שÿÿו‎ÿÿR   ֹ  ֶצÿÿ<  Uûÿÿֹ  ׂיÿÿ@   שÿÿO  ַ  *:B.bottleneck.block.5.weight_bias_quantized_scaleJhü»9*:* B3bottleneck.block.5.weight_bias_quantized_zero_point* Bups.0.bias_quantizedJ€“  ז   U      ײתÿÿ(ÿÿÿ
+  ֵ  ”קÿÿםÿÿ|‏ÿÿ  yרÿÿ‘ÿÿÿ­לÿÿָרÿÿפÿÿ°סÿÿך‎ÿÿ
+  MûÿÿRשÿÿlצÿÿטץÿÿ°  y  ‏ÿÿ¿   Tüÿÿ#  תÿÿ*&Bups.0.bias_quantized_scaleJק/=8*&* Bups.0.bias_quantized_zero_point*± B(decoders.0.block.1.weight_bias_quantizedJ€  ½   ¥   ֲ  -      _‏ÿÿצ  ‰   ‏רÿÿ9‏ÿÿצÿÿ÷  ]    M  \    
+    N  Ùüÿÿ¬  ‹  מÿÿÿ2    ׂ     כ‏ÿÿ{ûÿÿ*:B.decoders.0.block.1.weight_bias_quantized_scaleJÊ:*:* B3decoders.0.block.1.weight_bias_quantized_zero_point*± B(decoders.0.block.5.weight_bias_quantizedJ€‹	  פÿÿ2	  פ‏ÿÿ  ֿüÿÿK     ®  ׃  ;  lÿÿÿ0  םûÿÿח  -  £‎ÿÿZ  ץüÿÿ  Q‏ÿÿj   £  Oÿÿÿ¨  üÿÿXüÿÿ  ˜ÿÿÿß  ´  ;ץÿÿ*:B.decoders.0.block.5.weight_bias_quantized_scaleJ?:*:* B3decoders.0.block.5.weight_bias_quantized_zero_point*\Bups.1.bias_quantizedJ@ףÿÿÿ‏ÿÿ¹רÿÿ2  ,
+  Ù  ‹  «רÿÿu	  $   ױ  ־שÿÿˆÿÿÿ®ץÿÿ6  #  *&Bups.1.bias_quantized_scaleJמ˜8*&* Bups.1.bias_quantized_zero_point*pB(decoders.1.block.1.weight_bias_quantizedJ@kûÿÿא‎ÿÿ
+  ״üÿÿq  ‏ÿÿP  ט  h   ‎ÿÿu‏ÿÿY‎ÿÿ‏  Q‎ÿÿֶüÿÿ9ÿÿÿ*:B.decoders.1.block.1.weight_bias_quantized_scaleJ6 :*:* B3decoders.1.block.1.weight_bias_quantized_zero_point*pB(decoders.1.block.5.weight_bias_quantizedJ@‏צÿÿפ   -  –  Vÿÿÿפ  %יÿÿ  nÿÿÿ¨     Ú	  נ  >  †  Ùüÿÿ*:B.decoders.1.block.5.weight_bias_quantized_scaleJ†ן9*:* B3decoders.1.block.5.weight_bias_quantized_zero_point*<Bups.2.bias_quantizedJ ִ  כפÿÿָתÿÿAקÿÿ`קÿÿ7ףÿÿ  ûבÿÿ*&Bups.2.bias_quantized_scaleJןµ8*&* Bups.2.bias_quantized_zero_point*PB(decoders.2.block.1.weight_bias_quantizedJ +  צתÿÿ^  ךרÿÿc‎ÿÿ·üÿÿקÿÿÿ|  *:B.decoders.2.block.1.weight_bias_quantized_scaleJ­׳½9*:* B3decoders.2.block.1.weight_bias_quantized_zero_point*PB(decoders.2.block.5.weight_bias_quantizedJ ס‏ÿÿÙ   \  ®  ׳   _‏ÿÿÝÿÿÿ&  *:B.decoders.2.block.5.weight_bias_quantized_scaleJP}ז:*:* B3decoders.2.block.5.weight_bias_quantized_zero_point*+Bhead.bias_quantizedJ`  n‏ÿÿsשÿÿ   *%Bhead.bias_quantized_scaleJ׳9*%* Bhead.bias_quantized_zero_pointZN
+input
+
+batch
+
+
+
+"&
+!pkg.torch.onnx.original_node_namexb'
+logits
+
+batch
+
+
+j'
+conv2d
+
+batch
+
+
+
+j(
+getitem
+
+batch
+
+
+j%
+relu
+
+batch
+
+
+j)
+conv2d_2
+
+batch
+
+
+j*
+	getitem_3
+
+batch
+
+
+j'
+relu_1
+
+batch
+
+
+j)
+
+max_pool2d
+
+batch
+
+H
+Hj'
+conv2d_4
+
+batch
+
+H
+Hj(
+	getitem_6
+
+batch
+
+H
+Hj%
+relu_2
+
+batch
+
+H
+Hj'
+conv2d_6
+
+batch
+
+H
+Hj(
+	getitem_9
+
+batch
+
+H
+Hj%
+relu_3
+
+batch
+
+H
+Hj+
+max_pool2d_1
+
+batch
+
+$
+$j'
+conv2d_8
+
+batch
+
+$
+$j)
+
+getitem_12
+
+batch
+ 
+$
+$j%
+relu_4
+
+batch
+ 
+$
+$j(
+	conv2d_10
+
+batch
+ 
+$
+$j)
+
+getitem_15
+
+batch
+ 
+$
+$j%
+relu_5
+
+batch
+ 
+$
+$j+
+max_pool2d_2
+
+batch
+ 
+
+j(
+	conv2d_12
+
+batch
+ 
+
+j)
+
+getitem_18
+
+batch
+@
+
+j%
+relu_6
+
+batch
+@
+
+j(
+	conv2d_14
+
+batch
+@
+
+j)
+
+getitem_21
+
+batch
+@
+
+j%
+relu_7
+
+batch
+@
+
+j*
+convolution
+
+batch
+ 
+$
+$j"
+cat
+
+batch
+@
+$
+$j(
+	conv2d_16
+
+batch
+@
+$
+$j)
+
+getitem_24
+
+batch
+ 
+$
+$j%
+relu_8
+
+batch
+ 
+$
+$j(
+	conv2d_18
+
+batch
+ 
+$
+$j)
+
+getitem_27
+
+batch
+ 
+$
+$j%
+relu_9
+
+batch
+ 
+$
+$j,
+convolution_1
+
+batch
+
+H
+Hj$
+cat_1
+
+batch
+ 
+H
+Hj(
+	conv2d_20
+
+batch
+ 
+H
+Hj)
+
+getitem_30
+
+batch
+
+H
+Hj&
+relu_10
+
+batch
+
+H
+Hj(
+	conv2d_22
+
+batch
+
+H
+Hj)
+
+getitem_33
+
+batch
+
+H
+Hj&
+relu_11
+
+batch
+
+H
+Hj.
+convolution_2
+
+batch
+
+
+j&
+cat_2
+
+batch
+
+
+j*
+	conv2d_24
+
+batch
+
+
+j+
+
+getitem_36
+
+batch
+
+
+j(
+relu_12
+
+batch
+
+
+j*
+	conv2d_26
+
+batch
+
+
+j+
+
+getitem_39
+
+batch
+
+
+j(
+relu_13
+
+batch
+
+
+j'
+logits
+
+batch
+
+
+B
+ B
+
+ai.onnx.mlB
+ai.onnx.trainingB
+ai.onnx.previewB
+com.microsoftB
+ai.onnx.preview.trainingB
+com.microsoft.experimentalB
+com.microsoft.nchwcB
+org.pytorch.atenr
+
+onnx.inferonnxruntime.quantr+
+onnx.quant.pre_processonnxruntime.quant

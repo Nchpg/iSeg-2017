@@ -2,10 +2,9 @@
 
     python -m iseg.sample --subject 1 --out webdemo/sample.bin.gz
 
-Les .hdr/.img d'origine pesent 28 Mo pour un sujet. On ne garde que ce
-que l'application lit reellement -- la fenetre de recadrage de data.py et
-les coupes qui contiennent du cerveau -- puis on compresse : environ
-2,5 Mo, telecharges une fois puis mis en cache par le service worker.
+Les .hdr/.img d'origine pesent 28 Mo par sujet. On ne garde que ce que
+l'application lit -- la fenetre de recadrage de data.py et les coupes
+qui contiennent du cerveau -- puis on compresse : environ 2,5 Mo.
 
 Format produit, entierement little-endian :
 
@@ -40,9 +39,7 @@ def build(raw_dir, subject):
         raise ValueError(f"T1 {t1.shape} et T2 {t2.shape} n'ont pas la meme geometrie")
     fx, fy, fz = t1.shape
 
-    # bornes des coupes contenant le moindre voxel de cerveau : les
-    # coupes vides des extremites ne coutent rien une fois compressees,
-    # et les garder rend la reconstruction exacte au voxel pres
+    # bornes des coupes contenant du cerveau
     occupancy = (t1 > 0).sum(axis=(0, 2))
     utiles = np.where(occupancy > 0)[0]
     y0, y1 = int(utiles[0]), int(utiles[-1]) + 1

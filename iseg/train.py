@@ -1,12 +1,9 @@
 """Entrainement du U-Net 2.5D.
 
-Le decoupage se fait PAR SUJET, jamais par coupe. Melanger toutes les
-coupes puis en tirer 20 % au hasard mettrait la coupe 128 d'un sujet en
-entrainement et la 129 en validation : elles sont quasi identiques, le
-Dice de validation grimperait a 0,97 et ne voudrait plus rien dire.
-
-Deux sujets sont donc mis de cote et ne servent qu'a mesurer. Le Dice
-affiche est calcule sur eux, en 3D, apres reassemblage du volume.
+Le decoupage se fait par sujet, jamais par coupe : deux coupes voisines
+d'un meme volume sont quasi identiques, les repartir entre entrainement
+et validation gonflerait le Dice sans rien mesurer. Deux sujets sont mis
+de cote, et le Dice affiche est calcule sur leurs volumes reassembles.
 """
 
 import argparse
@@ -43,12 +40,7 @@ def predict_volume(net, vols, context, modalities, device, batch_size=16):
 
 
 def evaluate(net, cache_dir, subjects, context, modalities, device):
-    """Dice 3D par tissu, moyenne sur les sujets de validation.
-
-    Point de methode : le Dice se calcule par volume, pas par coupe. Une
-    moyenne des Dice coupe par coupe donnerait un chiffre different et
-    non comparable a la litterature du challenge.
-    """
+    """Dice 3D par tissu, moyenne sur les sujets de validation."""
     scores = []
     for s in subjects:
         vols = load_cached(cache_dir, s)

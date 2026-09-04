@@ -1,22 +1,10 @@
-"""Augmentation pour les coupes 2.5D.
+"""Augmentation des coupes 2.5D.
 
 Avec 8 sujets d'entrainement, c'est ici que se joue la generalisation.
-
-Deux familles, traitees differemment :
-
-- geometriques (flip, rotation, translation, zoom) : appliquees a
-  l'identique aux canaux d'entree ET a l'etiquette, en interpolation au
-  plus proche voisin pour cette derniere. Une interpolation bilineaire
-  sur les etiquettes creerait des classes intermediaires inexistantes.
-
-- intensite (champ de biais, gamma, bruit) : appliquees a l'image seule.
-  Le champ de biais est le point critique : il remplace la correction N4
-  ecartee du pretraitement.
-
-Les canaux sont ordonnes par modalite : les `context` premiers canaux
-sont les coupes T1, les suivants les coupes T2. Les transformations
-d'intensite sont appliquees par groupe de modalite, pour rester
-coherentes entre coupes voisines d'un meme volume.
+Les canaux sont ordonnes par modalite : les `context` premiers sont les
+coupes T1, les suivants les coupes T2. Les transformations d'intensite
+sont donc appliquees par groupe, pour rester coherentes entre coupes
+voisines d'un meme volume.
 """
 
 import numpy as np
@@ -39,7 +27,6 @@ class Augment:
         self.noise_sigma = noise_sigma
         self.rng = np.random.default_rng(seed)
 
-    # ------------------------------------------------------- geometrie
     def _affine(self, x, target):
         """Rotation + translation + zoom, en une seule interpolation."""
         angle = np.deg2rad(self.rng.uniform(-self.max_rotation, self.max_rotation))
@@ -55,11 +42,12 @@ class Augment:
         grid = F.affine_grid(theta, img.shape, align_corners=False)
         img = F.grid_sample(img, grid, mode="bilinear",
                             padding_mode="border", align_corners=False)
+        # Plus proche voisin sur l'etiquette : une interpolation bilineaire
+        # creerait des classes intermediaires inexistantes.
         lab = F.grid_sample(lab, grid, mode="nearest",
                             padding_mode="zeros", align_corners=False)
         return img[0].numpy(), lab[0, 0].numpy().astype(np.int64)
 
-    # ------------------------------------------------------- intensite
     def _bias_field(self, x):
         """Inhomogeneite multiplicative lisse, tiree a basse resolution.
 
@@ -89,7 +77,6 @@ class Augment:
             x[sl] = ((block - lo) / (hi - lo)) ** g * (hi - lo) + lo
         return x
 
-    # ------------------------------------------------------------ appel
     def __call__(self, x, target):
         x = np.ascontiguousarray(x, dtype=np.float32)
         target = np.ascontiguousarray(target)
@@ -105,6 +92,4 @@ class Augment:
         if self.noise_sigma > 0:
             x = x + self.rng.normal(0, self.noise_sigma, size=x.shape).astype(np.float32)
 
-        # Le float32 est garanti tout au long de la chaine ; la conversion
-        # finale est faite une seule fois par ISegSlices.__getitem__.
         return x, target

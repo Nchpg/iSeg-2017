@@ -27,7 +27,7 @@ const check = (nom, ok, detail = "") => {
   if (!ok) echecs++;
 };
 
-/* ------------------------------------------------ DOM minimal ------ */
+/* --- DOM minimal --- */
 function fakeElement(id) {
   const el = {
     id,
@@ -99,7 +99,7 @@ const exampleButtons = [1, 2, 3].map((n) => {
   return b;
 });
 
-/* ------------------------------------------- fausse session ONNX --- */
+/* --- fausse session ONNX --- */
 let dernierTenseur = null;
 const ortStub = {
   env: { wasm: {} },
@@ -109,8 +109,8 @@ const ortStub = {
   InferenceSession: {
     create: async () => ({
       run: async () => {
-        // logits arbitraires mais deterministes : la classe gagnante
-        // varie selon la position, ce qui exerce l'argmax
+        // logits deterministes dont la classe gagnante varie selon la
+        // position, ce qui exerce l'argmax
         const logits = new Float32Array(4 * SIZE * SIZE);
         for (let i = 0; i < SIZE * SIZE; i++) logits[(i % 4) * SIZE * SIZE + i] = 1;
         return { logits: { data: logits } };
@@ -119,7 +119,7 @@ const ortStub = {
   },
 };
 
-/* ------------------------------------------------ fichiers ---------- */
+/* --- fichiers --- */
 function fakeFile(nom) {
   const buf = fs.readFileSync(path.join(DATA, nom));
   return {
@@ -128,7 +128,7 @@ function fakeFile(nom) {
   };
 }
 
-/* ------------------------------------------------ execution --------- */
+/* --- execution --- */
 const source = fs.readFileSync(path.join(__dirname, "app.js"), "utf8") + `
 ;globalThis.__t = {
   acceptFiles, requestSegmentation, buildTensor, segmentSlice, unpackSample, loadSample,
@@ -191,7 +191,7 @@ vm.runInContext(source, ctx);
         `${tenseur.length} valeurs`);
   check("le tenseur ne contient pas de NaN", !tenseur.some(Number.isNaN));
 
-  // ---- chaque echantillon doit reconstituer son volume d'origine ----
+  // chaque echantillon doit reconstituer son volume d'origine
   for (const f of fs.readdirSync(__dirname).filter((n) => /^sample-\d+\.bin$/.test(n)).sort()) {
     const n = f.match(/\d+/)[0];
     const gz = fs.readFileSync(path.join(__dirname, f));
@@ -208,7 +208,7 @@ vm.runInContext(source, ctx);
           diff ? `${diff} voxels differents` : `${(gz.length / 1e6).toFixed(2)} Mo compresse`);
   }
 
-  // ---- les boutons d'exemple doivent etre cables et fonctionnels ----
+  // les boutons d'exemple doivent etre cables et fonctionnels
   check("les 3 boutons d'exemple ont un gestionnaire",
         exampleButtons.every((b) => b._clicks.length === 1),
         exampleButtons.map((b) => b._clicks.length).join("/"));
@@ -222,7 +222,7 @@ vm.runInContext(source, ctx);
   check("les boutons sont reactives", exampleButtons.every((b) => b.disabled === false) ||
         !!apresEx.volT1);
 
-  // ---- le clavier ne doit pas dependre du focus ----
+  // le clavier ne doit pas dependre du focus
   const touche = (key, cible) => {
     let bloque = false;
     const ev = { key, target: cible, preventDefault: () => { bloque = true; } };
@@ -241,7 +241,7 @@ vm.runInContext(source, ctx);
   check("les fleches agissent sur le corps de page",
         touche("ArrowLeft", { tagName: "BODY" }));
 
-  // ---- selecteur de modele ----
+  // selecteur de modele
   check("les 3 boutons de modele ont un gestionnaire",
         modelButtons.every((b) => b._clicks.length === 1),
         modelButtons.map((b) => b._clicks.length).join("/"));

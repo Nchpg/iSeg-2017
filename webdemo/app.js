@@ -6,23 +6,18 @@
    each slice is segmented through WebAssembly. No image ever leaves the
    machine.
 
-   Preprocessing mirrors iseg/data.py on the Python side exactly: brain
-   mask from T1 > 0, z-score within that mask applied to both
-   modalities, fixed crop, and a stack of 5 context slices per modality.
-   Any divergence here would silently wreck the Dice score. */
+   Preprocessing mirrors iseg/data.py exactly — brain mask from T1 > 0,
+   z-score within that mask applied to both modalities, fixed crop, 5
+   context slices per modality. Any divergence here silently wrecks the
+   Dice score. */
 
-/* ============================ constants =============================
-   Must stay in sync with iseg/data.py (CROP_X, CROP_Z) and the exported
-   checkpoint: separable variant, context 5, T1+T2 = 10 channels,
-   144x144 input. */
+/* Must stay in sync with iseg/data.py and the exported checkpoint. */
 const CROP_X = [0, 144];
 const CROP_Z = [72, 216];
 const CONTEXT = 5;
 const SIZE = 144;
-/* Les trois variantes entrainees, du plus frugal au plus performant.
-   Les chiffres viennent de la validation croisee 5 blocs (voir README) ;
-   ils sont figes ici parce qu'ils decrivent l'entrainement, pas
-   l'execution. Le temps d'inference, lui, est mesure sur l'appareil. */
+/* Training figures, hardcoded because they describe training rather
+   than this run. Inference time is the one thing measured live. */
 const MODELS = {
   tiny:      { params: 26974,   size: "0.07 MB", dice: "0.828" },
   separable: { params: 386782,  size: "0.43 MB", dice: "0.862" },
@@ -48,20 +43,16 @@ let lastClasses = null;
 let lastInput = null;
 let occupancy = null;         // fraction of brain voxels per slice
 
-/* =============================== errors ============================== */
-
 function showError(msg) {
   $("errBanner").textContent = msg;
   $("errBanner").classList.add("on");
 }
 function clearError() { $("errBanner").classList.remove("on"); }
 
-function setModelStatus(classe, texte) {
-  $("modelChip").className = "chip " + classe;
-  $("modelChipText").textContent = texte;
+function setModelStatus(state, text) {
+  $("modelChip").className = "chip " + state;
+  $("modelChipText").textContent = text;
 }
-
-/* ============================ model loading ========================== */
 
 function showModelSpec(variant) {
   const m = MODELS[variant];
@@ -82,12 +73,8 @@ async function loadModel(variant = currentModel) {
     session = await ort.InferenceSession.create(MODEL_URL(variant), { executionProviders: ["wasm"] });
     currentModel = variant;
     showModelSpec(variant);
-    // Pas de duree ici : la seule qui compte est le temps d'inference,
-    // affiche dans la fiche du modele. En donner deux invite a les
-    // confondre.
     setModelStatus("ok", `${variant} ready`);
     $("mTime").textContent = "—";
-    // relance la coupe courante avec le nouveau modele
     if (volT1 && volT2) requestSegmentation();
   } catch (e) {
     setModelStatus("err", "model unavailable");
@@ -103,9 +90,8 @@ async function loadModel(variant = currentModel) {
   }
 }
 
-/* ========================= Analyze 7.5 reader ========================
-   348-byte header, little-endian, raw data with no offset. Voxels are
-   stored with x varying fastest, then y, then z (checked against
+/* Analyze 7.5: 348-byte header, little-endian, raw data with no offset.
+   Voxels stored with x varying fastest, then y, then z (checked against
    nibabel on the challenge files). */
 
 function readHeader(buf) {
@@ -124,12 +110,9 @@ async function readVolume(hdrFile, imgFile) {
     throw new Error(`unexpected dimensions (${X}×${Y}×${Z}): the iSeg-2017 geometry (144×192×256) is expected`);
   }
   const buf = await imgFile.arrayBuffer();
-  // Little-endian byte order: true on every browser in the wild.
   return { X, Y, Z, raw: new Int16Array(buf, 0, X * Y * Z),
            name: hdrFile.name.replace(/\.hdr$/i, "") };
 }
-
-/* ============================ preprocessing ========================== */
 
 function zscoreInMask(raw, mask) {
   let sum = 0, n = 0;
@@ -172,8 +155,6 @@ function buildTensor(y) {
   return out;
 }
 
-/* =============================== drawing ============================= */
-
 function sliceToImage(vol, y) {
   const raw = extractSlice(vol, vol.raw, y);
   let mn = Infinity, mx = -Infinity;
@@ -195,15 +176,15 @@ function drawInput(y) {
   return img;
 }
 
-function drawSegmentation(base, classes, opacite) {
+function drawSegmentation(base, classes, opacity) {
   const out = new Uint8ClampedArray(base);
   for (let i = 0; i < SIZE * SIZE; i++) {
     const c = classes[i];
     if (c === 0) continue;
     const [r, g, b] = COLOURS[c];
-    out[i * 4]     = out[i * 4]     * (1 - opacite) + r * opacite;
-    out[i * 4 + 1] = out[i * 4 + 1] * (1 - opacite) + g * opacite;
-    out[i * 4 + 2] = out[i * 4 + 2] * (1 - opacite) + b * opacite;
+    out[i * 4]     = out[i * 4]     * (1 - opacity) + r * opacity;
+    out[i * 4 + 1] = out[i * 4 + 1] * (1 - opacity) + g * opacity;
+    out[i * 4 + 2] = out[i * 4 + 2] * (1 - opacity) + b * opacity;
   }
   $("canvasSeg").getContext("2d").putImageData(new ImageData(out, SIZE, SIZE), 0, 0);
   $("emptySeg").style.display = "none";
@@ -279,24 +260,18 @@ function drawProfile() {
 function updateStats(classes) {
   const n = [0, 0, 0, 0];
   for (let i = 0; i < classes.length; i++) n[classes[i]]++;
-  const cerveau = n[1] + n[2] + n[3];
-  const pct = cerveau ? [n[1], n[2], n[3]].map((c) => (100 * c) / cerveau) : [0, 0, 0];
-  const barres = $("statBar").children;
+  const brain = n[1] + n[2] + n[3];
+  const pct = brain ? [n[1], n[2], n[3]].map((c) => (100 * c) / brain) : [0, 0, 0];
+  const bars = $("statBar").children;
   ["pctCSF", "pctGM", "pctWM"].forEach((id, i) => {
-    barres[i].style.width = pct[i].toFixed(1) + "%";
+    bars[i].style.width = pct[i].toFixed(1) + "%";
     $(id).textContent = pct[i].toFixed(1) + " %";
   });
 }
 
-/* ============================== inference ============================ */
-
-/* "Latest request wins" queue.
-
-   A plain debounce would wait for the gesture to stop before running
-   anything, so nothing moves while you drag. Here a new inference
-   starts as soon as the previous one finishes, on the most recent slice
-   requested — intermediate positions are dropped rather than queued, so
-   the pace adapts to whatever the device can sustain. */
+/* "Latest request wins" queue: a new inference starts as soon as the
+   previous one finishes, on the most recent slice requested. A plain
+   debounce would freeze the view until the gesture stopped. */
 let inferenceRunning = false;
 let requestedSlice = null;
 
@@ -314,8 +289,8 @@ async function segmentationLoop() {
       await segmentSlice(y);
     }
   } finally {
-    // Without this, a single thrown error would leave the flag set and
-    // wedge every later request on "computing…" for good.
+    // A thrown error must not leave the flag set, or every later request
+    // wedges on "computing…" for good.
     inferenceRunning = false;
   }
 }
@@ -365,9 +340,9 @@ async function segmentSlice(y) {
     drawSegmentation(lastInput, classes, +$("opacitySlider").value / 100);
     updateStats(classes);
 
-    const cible = $("mTime");
-    cible.textContent = `${msInf.toFixed(0)} ms`;
-    cible.classList.add("live");
+    const timing = $("mTime");
+    timing.textContent = `${msInf.toFixed(0)} ms`;
+    timing.classList.add("live");
     $("segStateLabel").textContent = "slice " + y;
     $("panelStats").classList.remove("off");
   } catch (e) {
@@ -376,11 +351,9 @@ async function segmentSlice(y) {
   }
 }
 
-/* ============================ bundled sample =========================
-   The original .hdr/.img pair weighs 28 MB per subject. The sample only
-   carries what the app reads — the crop window plus the slices holding
-   brain — gzipped down to about 2.4 MB, and is unpacked back into a
-   full-size volume so the rest of the code sees no difference.
+/* Bundled sample: the crop window plus the slices holding brain, gzipped
+   to about 2.4 MB instead of the 28 MB of the original .hdr/.img pair,
+   unpacked back to full size so the rest of the code sees no difference.
    Layout is described in iseg/sample.py. */
 
 const SAMPLE_URL = (n) => `sample-${n}.bin`;
@@ -397,7 +370,7 @@ function unpackSample(buffer) {
   const voxels = nx * ny * nz;
   const build = (offset) => {
     const block = new Int16Array(buffer, offset, voxels);
-    const full = new Int16Array(fx * fy * fz);   // le reste vaut zero, comme le fond
+    const full = new Int16Array(fx * fy * fz);   // untouched voxels stay 0, like the background
     let ptr = 0;
     for (let iz = 0; iz < nz; iz++) {
       for (let iy = 0; iy < ny; iy++) {
@@ -429,11 +402,11 @@ async function loadSample(subject) {
     const response = await fetch(SAMPLE_URL(subject));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    // Certains hebergeurs decompressent d'eux-memes une reponse gzip.
-    // On regarde donc le nombre magique plutot que de le supposer.
+    // Some hosts gunzip the response themselves, so check the magic
+    // number rather than assume.
     let buffer = await response.arrayBuffer();
-    const tete = new Uint8Array(buffer, 0, 2);
-    if (tete[0] === 0x1f && tete[1] === 0x8b) {
+    const head = new Uint8Array(buffer, 0, 2);
+    if (head[0] === 0x1f && head[1] === 0x8b) {
       buffer = await new Response(
         new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"))
       ).arrayBuffer();
@@ -462,13 +435,8 @@ async function loadSample(subject) {
   }
 }
 
-/* ================================ files ==============================
-   All 4 files of a subject are dropped at once: T1 and T2 are picked
-   out by filename, then .hdr is paired with .img. */
-
-/* The brain mask comes from T1 (data.py: brain = t1 > 0) and also
-   normalises T2: both modalities share the same statistics, exactly as
-   during training. */
+/* The brain mask comes from T1 (data.py: brain = t1 > 0) and normalises
+   T2 as well: both modalities share the same statistics, as in training. */
 function normaliseVolumes() {
   if (!volT1) return;
   const mask = new Uint8Array(volT1.raw.length);
@@ -508,7 +476,7 @@ async function acceptFiles(fileList) {
     const complete = !!(volT1 && volT2);
     $("dropZone").classList.toggle("filled", complete);
     markExample(null);
-    // the image moves to the top, the drop dropArea moves down
+    // the image moves to the top, the drop area moves down
     $("shell").classList.toggle("loaded", complete);
     if (complete) $("btnBrowse").textContent = "Change volumes";
     enableWhenReady();
@@ -557,8 +525,6 @@ function step(delta) {
   requestSegmentation();
 }
 
-/* =============================== interface =========================== */
-
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
 $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
 for (const b of document.querySelectorAll(".segmented .ex")) {
@@ -571,9 +537,8 @@ for (const b of document.querySelectorAll(".segmented .mdl")) {
   });
 }
 
-/* Un element absent ne doit jamais interrompre le script : sans ce
-   garde-fou, une page et un script de versions differentes suffisent a
-   tout figer, et plus aucun bouton ne repond. */
+/* A missing element must never halt the script: a page and a script from
+   two different deploys would otherwise freeze every button. */
 window.addEventListener("error", (e) => {
   console.error("iSeg Viewer:", e.message);
 });
@@ -594,10 +559,8 @@ $("btnPrev").addEventListener("click", () => step(-1));
 $("btnNext").addEventListener("click", () => step(+1));
 
 document.addEventListener("keydown", (e) => {
-  // Only defer to fields where arrows already mean something natively —
-  // a slider, a select, a text field. On a button they mean nothing, and
-  // the previous filter blocked the keyboard as soon as you had clicked
-  // anywhere at all.
+  // Only defer to fields where arrows already mean something natively.
+  // On a button they mean nothing, so a click must not eat the keyboard.
   const tag = ((e.target && e.target.tagName) || "").toUpperCase();
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); step(-1); }
@@ -681,9 +644,8 @@ for (const [id, mod] of [["btnT1", "t1"], ["btnT2", "t2"]]) {
   });
 }
 
-/* =============================== offline =============================
-   Served over HTTPS the service worker caches the app, so the page keeps
-   working without a network and can be installed to the home screen. */
+/* Over HTTPS the service worker caches the app, so the page keeps working
+   without a network and can be installed to the home screen. */
 
 if (location.protocol !== "file:" && "serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});

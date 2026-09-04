@@ -3,9 +3,8 @@
     python -m iseg.export --checkpoint runs/separable.pt
     python -m iseg.export --checkpoint runs/separable.pt --deploy webdemo
 
-Produit le .onnx float32 et sa version int8 (environ 3,5x plus petite).
-Avec --deploy, le modele int8 est aussi copie sous le nom model.onnx
-dans le dossier du site, ou la page va le chercher.
+Produit le .onnx float32 et sa version int8, environ 3,5x plus petite.
+Avec --deploy, l'int8 est aussi copie dans le dossier du site.
 """
 
 import argparse
@@ -33,8 +32,8 @@ def to_onnx(checkpoint, out_path):
     torch.onnx.export(
         net, dummy, str(out_path),
         input_names=["input"], output_names=["logits"],
-        # Le lot reste dynamique : l'application segmente une coupe a la
-        # fois, mais on peut vouloir en grouper plusieurs.
+        # Lot dynamique : l'application segmente une coupe a la fois, mais
+        # on peut vouloir en grouper plusieurs.
         dynamic_axes={"input": {0: "batch"}, "logits": {0: "batch"}},
         opset_version=17,
     )
@@ -55,8 +54,7 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
     """Quantification statique int8, calibree sur de vraies coupes.
 
     Statique plutot que dynamique : sur un reseau convolutif, la
-    quantification dynamique ne touche pas les convolutions et ne gagne
-    presque rien. Quelques centaines de coupes suffisent a calibrer.
+    dynamique ne touche pas les convolutions et ne gagne presque rien.
     """
     from onnxruntime.quantization import CalibrationDataReader, QuantType, quantize_static
     from onnxruntime.quantization.shape_inference import quant_pre_process
@@ -80,11 +78,8 @@ def quantize(onnx_path, out_path, cache_dir, subjects, context, modalities, n_sa
 
 
 def deploy(onnx_path, site_dir, variant):
-    """Place le modele la ou la page ira le chercher.
-
-    Le nom porte la variante : la page en propose plusieurs et les
-    charge a la demande.
-    """
+    """Copie le modele sous le nom que la page attend : le nom porte la
+    variante, la page en propose plusieurs et les charge a la demande."""
     cible = Path(site_dir) / f"model-{variant}.onnx"
     if not cible.parent.is_dir():
         raise ValueError(f"dossier du site introuvable : {site_dir}")
@@ -103,7 +98,7 @@ def main():
     p.add_argument("--calib-subjects", type=int, nargs="+", default=[1, 2])
     p.add_argument("--out", default="export")
     p.add_argument("--deploy", metavar="DOSSIER",
-                   help="copier le modele int8 en <DOSSIER>/model.onnx")
+                   help="copier le modele int8 dans le dossier du site")
     p.add_argument("--no-quant", action="store_true", help="float32 seulement")
     args = p.parse_args()
 

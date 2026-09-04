@@ -1,14 +1,9 @@
 """Fonction de cout et metriques.
 
-Dice + entropie croisee, a parts egales. L'entropie croisee fournit des
-gradients stables en debut d'entrainement, quand le Dice est encore
-proche de zero et donne peu de signal ; le Dice optimise directement la
-metrique d'evaluation et se moque de la taille des classes.
-
-L'exploration a montre un desequilibre modere entre tissus a l'interieur
-du cerveau (LCR 22 %, GM 47 %, WM 31 %, soit un facteur 2,2). Pas besoin
-de ponderation agressive : le terme Dice suffit a mettre les trois tissus
-sur un pied d'egalite.
+Dice + entropie croisee a parts egales : l'entropie croisee donne des
+gradients stables au demarrage, quand le Dice est encore proche de zero
+et ne signale pas grand-chose ; le Dice optimise directement la metrique
+d'evaluation et ignore la taille des classes.
 """
 
 import torch
@@ -17,13 +12,10 @@ import torch.nn.functional as F
 
 
 def soft_dice(logits, target, n_classes=4, eps=1e-6):
-    """Dice differentiable, renvoie UNE valeur PAR TISSU : (LCR, GM, WM).
+    """Dice differentiable, une valeur par tissu : (LCR, GM, WM).
 
-    La moyenne sur les tissus est prise par l'appelant (DiceCELoss), ce
-    qui permet aussi de suivre les trois separement.
-
-    Le fond (classe 0) est ecarte : le segmenter est trivial et l'inclure
-    gonflerait le score sans rien mesurer d'utile.
+    Le fond est ecarte : le segmenter est trivial et l'inclure gonflerait
+    le score sans rien mesurer d'utile.
     """
     probs = F.softmax(logits, dim=1)[:, 1:]
     onehot = F.one_hot(target, n_classes).permute(0, 3, 1, 2).float()[:, 1:]
@@ -48,11 +40,10 @@ class DiceCELoss(nn.Module):
 
 @torch.no_grad()
 def dice_volume(pred, target, n_classes=4):
-    """Dice par classe sur un volume entier, en numpy.
+    """Dice par classe sur un volume entier.
 
-    Point de methode : le Dice se calcule par volume, pas par coupe. Une
-    moyenne des Dice coupe par coupe donnerait un chiffre different et
-    non comparable a la litterature du challenge.
+    Par volume et non par coupe : une moyenne des Dice coupe par coupe
+    donne un chiffre different, incomparable a celui du challenge.
     """
     out = []
     for c in range(1, n_classes):

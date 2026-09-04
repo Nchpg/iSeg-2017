@@ -1,20 +1,12 @@
 /* Service worker: makes the page usable offline after a first visit.
 
-   Two strategies, depending on what the file is:
+   Application code goes to the network first, cache as fallback — a new
+   deploy is picked up straight away. Serving it cache-first would freeze
+   the app on its first version until the cache name changed.
 
-   - Application code (HTML, CSS, JS) goes to the NETWORK first, with
-     the cache as a fallback. A freshly deployed version is therefore
-     picked up straight away, and the page still works offline. Serving
-     these files cache-first would freeze the app on its very first
-     version until the cache name changes: the classic PWA trap, and one
-     the client side cannot recover from on its own.
-
-   - The model and the ONNX Runtime engine go to the CACHE first, with
-     the network as a fallback. These are large, immutable binaries;
-     re-downloading them on every visit would be pure waste.
-
-   After one successful segmentation while online, everything needed is
-   cached and aeroplane mode works. */
+   The model and the ONNX Runtime engine go to the cache first: large
+   immutable binaries, not worth re-downloading. After one successful
+   segmentation while online, aeroplane mode works. */
 
 const CACHE = "iseg-viewer-v7";
 
@@ -29,11 +21,9 @@ const APP = [
 
 // binaries: cached once and for all
 const BINARIES = [
-  // seule la variante par defaut est preinstallee ; les deux autres
-  // sont mises en cache quand on les choisit
+  // only the default variant and the first sample ship with the install;
+  // the others are cached when they are first selected
   "./model-separable.onnx",
-  // seul le premier echantillon est preinstalle : les autres sont mis
-  // en cache a la premiere utilisation, pour ne pas alourdir l'install
   "./sample-1.bin",
   "./icon-192.png",
   "./icon-512.png",

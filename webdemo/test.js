@@ -68,7 +68,8 @@ const doc = {
     if (!elements.has(id)) elements.set(id, fakeElement(id));
     return elements.get(id);
   },
-  addEventListener() {},
+  _listeners: {},
+  addEventListener(ev, fn) { (this._listeners[ev] ||= []).push(fn); },
   querySelectorAll(sel) {
     if (sel === ".segmented .ex") return exampleButtons;
     if (sel === ".segmented .mdl") return modelButtons;
@@ -220,6 +221,25 @@ vm.runInContext(source, ctx);
         apresEx.volT1 ? apresEx.volT1.name : "rien charge");
   check("les boutons sont reactives", exampleButtons.every((b) => b.disabled === false) ||
         !!apresEx.volT1);
+
+  // ---- le clavier ne doit pas dependre du focus ----
+  const touche = (key, cible) => {
+    let bloque = false;
+    const ev = { key, target: cible, preventDefault: () => { bloque = true; } };
+    (doc._listeners.keydown || []).forEach((fn) => fn(ev));
+    return bloque;
+  };
+
+  const bouton = { tagName: "BUTTON" };
+  const curseur = { tagName: "INPUT" };
+  doc.getElementById("sliceSlider").value = "100";
+
+  check("les fleches agissent quand le focus est sur un bouton",
+        touche("ArrowRight", bouton), "cas qui etait casse");
+  check("les fleches sont laissees au curseur natif",
+        !touche("ArrowRight", curseur));
+  check("les fleches agissent sur le corps de page",
+        touche("ArrowLeft", { tagName: "BODY" }));
 
   // ---- selecteur de modele ----
   check("les 3 boutons de modele ont un gestionnaire",

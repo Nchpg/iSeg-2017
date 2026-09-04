@@ -594,7 +594,12 @@ $("btnPrev").addEventListener("click", () => step(-1));
 $("btnNext").addEventListener("click", () => step(+1));
 
 document.addEventListener("keydown", (e) => {
-  if (e.target.matches("input, button")) return;
+  // Only defer to fields where arrows already mean something natively —
+  // a slider, a select, a text field. On a button they mean nothing, and
+  // the previous filter blocked the keyboard as soon as you had clicked
+  // anywhere at all.
+  const tag = ((e.target && e.target.tagName) || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); step(-1); }
   if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); step(+1); }
 });

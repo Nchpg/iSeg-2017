@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=15">
+<link rel="stylesheet" href="app.css?v=16">
 </head>
 <body>
 
@@ -103,16 +103,16 @@
     <section class="panel off" id="panelSlice">
       <h2>Coronal slice</h2>
       <div class="sliceval"><span id="sliceNum">&mdash;</span><small id="sliceMax"></small></div>
-      <div class="scrub">
-        <canvas id="occupancy" width="300" height="26" aria-hidden="true"></canvas>
-        <input type="range" id="sliceSlider" min="0" max="191" value="96" disabled
-               aria-label="coronal slice index">
-      </div>
-      <div class="btnrow">
+      <div class="sliceline">
         <button id="btnPrev" disabled aria-label="previous slice">&larr;</button>
+        <div class="scrub">
+          <canvas id="occupancy" width="300" height="26" aria-hidden="true"></canvas>
+          <input type="range" id="sliceSlider" min="0" max="191" value="96" disabled
+                 aria-label="coronal slice index">
+        </div>
         <button id="btnNext" disabled aria-label="next slice">&rarr;</button>
-        <span class="kbdhint">or arrow keys</span>
       </div>
+      <p class="kbdhint">or use the arrow keys</p>
     </section>
 
     <section class="panel off" id="panelDisplay">
@@ -159,6 +159,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

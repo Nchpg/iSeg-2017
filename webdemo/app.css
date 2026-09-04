@@ -310,20 +310,26 @@ input[type=range]::-moz-range-thumb {
 }
 input[type=range]:disabled::-webkit-slider-thumb { background: var(--text-faint); box-shadow: none; }
 
-.btnrow { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
-.btnrow button {
-  font-family: var(--font-mono); font-size: 14px;
+/* The arrows flank the scrub bar rather than sitting in a row of their
+   own: stepping backwards and forwards reads as part of the same track. */
+.sliceline { display: flex; align-items: center; gap: 9px; }
+.sliceline .scrub { flex: 1; min-width: 0; }
+
+.sliceline button {
+  flex: none;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1;
   color: var(--text-dim);
   background: var(--panel-2);
   border: 1px solid var(--border-2);
   border-radius: 6px;
-  padding: 5px 15px;
+  padding: 8px 10px;
   cursor: pointer;
   touch-action: manipulation;
 }
-.btnrow button:hover:not(:disabled) { color: var(--text); border-color: var(--accent-dim); }
-.btnrow button:disabled { opacity: .4; cursor: not-allowed; }
-.kbdhint { font-size: 11px; color: var(--text-faint); }
+.sliceline button:hover:not(:disabled) { color: var(--text); border-color: var(--accent-dim); }
+.sliceline button:disabled { opacity: .4; cursor: not-allowed; }
+
+.kbdhint { margin: 9px 0 0; font-size: 11px; color: var(--text-faint); text-align: center; }
 @media (pointer: coarse) { .kbdhint { display: none; } }
 
 /* ======================= display controls =================== */

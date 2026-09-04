@@ -11,29 +11,6 @@ number here comes from the 10 training subjects: 8 to train, subjects 1 and 2 he
 The split is by subject, never by slice, and Dice is computed per volume after
 reassembling all slices.
 
-## Why it is hard
-
-At 6 months, grey and white matter are iso-intense. Histogram intersection for GM/WM
-(1 = indistinguishable) is 0.702 on T1 and 0.901 on T2. The Fisher ratio is 0.269 on T1,
-0.001 on T2, and 0.297 for the best linear combination of the two. No combination of
-intensities separates the tissues, so spatial context is mandatory rather than helpful.
-Full measurements: `git show 468185b^:explore.py`.
-
-The rest is comfortable: 10 subjects at 144×192×256, 1 mm isotropic, T1, T2 and label
-already registered, and a mild class imbalance inside the brain (CSF 22 %, GM 47 %,
-WM 31 %).
-
-## Design choices
-
-| Decision | Why |
-|---|---|
-| Coronal orientation | left/right symmetry is in-plane, which makes the horizontal flip a legitimate augmentation |
-| Fixed 144×144 crop | covers the brain with 13-17 voxels of margin, divisible by 16, so no resize and no padding |
-| No N4 correction | SimpleITK does not ship in a browser; an augmentation simulates bias fields instead |
-| Z-score inside the brain mask | background would crush the statistic under millions of empty voxels |
-| 2.5D rather than 3D | NNAPI and Core ML accelerate and quantize 3D convolutions poorly |
-| Dice + cross-entropy | cross-entropy is stable early, Dice optimises the metric and ignores class size |
-
 ## Models
 
 A 2D U-Net whose input channels carry the third dimension: 5 adjacent coronal slices per
@@ -46,8 +23,8 @@ modality, so 10 channels with T1+T2.
 | `tiny` | separable, base 8, 3 levels | 26,974 | 0.07 MB | 0.8281 |
 
 `separable` ships: 97 % of `standard`'s Dice at 20 % of its size. Per tissue, CSF 0.8969,
-GM 0.8606, WM 0.8297. White matter is the hardest, as the histogram overlap predicted.
-A 5-fold cross-validation spread 0.0085 between best and worst fold, so the result does
+GM 0.8606, WM 0.8297. White matter is the hardest: at 6 months it is iso-intense with
+grey matter, which is what makes the task hard in the first place. A 5-fold cross-validation spread 0.0085 between best and worst fold, so the result does
 not hinge on the split.
 
 ## Usage

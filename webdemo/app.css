@@ -138,9 +138,6 @@ body {
        stretch and leave a gap under the volumes panel: "auto" pins it
        to its content, "1fr" hands the remainder to the second. */
     grid-template-rows: auto 1fr;
-    /* viewport height minus header, footer and padding, so the whole
-       app fits on screen without scrolling */
-    min-height: calc(100dvh - 232px);
   }
   .side { position: sticky; top: 62px; align-self: start; }
 
@@ -150,7 +147,11 @@ body {
      the images and the page scrolls for nothing. */
   .viewer { align-self: stretch; }
   .viewer, .views { height: 100%; }
-  .views { min-height: 430px; }
+  /* The right column sets the height: the views match it rather than
+     the viewport, so the images never overshoot the panels beside them.
+     Floored so they stay usable when the column is short, and capped so
+     a tall column never forces the page to scroll. */
+  .views { min-height: 430px; max-height: calc(100dvh - 150px); }
   .view { display: flex; flex-direction: column; }
   .view figcaption { flex: none; }
   .canvaswrap { flex: 1; aspect-ratio: auto; min-height: 0; }

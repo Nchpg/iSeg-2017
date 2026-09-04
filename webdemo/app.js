@@ -79,11 +79,13 @@ async function loadModel(variant = currentModel) {
   buttons.forEach((b) => { b.disabled = true; });
   setModelStatus("busy", `loading ${variant}…`);
   try {
-    const t0 = performance.now();
     session = await ort.InferenceSession.create(MODEL_URL(variant), { executionProviders: ["wasm"] });
     currentModel = variant;
     showModelSpec(variant);
-    setModelStatus("ok", `${variant} ready (${(performance.now() - t0).toFixed(0)} ms)`);
+    // Pas de duree ici : la seule qui compte est le temps d'inference,
+    // affiche dans la fiche du modele. En donner deux invite a les
+    // confondre.
+    setModelStatus("ok", `${variant} ready`);
     $("mTime").textContent = "—";
     // relance la coupe courante avec le nouveau modele
     if (volT1 && volT2) requestSegmentation();

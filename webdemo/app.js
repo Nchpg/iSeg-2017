@@ -349,7 +349,7 @@ async function segmentSlice(y) {
    full-size volume so the rest of the code sees no difference.
    Layout is described in iseg/sample.py. */
 
-const SAMPLE_URL = "sample.bin.gz";
+const SAMPLE_URL = (n) => `sample-${n}.bin.gz`;
 
 function unpackSample(buffer) {
   const dv = new DataView(buffer);
@@ -381,18 +381,19 @@ function unpackSample(buffer) {
   };
 }
 
-async function loadSample() {
-  const btn = $("btnSample");
-  btn.disabled = true;
-  btn.textContent = "loading…";
+async function loadSample(subject) {
+  const buttons = [...document.querySelectorAll(".sample .ex")];
+  buttons.forEach((b) => { b.disabled = true; });
   clearError();
   try {
-    const response = await fetch(SAMPLE_URL);
+    const response = await fetch(SAMPLE_URL(subject));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
     const buffer = await new Response(stream).arrayBuffer();
 
     const { t1, t2 } = unpackSample(buffer);
+    t1.name = `example ${subject} T1`;
+    t2.name = `example ${subject} T2`;
     volT1 = t1;
     volT2 = t2;
     for (const [id, vol] of [["rowT1", t1], ["rowT2", t2]]) {
@@ -407,8 +408,7 @@ async function loadSample() {
     enableWhenReady();
   } catch (e) {
     showError("Could not load the example: " + e.message);
-    btn.disabled = false;
-    btn.textContent = "load an example";
+    buttons.forEach((b) => { b.disabled = false; });
   }
 }
 
@@ -510,7 +510,9 @@ function step(delta) {
 
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
 $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
-$("btnSample").addEventListener("click", loadSample);
+for (const b of document.querySelectorAll(".sample .ex")) {
+  b.addEventListener("click", () => loadSample(b.dataset.subject));
+}
 
 const dropArea = $("dropZone");
 ["dragenter", "dragover"].forEach((ev) =>

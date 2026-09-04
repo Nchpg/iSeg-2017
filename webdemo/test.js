@@ -69,6 +69,7 @@ const doc = {
     return elements.get(id);
   },
   addEventListener() {},
+  querySelectorAll() { return []; },
   documentElement: { outerHTML: "" },
 };
 
@@ -153,23 +154,22 @@ vm.runInContext(source, ctx);
         `${tenseur.length} valeurs`);
   check("le tenseur ne contient pas de NaN", !tenseur.some(Number.isNaN));
 
-  // ---- l'echantillon embarque doit reconstituer le volume d'origine ----
-  const gz = fs.readFileSync(path.join(__dirname, "sample.bin.gz"));
-  const brut = require("zlib").gunzipSync(gz);
-  const ech = t.unpackSample(brut.buffer.slice(brut.byteOffset, brut.byteOffset + brut.byteLength));
+  // ---- chaque echantillon doit reconstituer son volume d'origine ----
+  for (const f of fs.readdirSync(__dirname).filter((n) => /^sample-\d+\.bin\.gz$/.test(n)).sort()) {
+    const n = f.match(/\d+/)[0];
+    const gz = fs.readFileSync(path.join(__dirname, f));
+    const brut = require("zlib").gunzipSync(gz);
+    const ech = t.unpackSample(brut.buffer.slice(brut.byteOffset, brut.byteOffset + brut.byteLength));
 
-  check("l'echantillon se decompresse", !!ech.t1 && !!ech.t2,
-        `${ech.t1.X}x${ech.t1.Y}x${ech.t1.Z}, ${(gz.length / 1e6).toFixed(2)} Mo compresse`);
-
-  // comparaison voxel par voxel avec le .img d'origine
-  const orig = fs.readFileSync(path.join(DATA, `subject-${SUBJECT}-T1.img`));
-  const ref = new Int16Array(orig.buffer, orig.byteOffset, orig.byteLength / 2);
-  let diff = 0, horsBloc = 0;
-  for (let i = 0; i < ref.length; i++) {
-    if (ech.t1.raw[i] !== ref[i]) { diff++; if (ref[i] === 0) horsBloc++; }
+    let diff = 0;
+    for (const [mod, vol] of [["T1", ech.t1], ["T2", ech.t2]]) {
+      const orig = fs.readFileSync(path.join(DATA, `subject-${n}-${mod}.img`));
+      const ref = new Int16Array(orig.buffer, orig.byteOffset, orig.byteLength / 2);
+      for (let i = 0; i < ref.length; i++) if (vol.raw[i] !== ref[i]) diff++;
+    }
+    check(`${f} reproduit le volume d'origine`, diff === 0,
+          diff ? `${diff} voxels differents` : `${(gz.length / 1e6).toFixed(2)} Mo compresse`);
   }
-  check("l'echantillon reproduit le volume d'origine", diff === 0,
-        diff ? `${diff} voxels differents` : `${ref.length.toLocaleString()} voxels identiques`);
 
   fs.writeFileSync("/tmp/tenseur_js.bin", Buffer.from(tenseur.buffer));
   console.log(`\n  tenseur ecrit dans /tmp/tenseur_js.bin pour comparaison avec Python`);

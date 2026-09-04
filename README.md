@@ -135,18 +135,19 @@ webdemo/
   app.css         styles
   app.js          lecture Analyze, prétraitement, inférence, rendu
   model.onnx      le modèle int8 (0,43 Mo)
-  sample.bin.gz   IRM de démonstration (2,4 Mo)
+  sample-*.bin.gz IRM de démonstration, 3 sujets (2,0 à 2,4 Mo chacun)
   sw.js           service worker (cache hors ligne)
   manifest.json   déclaration PWA
   icon-*.png      icônes d'application
   test.js         test sans navigateur : node webdemo/test.js
 ```
 
-Un lien « load an example » charge une IRM embarquée, pour qui n'a pas de données sous
-la main. Elle est régénérée par :
+Trois IRM de démonstration sont embarquées, pour qui n'a pas de données sous la main.
+Seule la première est préchargée par le service worker ; les deux autres sont mises en
+cache à leur première utilisation, pour ne pas alourdir l'installation. Régénération :
 
 ```bash
-python -m iseg.sample --subject 1 --out webdemo/sample.bin.gz
+for n in 1 2 3; do python -m iseg.sample --subject $n --out webdemo/sample-$n.bin.gz; done
 ```
 
 Le fichier ne contient que la fenêtre de recadrage et les coupes contenant du cerveau,

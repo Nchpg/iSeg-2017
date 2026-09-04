@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=11">
+<link rel="stylesheet" href="app.css?v=12">
 </head>
 <body>
 
@@ -43,7 +43,7 @@
     </ul>
 
     <div class="examples">
-      <span class="lbl">no data at hand? load an example subject</span>
+      <span class="lbl">Or load an example subject</span>
       <div class="segmented" role="group" aria-label="example subject">
         <button type="button" class="ex" data-subject="1">1</button>
         <button type="button" class="ex" data-subject="2">2</button>
@@ -94,9 +94,9 @@
       </div>
       <dl class="modelspec">
         <div><dt>parameters</dt><dd id="mParams">&mdash;</dd></div>
-        <div><dt>size, int8</dt><dd id="mSize">&mdash;</dd></div>
-        <div><dt>Dice, held out</dt><dd id="mDice">&mdash;</dd></div>
-        <div><dt>inference</dt><dd id="mTime">&mdash;</dd></div>
+        <div><dt>size (int8)</dt><dd id="mSize">&mdash;</dd></div>
+        <div><dt>Dice (held-out)</dt><dd id="mDice">&mdash;</dd></div>
+        <div><dt>time per slice</dt><dd id="mTime">&mdash;</dd></div>
       </dl>
     </section>
 
@@ -159,6 +159,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>

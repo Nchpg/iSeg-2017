@@ -381,8 +381,14 @@ function unpackSample(buffer) {
   };
 }
 
+function markExample(subject) {
+  for (const b of document.querySelectorAll(".segmented .ex")) {
+    b.classList.toggle("on", b.dataset.subject === subject);
+  }
+}
+
 async function loadSample(subject) {
-  const buttons = [...document.querySelectorAll(".sample .ex")];
+  const buttons = [...document.querySelectorAll(".segmented .ex")];
   buttons.forEach((b) => { b.disabled = true; });
   clearError();
   try {
@@ -413,6 +419,8 @@ async function loadSample(subject) {
     $("dropZone").classList.add("filled");
     $("shell").classList.add("loaded");
     $("btnBrowse").textContent = "Change volumes";
+    markExample(subject);
+    buttons.forEach((b) => { b.disabled = false; });
     enableWhenReady();
   } catch (e) {
     showError("Could not load the example: " + e.message);
@@ -465,6 +473,7 @@ async function acceptFiles(fileList) {
 
     const complete = !!(volT1 && volT2);
     $("dropZone").classList.toggle("filled", complete);
+    markExample(null);
     // the image moves to the top, the drop dropArea moves down
     $("shell").classList.toggle("loaded", complete);
     if (complete) $("btnBrowse").textContent = "Change volumes";
@@ -518,7 +527,7 @@ function step(delta) {
 
 $("btnBrowse").addEventListener("click", () => $("fileInput").click());
 $("fileInput").addEventListener("change", (e) => acceptFiles(e.target.files));
-for (const b of document.querySelectorAll(".sample .ex")) {
+for (const b of document.querySelectorAll(".segmented .ex")) {
   b.addEventListener("click", () => loadSample(b.dataset.subject));
 }
 

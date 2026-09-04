@@ -71,7 +71,7 @@ const doc = {
   addEventListener() {},
   querySelectorAll(sel) {
     // seul selecteur utilise par app.js
-    return sel === ".sample .ex" ? exampleButtons : [];
+    return sel === ".segmented .ex" ? exampleButtons : [];
   },
   documentElement: { outerHTML: "" },
 };

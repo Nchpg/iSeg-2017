@@ -185,20 +185,33 @@ button.ghost {
 }
 button.ghost:hover { border-color: var(--accent-dim); }
 
-.sample { margin: 11px 0 0; font-size: 11.5px; color: var(--text-faint); }
-.sample .ex {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--accent);
-  background: none;
-  border: none;
-  padding: 0 5px;
+/* Example picker: a segmented control, kept visible after loading so
+   you can hop from one subject to the next without reloading. */
+.examples { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--border); }
+.examples .lbl { display: block; font-size: 11.5px; color: var(--text-faint); margin-bottom: 8px; }
+
+.segmented { display: flex; gap: 0; }
+.segmented .ex {
+  flex: 1;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  color: var(--text-dim);
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  border-left-width: 0;
+  padding: 7px 0;
   cursor: pointer;
+  transition: color .12s, background .12s;
 }
-.sample .ex + .ex { border-left: 1px solid var(--border-2); }
-.sample .ex:hover { text-decoration: underline; text-underline-offset: 2px; }
-.sample .ex:disabled { color: var(--text-faint); cursor: progress; text-decoration: none; }
-.drop.filled .sample { display: none; }
+.segmented .ex:first-child { border-left-width: 1px; border-radius: 7px 0 0 7px; }
+.segmented .ex:last-child { border-radius: 0 7px 7px 0; }
+.segmented .ex:hover:not(:disabled) { color: var(--text); }
+.segmented .ex.on {
+  color: var(--void);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.segmented .ex.on + .ex { border-left-color: var(--accent); }
+.segmented .ex:disabled { cursor: progress; opacity: .55; }
 
 .filelist { list-style: none; margin: 11px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
 .filelist li {

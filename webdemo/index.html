@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=6">
+<link rel="stylesheet" href="app.css?v=7">
 </head>
 <body>
 
@@ -36,14 +36,20 @@
       <p class="drop-title">Drop all 4 files</p>
       <p class="drop-hint">T1 and T2, <code>.hdr</code> + <code>.img</code>, matched by filename</p>
       <button type="button" class="ghost" id="btnBrowse">Browse&hellip;</button>
-      <p class="sample">no MRI at hand? try example
-        <button type="button" class="ex" data-subject="1">1</button><button type="button" class="ex" data-subject="2">2</button><button type="button" class="ex" data-subject="3">3</button>
-      </p>
     </div>
     <ul class="filelist">
       <li id="rowT1"><span class="tag">T1</span><span class="name">waiting</span></li>
       <li id="rowT2"><span class="tag">T2</span><span class="name">waiting</span></li>
     </ul>
+
+    <div class="examples">
+      <span class="lbl">no data at hand? load an example subject</span>
+      <div class="segmented" role="group" aria-label="example subject">
+        <button type="button" class="ex" data-subject="1">1</button>
+        <button type="button" class="ex" data-subject="2">2</button>
+        <button type="button" class="ex" data-subject="3">3</button>
+      </div>
+    </div>
   </section>
 
   <!-- ===================== viewer ===================== -->
@@ -159,6 +165,6 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.24.2/ort.min.js"></script>
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

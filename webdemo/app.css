@@ -130,6 +130,7 @@ body {
 
 @media (min-width: 1081px) {
   .shell, .shell.loaded {
+    max-width: 1700px;
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-areas: "viewer files" "viewer side";
     /* The viewer spans both rows and makes them taller than the right
@@ -137,8 +138,22 @@ body {
        stretch and leave a gap under the volumes panel: "auto" pins it
        to its content, "1fr" hands the remainder to the second. */
     grid-template-rows: auto 1fr;
+    /* viewport height minus header, footer and padding, so the whole
+       app fits on screen without scrolling */
+    min-height: calc(100dvh - 232px);
   }
   .side { position: sticky; top: 62px; align-self: start; }
+
+  /* The views take the height available instead of staying square and
+     leaving a gap underneath — object-fit keeps the drawn image square
+     inside them. Without this the right column ends up twice as tall as
+     the images and the page scrolls for nothing. */
+  .viewer { align-self: stretch; }
+  .viewer, .views { height: 100%; }
+  .views { min-height: 430px; }
+  .view { display: flex; flex-direction: column; }
+  .view figcaption { flex: none; }
+  .canvaswrap { flex: 1; aspect-ratio: auto; min-height: 0; }
 }
 
 .panel {
@@ -411,7 +426,7 @@ input[type=range]:disabled::-webkit-slider-thumb { background: var(--text-faint)
   background: #06080b;
   touch-action: pan-y;
 }
-canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; object-fit: contain; }
 
 .empty {
   position: absolute; inset: 0;
@@ -447,7 +462,7 @@ canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; 
 /* ========================== footer ========================== */
 
 footer {
-  width: 100%; max-width: 1440px; margin: 0 auto;
+  width: 100%; max-width: 1700px; margin: 0 auto;
   padding: 0 var(--gap) calc(24px + env(safe-area-inset-bottom));
   display: flex; flex-direction: column; gap: 12px;
 }
@@ -472,7 +487,7 @@ footer {
 
 .err-banner {
   display: none;
-  width: 100%; max-width: 1440px; margin: var(--gap) auto 0;
+  width: 100%; max-width: 1700px; margin: var(--gap) auto 0;
   padding: 11px 14px;
   background: color-mix(in srgb, var(--danger) 13%, var(--panel));
   border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));

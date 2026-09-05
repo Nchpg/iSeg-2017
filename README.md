@@ -1,5 +1,7 @@
 # iSeg-2017: frugal infant brain segmentation
 
+![Segmented coronal slices, CSF in blue, grey matter in orange, white matter in green](docs/demo.gif)
+
 Three-tissue segmentation (CSF, grey matter, white matter) on T1/T2 MRI of 6-month-old
 infants, small enough to run on a phone. `webdemo/` segments in the browser, on the
 device, with no server.

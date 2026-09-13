@@ -1,0 +1,50 @@
+name: images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Rien à compiler : l'image ne fait que poser `webdemo/` derrière nginx,
+      # les modèles étant exécutés par le navigateur du visiteur. Le `context`
+      # est la racine du dépôt parce que le Dockerfile y prend sa configuration
+      # nginx, qui vit à côté de lui.
+      #
+      # `iseg-2017` en minuscules, et pas le nom du dépôt : ghcr.io refuse les
+      # majuscules dans un nom d'image.
+      - id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/nchpg/iseg-2017:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # La référence COMPLÈTE, prête à coller dans profiles/server/default.nix
+      # du dépôt d'infrastructure, qui épingle un digest et jamais un tag. Dans
+      # le résumé du run plutôt que dans le journal : c'est la seule valeur
+      # qu'on vient chercher après une publication, elle ne doit pas être à
+      # dérouler au milieu de mille lignes de build.
+      - name: digest
+        run: |
+          echo '`ghcr.io/nchpg/iseg-2017@${{ steps.push.outputs.digest }}`' >> "$GITHUB_STEP_SUMMARY"

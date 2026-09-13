@@ -1,0 +1,8 @@
+.git/
+docs/
+iseg/
+colab_iseg.ipynb
+env.sh
+README.md
+# Headless test of the reader, run from a checkout and not from the image.
+webdemo/test.js
